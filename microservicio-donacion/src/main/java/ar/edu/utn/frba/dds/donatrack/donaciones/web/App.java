@@ -12,11 +12,11 @@ import ar.edu.utn.frba.dds.donatrack.donaciones.web.routes.BeneficiarioRoutes;
 import ar.edu.utn.frba.dds.donatrack.donaciones.web.routes.DonacionRoutes;
 import ar.edu.utn.frba.dds.donatrack.donaciones.web.routes.DonanteRoutes;
 import ar.edu.utn.frba.dds.donatrack.donaciones.web.routes.NecesidadRoutes;
-import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.comunicaciones.DispatcherEventos;
 import ar.edu.utn.frba.dds.donatrack.shared.ConfiguracionEntorno;
 import ar.edu.utn.frba.dds.donatrack.shared.ExceptionHandlers;
 import ar.edu.utn.frba.dds.donatrack.shared.GsonConfig;
 import io.javalin.Javalin;
+import io.javalin.rendering.template.JavalinHandlebars;
 
 public class App {
 
@@ -29,11 +29,6 @@ public class App {
   }
 
   public static Javalin crearApp() {
-    Javalin app = Javalin.create(config -> {
-      config.jsonMapper(GsonConfig.jsonMapper());
-      config.http.defaultContentType = "application/json";
-    });
-
     //Repositorios
     DonanteRepository donanteRepository = DonanteRepository.getInstancia();
     DonacionRepository donacionRepository = DonacionRepository.getInstancia();
@@ -49,16 +44,22 @@ public class App {
     NecesidadController necesidadController = new NecesidadController(benificiarioRepository, subcategoriaRepository);
     AsignacionController asignacionController = new AsignacionController(donacionRepository, benificiarioRepository, rankingRepository);
 
-    //Registramos las Rutas
-    app.get("/health", ctx -> ctx.json("Micro servicio de donaciones funcionando"));
-    DonanteRoutes.registrar(app, donanteController);
-    DonacionRoutes.registrar(app, donacionController);
-    BeneficiarioRoutes.registrar(app, beneficiarioController);
-    NecesidadRoutes.registrar(app, necesidadController);
-    AsignacionRoutes.registrar(app, asignacionController);
+    Javalin app = Javalin.create(config -> {
+      config.jsonMapper(GsonConfig.jsonMapper());
+      config.http.defaultContentType = "application/json";
+      config.fileRenderer(new JavalinHandlebars());
 
-    //Registramos las excepciones
-    ExceptionHandlers.registrar(app);
+      //Registramos las Rutas
+      config.routes.get("/health", ctx -> ctx.json("Micro servicio de donaciones funcionando"));
+      DonanteRoutes.registrar(config.routes, donanteController);
+      DonacionRoutes.registrar(config.routes, donacionController);
+      BeneficiarioRoutes.registrar(config.routes, beneficiarioController);
+      NecesidadRoutes.registrar(config.routes, necesidadController);
+      AsignacionRoutes.registrar(config.routes, asignacionController);
+
+      //Registramos las excepciones
+      ExceptionHandlers.registrar(config.routes);
+    });
 
     return app;
   }

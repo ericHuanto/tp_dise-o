@@ -76,20 +76,28 @@
             <!-- <version>6.3.0</version>
             <scope>compile</scope> -->
         </dependency>
+        <!-- Source: https://mvnrepository.com/artifact/org.slf4j/slf4j-simple
+             Motivo: Para registrar mensajes de log en consola, necesario para javalin-->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <!-- <version>2.0.16</version>
+            <scope>compile</scope> -->
+        </dependency>
+        <!-- Source: https://mvnrepository.com/artifact/io.javalin/javalin-rendering-handlebars
+            Motivo: Proporciona el motor de plantillas Handlebars para renderizar vistas en Javalin -->
+        <dependency>
+             <groupId>io.javalin</groupId>
+             <artifactId>javalin-rendering-handlebars</artifactId>
+             <!-- <version>7.2.4</version>
+             <scope>compile</scope> -->
+        </dependency>
         <!-- Source: https://mvnrepository.com/artifact/com.google.code.gson/gson
              Motivo: Para convertir/desconvertir JSON. -->
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
             <!-- <version>2.11.0</version>
-            <scope>compile</scope> -->
-        </dependency>
-        <!-- Source: https://mvnrepository.com/artifact/org.slf4j/slf4j-simple
-             Motivo: Para registrar mensajes de log en consola. necesario para javalin-->
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-simple</artifactId>
-            <!-- <version>2.0.16</version>
             <scope>compile</scope> -->
         </dependency>
         <!-- Source: https://mvnrepository.com/artifact/com.sun.mail/javax.mail

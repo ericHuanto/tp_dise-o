@@ -29,7 +29,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class App {
-
   public static final int PUERTO = 7071;
 
   public static void main(String[] args) {
@@ -56,17 +55,9 @@ public class App {
     resultado.app().start(PUERTO);
   }
 
-  private static long calcularMinutosHasta(LocalTime hora) {
-    long minutos = ChronoUnit.MINUTES.between(LocalTime.now(), hora);
-    return minutos < 0 ? minutos + 24 * 60 : minutos;
-  }
+  public record AppLogistica(Javalin app, ProcesoLogistica procesoLogistica) {}
 
   public static AppLogistica crearApp() {
-    Javalin app = Javalin.create(config -> {
-      config.jsonMapper(GsonConfig.jsonMapper());
-      config.http.defaultContentType = "application/json";
-    });
-
     //Servicios Externos
     ConectorDonacionesApi donacionesClient = new ConectorDonacionesApi();
     ClientePlanificadorExterno clienteExterno = new ClientePlanificadorExternoMock();
@@ -91,19 +82,28 @@ public class App {
     EntregaController entregaController = new EntregaController(entregaRepository, donacionesClient);
     CamionController camionController = new CamionController(camionRepository, gpsRepository);
 
-    //Registramos las Rutas
-    app.get("/health",ctx -> ctx.json("Micro servicio de logística funcionando"));
-    CamionRoutes.registrar(app, camionController);
-    RutaRoutes.registrar(app, rutaController);
-    EntregaRoutes.registrar(app, entregaController);
-    PlanificacionRoutes.registrar(app, planificacionController);
+    Javalin app = Javalin.create(config -> {
+      config.jsonMapper(GsonConfig.jsonMapper());
+      config.http.defaultContentType = "application/json";
 
-    //Registramos las excepciones
-    ExceptionHandlers.registrar(app);
+      // Registramos las Rutas usando config.routes
+      config.routes.get("/health", ctx -> ctx.json("Micro servicio de logística funcionando"));
+      CamionRoutes.registrar(config.routes, camionController);
+      RutaRoutes.registrar(config.routes, rutaController);
+      EntregaRoutes.registrar(config.routes, entregaController);
+      PlanificacionRoutes.registrar(config.routes, planificacionController);
+
+      // Registramos las excepciones usando config.routes
+      ExceptionHandlers.registrar(config.routes);
+    });
 
     return new AppLogistica(app, procesoLogistica);
   }
 
-  public record AppLogistica(Javalin app, ProcesoLogistica procesoLogistica) {}
+  //============= FUNCIONES AUXILIARES ====================
+  private static long calcularMinutosHasta(LocalTime hora) {
+    long minutos = ChronoUnit.MINUTES.between(LocalTime.now(), hora);
+    return minutos < 0 ? minutos + (24 * 60) : minutos;
+  }
 
 }
