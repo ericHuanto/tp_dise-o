@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>{{#block "nombre_pestaña"}}DonaTrack{{/block}}</title>
+</head>
+<body>
+    <!-- HEADER -->
+    {{> plantillas/header/header.hbs}}
+    <!-- MAIN -->
+    <main>
+        <nav> {{#block "breadcrumbs"}} <a href="/">Inicio</a> {{/block}} </nav>
+
+        {{#block "contenido_propio"}} {{/block}}
+    </main>
+    <!-- FOOTER -->
+    {{> plantillas/footer/footer.hbs}}
+</body>
+</html>

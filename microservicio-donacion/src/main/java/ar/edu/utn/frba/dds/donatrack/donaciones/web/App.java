@@ -2,11 +2,7 @@ package ar.edu.utn.frba.dds.donatrack.donaciones.web;
 
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.comunicaciones.SuscriptorNotificacion;
 import ar.edu.utn.frba.dds.donatrack.donaciones.persistencia.*;
-import ar.edu.utn.frba.dds.donatrack.donaciones.web.controller.AsignacionController;
-import ar.edu.utn.frba.dds.donatrack.donaciones.web.controller.BeneficiarioController;
-import ar.edu.utn.frba.dds.donatrack.donaciones.web.controller.DonacionController;
-import ar.edu.utn.frba.dds.donatrack.donaciones.web.controller.DonanteController;
-import ar.edu.utn.frba.dds.donatrack.donaciones.web.controller.NecesidadController;
+import ar.edu.utn.frba.dds.donatrack.donaciones.web.controller.*;
 import ar.edu.utn.frba.dds.donatrack.donaciones.web.routes.AsignacionRoutes;
 import ar.edu.utn.frba.dds.donatrack.donaciones.web.routes.BeneficiarioRoutes;
 import ar.edu.utn.frba.dds.donatrack.donaciones.web.routes.DonacionRoutes;
@@ -15,6 +11,9 @@ import ar.edu.utn.frba.dds.donatrack.donaciones.web.routes.NecesidadRoutes;
 import ar.edu.utn.frba.dds.donatrack.shared.ConfiguracionEntorno;
 import ar.edu.utn.frba.dds.donatrack.shared.ExceptionHandlers;
 import ar.edu.utn.frba.dds.donatrack.shared.GsonConfig;
+import com.github.jknack.handlebars.Handlebars;
+import com.github.jknack.handlebars.io.ClassPathTemplateLoader;
+import com.github.jknack.handlebars.io.TemplateLoader;
 import io.javalin.Javalin;
 import io.javalin.rendering.template.JavalinHandlebars;
 
@@ -43,14 +42,24 @@ public class App {
     BeneficiarioController beneficiarioController = new BeneficiarioController(benificiarioRepository);
     NecesidadController necesidadController = new NecesidadController(benificiarioRepository, subcategoriaRepository);
     AsignacionController asignacionController = new AsignacionController(donacionRepository, benificiarioRepository, rankingRepository);
+    HomeController homeController = new HomeController();
+    SesionController sesionController = new SesionController();
+    MapaController mapaController = new MapaController();
 
     Javalin app = Javalin.create(config -> {
       config.jsonMapper(GsonConfig.jsonMapper());
       config.http.defaultContentType = "application/json";
-      config.fileRenderer(new JavalinHandlebars());
+      TemplateLoader loader = new ClassPathTemplateLoader("/presentacion", "");
+      Handlebars motorHandlebars = new Handlebars(loader);
+      config.fileRenderer(new JavalinHandlebars(motorHandlebars));
 
       //Registramos las Rutas
       config.routes.get("/health", ctx -> ctx.json("Micro servicio de donaciones funcionando"));
+      config.routes.get("/", homeController::index);
+      config.routes.get("/registro", sesionController::iniciarRegistro);
+      config.routes.get("/login", sesionController::iniciarSesion);
+      config.routes.get("/entregas/galeria", mapaController::mostrarDonacionesEntregadas);
+
       DonanteRoutes.registrar(config.routes, donanteController);
       DonacionRoutes.registrar(config.routes, donacionController);
       BeneficiarioRoutes.registrar(config.routes, beneficiarioController);

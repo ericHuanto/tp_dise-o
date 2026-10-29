@@ -10,6 +10,8 @@ import com.google.gson.JsonSyntaxException;
 import io.javalin.Javalin;
 import io.javalin.config.RoutesConfig;
 
+import java.io.FileNotFoundException;
+
 public class ExceptionHandlers {
 
   public record ErrorResponse(int status, String error) { }
@@ -38,6 +40,12 @@ public class ExceptionHandlers {
     // Error en la BD
     ruta.exception(BaseDatoException.class, (e, ctx) -> {
       ctx.status(500).json(new ErrorResponse(500, e.getMessage()));
+    });
+    // Archivo .hbs No encontrado
+    ruta.exception(FileNotFoundException.class, (e, ctx) -> {
+      System.err.println("[Vista] Error de renderizado: ");
+      System.out.print("Faltó crear el archivo -> " + e.getMessage());
+      ctx.status(500).html("<h2>Error Interno: Vista no encontrada</h2>" + "<p>El sistema intentó cargar una pantalla, que no existe.</p>");
     });
     // Comodín atrapa todas las excepciones que no fueron, registradas
     ruta.exception(Exception.class, (e, ctx) -> {
