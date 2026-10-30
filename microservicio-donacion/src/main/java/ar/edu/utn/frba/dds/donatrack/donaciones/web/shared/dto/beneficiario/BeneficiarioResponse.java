@@ -1,0 +1,11 @@
+package ar.edu.utn.frba.dds.donatrack.donaciones.web.shared.dto.beneficiario;
+
+import ar.edu.utn.frba.dds.donatrack.donaciones.web.shared.dto.contacto.ContactoDto;
+import java.util.List;
+
+public record BeneficiarioResponse(
+    Long id,
+    String razonSocial,
+    String direccion,
+    List<ContactoDto> contactos
+) { }

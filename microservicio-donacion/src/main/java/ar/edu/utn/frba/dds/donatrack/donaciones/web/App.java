@@ -2,12 +2,18 @@ package ar.edu.utn.frba.dds.donatrack.donaciones.web;
 
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.comunicaciones.SuscriptorNotificacion;
 import ar.edu.utn.frba.dds.donatrack.donaciones.persistencia.*;
-import ar.edu.utn.frba.dds.donatrack.donaciones.web.controller.*;
-import ar.edu.utn.frba.dds.donatrack.donaciones.web.routes.AsignacionRoutes;
-import ar.edu.utn.frba.dds.donatrack.donaciones.web.routes.BeneficiarioRoutes;
-import ar.edu.utn.frba.dds.donatrack.donaciones.web.routes.DonacionRoutes;
-import ar.edu.utn.frba.dds.donatrack.donaciones.web.routes.DonanteRoutes;
-import ar.edu.utn.frba.dds.donatrack.donaciones.web.routes.NecesidadRoutes;
+import ar.edu.utn.frba.dds.donatrack.donaciones.web.api.controller.*;
+import ar.edu.utn.frba.dds.donatrack.donaciones.web.api.routes.AsignacionApiRoutes;
+import ar.edu.utn.frba.dds.donatrack.donaciones.web.api.routes.BeneficiarioApiRoutes;
+import ar.edu.utn.frba.dds.donatrack.donaciones.web.api.routes.DonacionApiRoutes;
+import ar.edu.utn.frba.dds.donatrack.donaciones.web.api.routes.DonanteApiRoutes;
+import ar.edu.utn.frba.dds.donatrack.donaciones.web.api.routes.NecesidadApiRoutes;
+import ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.controller.HomeController;
+import ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.controller.MapaController;
+import ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.controller.SesionController;
+import ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.routes.HomeRoutes;
+import ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.routes.MapaRoutes;
+import ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.routes.SesionRoutes;
 import ar.edu.utn.frba.dds.donatrack.shared.ConfiguracionEntorno;
 import ar.edu.utn.frba.dds.donatrack.shared.ExceptionHandlers;
 import ar.edu.utn.frba.dds.donatrack.shared.GsonConfig;
@@ -16,6 +22,7 @@ import com.github.jknack.handlebars.io.ClassPathTemplateLoader;
 import com.github.jknack.handlebars.io.TemplateLoader;
 import io.javalin.Javalin;
 import io.javalin.rendering.template.JavalinHandlebars;
+import static io.javalin.apibuilder.ApiBuilder.path;
 
 public class App {
 
@@ -37,11 +44,11 @@ public class App {
     CategoriaRepository categoriaRepository = CategoriaRepository.getInstancia();
 
     //Controllers
-    DonanteController donanteController = new DonanteController(donanteRepository);
-    DonacionController donacionController = new DonacionController(donacionRepository, donanteRepository, subcategoriaRepository, categoriaRepository);
-    BeneficiarioController beneficiarioController = new BeneficiarioController(benificiarioRepository);
-    NecesidadController necesidadController = new NecesidadController(benificiarioRepository, subcategoriaRepository);
-    AsignacionController asignacionController = new AsignacionController(donacionRepository, benificiarioRepository, rankingRepository);
+    DonanteApiController donanteApiController = new DonanteApiController(donanteRepository);
+    DonacionApiController donacionApiController = new DonacionApiController(donacionRepository, donanteRepository, subcategoriaRepository, categoriaRepository);
+    BeneficiarioApiController beneficiarioApiController = new BeneficiarioApiController(benificiarioRepository);
+    NecesidadApiController necesidadApiController = new NecesidadApiController(benificiarioRepository, subcategoriaRepository);
+    AsignacionApiController asignacionApiController = new AsignacionApiController(donacionRepository, benificiarioRepository, rankingRepository);
     HomeController homeController = new HomeController();
     SesionController sesionController = new SesionController();
     MapaController mapaController = new MapaController();
@@ -53,18 +60,18 @@ public class App {
       Handlebars motorHandlebars = new Handlebars(loader);
       config.fileRenderer(new JavalinHandlebars(motorHandlebars));
 
-      //Registramos las Rutas
+      //Registramos las rutas
       config.routes.get("/health", ctx -> ctx.json("Micro servicio de donaciones funcionando"));
-      config.routes.get("/", homeController::index);
-      config.routes.get("/registro", sesionController::iniciarRegistro);
-      config.routes.get("/login", sesionController::iniciarSesion);
-      config.routes.get("/entregas/galeria", mapaController::mostrarDonacionesEntregadas);
-
-      DonanteRoutes.registrar(config.routes, donanteController);
-      DonacionRoutes.registrar(config.routes, donacionController);
-      BeneficiarioRoutes.registrar(config.routes, beneficiarioController);
-      NecesidadRoutes.registrar(config.routes, necesidadController);
-      AsignacionRoutes.registrar(config.routes, asignacionController);
+      //rutas que devuelven json
+      DonanteApiRoutes.registrar(config.routes, donanteApiController);
+      DonacionApiRoutes.registrar(config.routes, donacionApiController);
+      BeneficiarioApiRoutes.registrar(config.routes, beneficiarioApiController);
+      NecesidadApiRoutes.registrar(config.routes, necesidadApiController);
+      AsignacionApiRoutes.registrar(config.routes, asignacionApiController);
+      //rutas que devuelven vistas
+      HomeRoutes.registrar(config.routes, homeController);
+      SesionRoutes.registrar(config.routes, sesionController);
+      MapaRoutes.registrar(config.routes, mapaController);
 
       //Registramos las excepciones
       ExceptionHandlers.registrar(config.routes);
