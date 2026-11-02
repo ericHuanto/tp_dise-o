@@ -139,7 +139,7 @@
                             <archive>
                                 <manifest>
                                     <!-- Apunta al Main de Logística -->
-                                    <mainClass>ar.edu.utn.frba.dds.donatrack.logistica.Main</mainClass>
+                                    <mainClass>ar.edu.utn.frba.dds.donatrack.logistica.web.App</mainClass>
                                 </manifest>
                             </archive>
                             <finalName>donatrack-logistica</finalName>

@@ -160,7 +160,7 @@
                             <archive>
                                 <manifest>
                                     <!-- Apunta al Main de Donaciones -->
-                                    <mainClass>ar.edu.utn.frba.dds.donatrack.donaciones.Main</mainClass>
+                                    <mainClass>ar.edu.utn.frba.dds.donatrack.donaciones.web.App</mainClass>
                                 </manifest>
                             </archive>
                             <finalName>donatrack-donaciones</finalName>
