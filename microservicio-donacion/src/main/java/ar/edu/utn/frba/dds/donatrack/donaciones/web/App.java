@@ -38,7 +38,7 @@ public class App {
     //Repositorios
     DonanteRepository donanteRepository = DonanteRepository.getInstancia();
     DonacionRepository donacionRepository = DonacionRepository.getInstancia();
-    BeneficiarioRepository benificiarioRepository = BeneficiarioRepository.getInstancia();
+    BeneficiarioRepository beneficiarioRepository = BeneficiarioRepository.getInstancia();
     RankingRepository rankingRepository = RankingRepository.getInstancia();
     SubcategoriaRepository subcategoriaRepository = SubcategoriaRepository.getInstancia();
     CategoriaRepository categoriaRepository = CategoriaRepository.getInstancia();
