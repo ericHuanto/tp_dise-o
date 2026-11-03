@@ -42,6 +42,7 @@ public class App {
     RankingRepository rankingRepository = RankingRepository.getInstancia();
     SubcategoriaRepository subcategoriaRepository = SubcategoriaRepository.getInstancia();
     CategoriaRepository categoriaRepository = CategoriaRepository.getInstancia();
+    UsuarioRepository usuarioRepository = UsuarioRepository.getInstancia();
 
     //Controllers
     DonanteApiController donanteApiController = new DonanteApiController(donanteRepository);
@@ -50,7 +51,7 @@ public class App {
     NecesidadApiController necesidadApiController = new NecesidadApiController(benificiarioRepository, subcategoriaRepository);
     AsignacionApiController asignacionApiController = new AsignacionApiController(donacionRepository, benificiarioRepository, rankingRepository);
     HomeController homeController = new HomeController();
-    SesionController sesionController = new SesionController();
+    SesionController sesionController = new SesionController(usuarioRepository);
     MapaController mapaController = new MapaController();
 
     Javalin app = Javalin.create(config -> {

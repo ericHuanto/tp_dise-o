@@ -1,0 +1,23 @@
+{{#partial "nombre_pestaña"}}
+    Iniciar Sesión - DonaTrack
+{{/partial}}
+
+{{#partial "contenido_propio"}}
+    <section class="login-container">
+        <h2>Iniciar Sesión</h2>
+
+        <form action="/login" method="post">
+            <label for="nombre_usuario">Nombre de usuario:</label>
+            <input type="text" id="nombre_usuario" name="name" required>
+
+            <label for="contrasenia">Contraseña:</label>
+            <input type="password" id="contrasenia" name="password" required>
+
+            <button type="submit" >Ingresar</button>
+        </form>
+
+        <p>¿No tienes cuenta? <a href="/registro">Regístrate aquí</a></p>
+    </section>
+{{/partial}}
+
+{{> plantillas/layout_publico.hbs}}

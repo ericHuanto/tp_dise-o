@@ -2,6 +2,7 @@ package ar.edu.utn.frba.dds.donatrack.donaciones.dominio.beneficiario;
 
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.donacion.Donacion;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.donacion.TipoEstadoDonacion;
+import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.usuario.Usuario;
 import ar.edu.utn.frba.dds.donatrack.shared.excepciones.DominioException;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.mediocontacto.MedioContacto;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.necesidades.Necesidad;
@@ -9,10 +10,8 @@ import ar.edu.utn.frba.dds.donatrack.shared.excepciones.RecursoNoEncontradoExcep
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.*;
-
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Getter
 @NoArgsConstructor
@@ -34,6 +33,9 @@ public class Beneficiario {
   private List<Necesidad> necesidades;
   @OneToMany(mappedBy = "beneficiario") //Intentar evitar mappedBy. Relaciones bidireccionales son costosas de mantener
   private List<Donacion> donaciones;
+  @OneToOne
+  @JoinColumn(name = "id_usuario")
+  private Usuario usuario;
 
   public Beneficiario(String razonSocial, String direccion, List<MedioContacto> contactos) {
     checkDatos(razonSocial, contactos);
@@ -42,6 +44,7 @@ public class Beneficiario {
     this.contactos = new ArrayList<>(contactos);
     this.necesidades = new ArrayList<>();
     this.donaciones = new ArrayList<>();
+    this.usuario = null;
   }
 
   private void checkDatos(String razonSocial, List<MedioContacto> contactos) {
@@ -89,6 +92,10 @@ public class Beneficiario {
     contactos.forEach(c -> c.enviarMensaje(mensaje));
   }
 
+  public void vincularUsuario(Usuario usuario) {
+    this.usuario = usuario;
+  }
+
   public Boolean esIgual(Beneficiario otroBeneficiario) {
     return razonSocial.equalsIgnoreCase(otroBeneficiario.getRazonSocial());
   }
@@ -100,9 +107,4 @@ public class Beneficiario {
     this.contactos = new ArrayList<>(contactos);
   }
 
-  public void addContacto(MedioContacto contacto) {
-    if (contacto != null) {
-      this.contactos.add(contacto);
-    }
-  }
 }
