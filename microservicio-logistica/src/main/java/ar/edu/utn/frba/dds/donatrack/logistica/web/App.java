@@ -19,6 +19,7 @@ import ar.edu.utn.frba.dds.donatrack.logistica.web.routes.PlanificacionRoutes;
 import ar.edu.utn.frba.dds.donatrack.logistica.web.routes.RutaRoutes;
 import ar.edu.utn.frba.dds.donatrack.logistica.persistencia.EntregaRepository;
 import ar.edu.utn.frba.dds.donatrack.logistica.web.routes.CamionRoutes;
+import ar.edu.utn.frba.dds.donatrack.shared.ConfiguracionEntorno;
 import ar.edu.utn.frba.dds.donatrack.shared.ExceptionHandlers;
 import ar.edu.utn.frba.dds.donatrack.shared.GsonConfig;
 import io.javalin.Javalin;
@@ -32,6 +33,13 @@ public class App {
   public static final int PUERTO = 7071;
 
   public static void main(String[] args) {
+    ConfiguracionEntorno config = ConfiguracionEntorno.getInstance();
+
+    //Cargo credenciales para la db desde el .env
+    System.setProperty("hibernate.connection.url", config.getDbUrlLogistica());
+    System.setProperty("hibernate.connection.username", config.getDbUser());
+    System.setProperty("hibernate.connection.password", config.getDbPassword());
+
     AppLogistica resultado = crearApp();
 
     ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
@@ -52,7 +60,7 @@ public class App {
 
     System.out.println("[Cron] Planificación programada en " + minutosHasta + " minutos");
     DatosIniciales.init();
-    resultado.app().start(PUERTO);
+    resultado.app().start(config.puertoLogistica(PUERTO));
   }
 
   public record AppLogistica(Javalin app, ProcesoLogistica procesoLogistica) {}

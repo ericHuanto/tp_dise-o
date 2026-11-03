@@ -29,16 +29,23 @@ public class App {
   public static final int PUERTO = 7070;
 
   public static void main(String[] args) {
+    ConfiguracionEntorno config = ConfiguracionEntorno.getInstance();
+
+    //Cargo credenciales para la db desde el .env
+    System.setProperty("hibernate.connection.url", config.getDbUrlDonaciones());
+    System.setProperty("hibernate.connection.username", config.getDbUser());
+    System.setProperty("hibernate.connection.password", config.getDbPassword());
+
     DatosIniciales.init();
     SuscriptorNotificacion.init();
-    crearApp().start(ConfiguracionEntorno.getInstance().puertoDonaciones(PUERTO));
+    crearApp().start(config.puertoDonaciones(PUERTO));
   }
 
   public static Javalin crearApp() {
     //Repositorios
     DonanteRepository donanteRepository = DonanteRepository.getInstancia();
     DonacionRepository donacionRepository = DonacionRepository.getInstancia();
-    BeneficiarioRepository benificiarioRepository = BeneficiarioRepository.getInstancia();
+    BeneficiarioRepository beneficiarioRepository = BeneficiarioRepository.getInstancia();
     RankingRepository rankingRepository = RankingRepository.getInstancia();
     SubcategoriaRepository subcategoriaRepository = SubcategoriaRepository.getInstancia();
     CategoriaRepository categoriaRepository = CategoriaRepository.getInstancia();
@@ -47,9 +54,9 @@ public class App {
     //Controllers
     DonanteApiController donanteApiController = new DonanteApiController(donanteRepository);
     DonacionApiController donacionApiController = new DonacionApiController(donacionRepository, donanteRepository, subcategoriaRepository, categoriaRepository);
-    BeneficiarioApiController beneficiarioApiController = new BeneficiarioApiController(benificiarioRepository);
-    NecesidadApiController necesidadApiController = new NecesidadApiController(benificiarioRepository, subcategoriaRepository);
-    AsignacionApiController asignacionApiController = new AsignacionApiController(donacionRepository, benificiarioRepository, rankingRepository);
+    BeneficiarioApiController beneficiarioApiController = new BeneficiarioApiController(beneficiarioRepository);
+    NecesidadApiController necesidadApiController = new NecesidadApiController(beneficiarioRepository, subcategoriaRepository);
+    AsignacionApiController asignacionApiController = new AsignacionApiController(donacionRepository, beneficiarioRepository, rankingRepository);
     HomeController homeController = new HomeController();
     SesionController sesionController = new SesionController(usuarioRepository);
     MapaController mapaController = new MapaController();
