@@ -10,9 +10,11 @@ import ar.edu.utn.frba.dds.donatrack.donaciones.web.api.routes.DonanteApiRoutes;
 import ar.edu.utn.frba.dds.donatrack.donaciones.web.api.routes.NecesidadApiRoutes;
 import ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.controller.HomeController;
 import ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.controller.MapaController;
+import ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.controller.PerfilController;
 import ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.controller.SesionController;
 import ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.routes.HomeRoutes;
 import ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.routes.MapaRoutes;
+import ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.routes.PerfilRoutes;
 import ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.routes.SesionRoutes;
 import ar.edu.utn.frba.dds.donatrack.shared.ConfiguracionEntorno;
 import ar.edu.utn.frba.dds.donatrack.shared.ExceptionHandlers;
@@ -31,11 +33,11 @@ public class App {
   public static void main(String[] args) {
     ConfiguracionEntorno config = ConfiguracionEntorno.getInstance();
 
-    //Cargo credenciales para la db desde el .env
+    //Cargo credenciales para la db desde el .env TODO esta configuracion deberia estar en persistence.xml
     System.setProperty("hibernate.connection.url", config.getDbUrlDonaciones());
     System.setProperty("hibernate.connection.username", config.getDbUser());
     System.setProperty("hibernate.connection.password", config.getDbPassword());
-
+    //Si te sale error por el momento puedes usar la opción: 3 del meta-inf
     DatosIniciales.init();
     SuscriptorNotificacion.init();
     crearApp().start(config.puertoDonaciones(PUERTO));
@@ -59,6 +61,7 @@ public class App {
     AsignacionApiController asignacionApiController = new AsignacionApiController(donacionRepository, beneficiarioRepository, rankingRepository);
     HomeController homeController = new HomeController();
     SesionController sesionController = new SesionController(usuarioRepository);
+    PerfilController perfilController = new PerfilController(donanteRepository, beneficiarioRepository, usuarioRepository);
     MapaController mapaController = new MapaController();
 
     Javalin app = Javalin.create(config -> {
@@ -79,6 +82,7 @@ public class App {
       //rutas que devuelven vistas
       HomeRoutes.registrar(config.routes, homeController);
       SesionRoutes.registrar(config.routes, sesionController);
+      PerfilRoutes.registrar(config.routes, perfilController);
       MapaRoutes.registrar(config.routes, mapaController);
 
       //Registramos las excepciones

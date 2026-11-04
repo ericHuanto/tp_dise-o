@@ -1,0 +1,64 @@
+{{#partial "nombre_pestaña"}}
+    Registro Beneficiario - DonaTrack
+{{/partial}}
+
+{{#partial "contenido_propio"}}
+    <section>
+        <h2>Complete Los Datos</h2>
+        <h3>porfavor {{usuario.nombreUsuario}}, para terminar el registro</h3>
+
+        <form action="/perfil/beneficiario" method="POST">
+            <label for="razon_social">Razon social:</label>
+            <input type="text" id="razon_social" name="razonSocial" required>
+
+            <label for="direccion">Dirección física:</label>
+            <input type="text" id="direccion" name="direccion">
+
+            <div class="contacto-principal">
+                <label>Contacto Principal:</label>
+                <select name="medio_principal" required>
+                    <option value="EMAIL">Email</option>
+                    <option value="WHATSAPP">WhatsApp</option>
+                    <option value="SMS">SMS</option>
+                </select>
+                <input type="text" name="valor_principal" required>
+            </div>
+
+            <!-- CONTACTOS ADICIONALES OPCIONALES -->
+            <div>
+                <div id="contenedor-contactos"></div>
+                <button type="button" onclick="agregarContacto()">+ Agregar contacto adicional</button>
+            </div>
+
+            <button type="submit">Finalizar Registro</button>
+        </form>
+    </section>
+{{/partial}}
+
+{{#partial "scripts"}}
+    <script>
+        function agregarContacto() {
+            const contenedor = document.getElementById('contenedor-contactos');
+            const nuevaFila = document.createElement('div');
+            nuevaFila.className = 'contacto-row';
+
+            nuevaFila.innerHTML = `
+                <select name="medios[]" required>
+                    <option value="EMAIL">Email</option>
+                    <option value="WHATSAPP">WhatsApp</option>
+                    <option value="SMS">SMS</option>
+                </select>
+                <input type="text" name="valores[]" required>
+                <select name="principales[]">
+                    <option value="true">Es Principal</option>
+                    <option selected value="false">Secundario</option>
+                </select>
+                <button type="button" onclick="this.parentElement.remove()">Eliminar</button>
+            `;
+
+            contenedor.appendChild(nuevaFila);
+        }
+    </script>
+{{/partial}}
+
+{{> plantillas/layout_publico.hbs}}
