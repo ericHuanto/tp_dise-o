@@ -20,6 +20,9 @@ public class BeneficiarioRepository implements WithSimplePersistenceUnit {
   }
 
   public void guardar(Beneficiario beneficiario) {
+    if (beneficiario.getId() != null) {
+      throw new BaseDatoException("No se puede guardar: El Beneficiario ya tiene un ID asignado (ya existe).");
+    }
     entityManager().persist(beneficiario);
   }
 

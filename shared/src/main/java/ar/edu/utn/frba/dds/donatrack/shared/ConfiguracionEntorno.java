@@ -62,6 +62,21 @@ public class ConfiguracionEntorno {
       return hostPorDefecto;
     }
     return valor;
+
+  public String getDbUrlDonaciones() {
+    return obtenerObligatorio("DB_URL_DONACIONES");
+  }
+
+  public String getDbUrlLogistica() {
+    return obtenerObligatorio("DB_URL_LOGISTICA");
+  }
+
+  public String getDbUser() {
+    return obtenerObligatorio("DB_USER");
+  }
+
+  public String getDbPassword() {
+    return obtenerObligatorio("DB_PASSWORD");
   }
 
   //=================== FUNCIONES AUXILIARES =====================

@@ -1,6 +1,7 @@
 package ar.edu.utn.frba.dds.donatrack.donaciones.persistencia;
 
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.donante.Donante;
+import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.usuario.Usuario;
 import ar.edu.utn.frba.dds.donatrack.shared.excepciones.RegistroNoEncontradoException;
 import io.github.flbulgarelli.jpa.extras.simple.WithSimplePersistenceUnit;
 import java.util.List;
@@ -52,6 +53,15 @@ public class DonanteRepository implements WithSimplePersistenceUnit {
 
   public void eliminar(Donante donante) {
     entityManager().remove(donante);
+  }
+
+  public Donante buscarPorUsuario(Usuario usuario) {
+    return entityManager()
+        .createQuery("SELECT d FROM Donante d WHERE d.usuario.id = :idUsuario", Donante.class)
+        .setParameter("idUsuario", usuario.getId())
+        .getResultStream()
+        .findFirst()
+        .orElse(null);
   }
 
 }
