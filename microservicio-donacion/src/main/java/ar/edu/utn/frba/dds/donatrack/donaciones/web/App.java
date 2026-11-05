@@ -8,10 +8,12 @@ import ar.edu.utn.frba.dds.donatrack.donaciones.web.api.routes.BeneficiarioApiRo
 import ar.edu.utn.frba.dds.donatrack.donaciones.web.api.routes.DonacionApiRoutes;
 import ar.edu.utn.frba.dds.donatrack.donaciones.web.api.routes.DonanteApiRoutes;
 import ar.edu.utn.frba.dds.donatrack.donaciones.web.api.routes.NecesidadApiRoutes;
+import ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.controller.DonanteController;
 import ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.controller.HomeController;
 import ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.controller.MapaController;
 import ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.controller.PerfilController;
 import ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.controller.SesionController;
+import ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.routes.DonanteRoutes;
 import ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.routes.HomeRoutes;
 import ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.routes.MapaRoutes;
 import ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.routes.PerfilRoutes;
@@ -24,6 +26,7 @@ import com.github.jknack.handlebars.io.ClassPathTemplateLoader;
 import com.github.jknack.handlebars.io.TemplateLoader;
 import io.javalin.Javalin;
 import io.javalin.rendering.template.JavalinHandlebars;
+import com.github.jknack.handlebars.helper.ConditionalHelpers;
 import static io.javalin.apibuilder.ApiBuilder.path;
 
 public class App {
@@ -63,12 +66,16 @@ public class App {
     SesionController sesionController = new SesionController(usuarioRepository);
     PerfilController perfilController = new PerfilController(donanteRepository, beneficiarioRepository, usuarioRepository);
     MapaController mapaController = new MapaController();
+    DonanteController donanteController = new DonanteController(donanteRepository, donacionRepository, categoriaRepository, subcategoriaRepository);
 
     Javalin app = Javalin.create(config -> {
       config.jsonMapper(GsonConfig.jsonMapper());
       config.http.defaultContentType = "application/json";
       TemplateLoader loader = new ClassPathTemplateLoader("/presentacion", "");
       Handlebars motorHandlebars = new Handlebars(loader);
+      for (ConditionalHelpers helper : ConditionalHelpers.values()) {
+        motorHandlebars.registerHelper(helper.name(), helper);
+      }
       config.fileRenderer(new JavalinHandlebars(motorHandlebars));
 
       //Registramos las rutas
@@ -84,6 +91,7 @@ public class App {
       SesionRoutes.registrar(config.routes, sesionController);
       PerfilRoutes.registrar(config.routes, perfilController);
       MapaRoutes.registrar(config.routes, mapaController);
+      DonanteRoutes.registrar(config.routes, donanteController);
 
       //Registramos las excepciones
       ExceptionHandlers.registrar(config.routes);
