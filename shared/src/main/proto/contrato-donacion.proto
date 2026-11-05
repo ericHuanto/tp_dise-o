@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "ar.edu.utn.frba.dds.donatrack.grpc";
+
+service DonacionesService {
+  rpc BuscarDonacionesAsignadas (Vacio) returns (ListaDonaciones);
+  rpc MarcarListaParaEntregar  (DonacionId) returns (Resultado);
+  rpc MarcarEnCamino           (EnCaminoRequest) returns (Resultado);
+  rpc MarcarEntregada          (EntregadaRequest) returns (Resultado);
+  rpc MarcarErrorEntrega       (ErrorEntregaRequest) returns (Resultado);
+  rpc MarcarVueltaDeposito     (DonacionId) returns (Resultado);
+}
+
+message Vacio {}
+message DonacionId { int64 id = 1; }
+message EnCaminoRequest { int64 id = 1; string link_mapa = 2; }
+message EntregadaRequest { int64 id = 1; string link_comprobante_entrega = 2; }
+message ErrorEntregaRequest { int64 id = 1; string observacion = 2; }
+message Resultado { string mensaje = 1; }
+
+message BeneficiarioMsg { int64 id = 1; string razon_social = 2; string direccion = 3; }
+message DonacionMsg { int64 id = 1; string descripcion = 2; BeneficiarioMsg beneficiario = 3; }
+message ListaDonaciones { repeated DonacionMsg donaciones = 1; }

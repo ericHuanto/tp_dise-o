@@ -87,10 +87,10 @@
         <!-- Source: https://mvnrepository.com/artifact/io.javalin/javalin-rendering-handlebars
             Motivo: Proporciona el motor de plantillas Handlebars para renderizar vistas en Javalin -->
         <dependency>
-             <groupId>io.javalin</groupId>
-             <artifactId>javalin-rendering-handlebars</artifactId>
-             <!-- <version>7.2.4</version>
-             <scope>compile</scope> -->
+            <groupId>io.javalin</groupId>
+            <artifactId>javalin-rendering-handlebars</artifactId>
+            <!-- <version>7.2.4</version>
+            <scope>compile</scope> -->
         </dependency>
         <!-- Source: https://mvnrepository.com/artifact/com.google.code.gson/gson
              Motivo: Para convertir/desconvertir JSON. -->
@@ -160,7 +160,7 @@
                             <archive>
                                 <manifest>
                                     <!-- Apunta al Main de Donaciones -->
-                                    <mainClass>ar.edu.utn.frba.dds.donatrack.donaciones.Main</mainClass>
+                                    <mainClass>ar.edu.utn.frba.dds.donatrack.donaciones.web.App</mainClass>
                                 </manifest>
                             </archive>
                             <finalName>donatrack-donaciones</finalName>

@@ -3,6 +3,7 @@ package ar.edu.utn.frba.dds.donatrack.logistica.web;
 import ar.edu.utn.frba.dds.donatrack.logistica.persistencia.BeneficiarioRepository;
 import ar.edu.utn.frba.dds.donatrack.logistica.persistencia.DatosIniciales;
 import ar.edu.utn.frba.dds.donatrack.logistica.persistencia.GpsRepository;
+import ar.edu.utn.frba.dds.donatrack.logistica.persistencia.WithLogisticaPersistenceUnit;
 import ar.edu.utn.frba.dds.donatrack.logistica.web.controllers.CamionController;
 import ar.edu.utn.frba.dds.donatrack.logistica.web.controllers.PlanificacionController;
 import ar.edu.utn.frba.dds.donatrack.logistica.web.coordinadores.CoordinadorRuta;
@@ -10,6 +11,8 @@ import ar.edu.utn.frba.dds.donatrack.logistica.cron.ProcesoLogistica;
 import ar.edu.utn.frba.dds.donatrack.logistica.web.integracion.planificadorexterno.ClientePlanificadorExterno;
 import ar.edu.utn.frba.dds.donatrack.logistica.web.integracion.planificadorexterno.ClientePlanificadorExternoMock;
 import ar.edu.utn.frba.dds.donatrack.logistica.web.integracion.microserviciosdonaciones.ConectorDonacionesApi;
+import ar.edu.utn.frba.dds.donatrack.logistica.web.integracion.microserviciosdonaciones.ConectorDonacionesGrpc;
+import ar.edu.utn.frba.dds.donatrack.logistica.web.integracion.microserviciosdonaciones.ConectorDonaciones;
 import ar.edu.utn.frba.dds.donatrack.logistica.web.controllers.RutaController;
 import ar.edu.utn.frba.dds.donatrack.logistica.web.controllers.EntregaController;
 import ar.edu.utn.frba.dds.donatrack.logistica.persistencia.CamionRepository;
@@ -59,7 +62,8 @@ public class App {
 
   public static AppLogistica crearApp() {
     //Servicios Externos
-    ConectorDonacionesApi donacionesClient = new ConectorDonacionesApi();
+    //ConectorDonacionesApi donacionesClient = new ConectorDonacionesApi();
+    ConectorDonaciones donacionesClient = new ConectorDonacionesGrpc();
     ClientePlanificadorExterno clienteExterno = new ClientePlanificadorExternoMock();
 
     //Repositorios
@@ -95,6 +99,14 @@ public class App {
 
       // Registramos las excepciones usando config.routes
       ExceptionHandlers.registrar(config.routes);
+
+      config.routes.after(ctx -> {
+        var acceso = WithLogisticaPersistenceUnit.PER_THREAD_ENTITY_MANAGER_ACCESS;
+        if (acceso.isAttached() && acceso.get().getTransaction().isActive()) {
+          acceso.get().getTransaction().rollback();
+        }
+        WithLogisticaPersistenceUnit.dispose();
+      });
     });
 
     return new AppLogistica(app, procesoLogistica);
