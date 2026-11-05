@@ -62,6 +62,7 @@ public class ConfiguracionEntorno {
       return hostPorDefecto;
     }
     return valor;
+  }
 
   public String getDbUrlDonaciones() {
     return obtenerObligatorio("DB_URL_DONACIONES");
