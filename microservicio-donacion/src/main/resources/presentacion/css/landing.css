@@ -1,0 +1,298 @@
+:root {
+    --primary-color: #F1F0E8;
+    --accent-dark: #1A1A1A;
+    --accent-green: #3B6B5B;
+    --text-muted: #555555;
+    --white: #FFFFFF;
+    --border-color: #D1D0C4;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+body {
+    background-color: var(--primary-color);
+    color: var(--accent-dark);
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/*
+   HEADER GLOBAL
+*/
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 60px;
+    background-color: var(--white);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.header-left, .header-right {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+}
+
+.logo-footer {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 700;
+    font-size: 1.2rem;
+}
+
+.icono-logo {
+    background-color: var(--accent-green);
+    color: var(--white);
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    font-size: 1rem;
+}
+
+.header-left a, .header-right a {
+    text-decoration: none;
+    font-size: 0.95rem;
+    color: var(--text-muted);
+}
+
+.header-right a:hover, .header-left a:hover {
+    color: var(--accent-dark);
+}
+
+.btn-primary {
+    background-color: var(--accent-dark);
+    color: var(--white) !important;
+    padding: 10px 24px;
+    border-radius: 6px;
+    transition: opacity 0.2s;
+    font-weight: 500;
+}
+
+.btn-primary:hover {
+    opacity: 0.9;
+}
+
+.btn-secondary {
+    background-color: transparent;
+    color: var(--accent-dark);
+    border: 1px solid var(--border-color);
+    padding: 10px 24px;
+    border-radius: 6px;
+    font-weight: 500;
+}
+
+/*
+   MAIN Y HERO SECTION
+*/
+main {
+    flex: 1;
+    padding: 60px;
+    max-width: 1400px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.hero-section {
+    display: flex;
+    gap: 60px;
+    margin-bottom: 80px;
+}
+
+.hero-content {
+    flex: 1;
+    max-width: 600px;
+}
+
+.etiqueta-trazabilidad {
+    display: inline-block;
+    background-color: #D3E0D7;
+    color: var(--accent-green);
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 6px 12px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    letter-spacing: 0.5px;
+}
+
+.hero-content h1 {
+    font-size: 4rem;
+    font-weight: 700;
+    line-height: 1.1;
+    margin-bottom: 25px;
+    color: var(--accent-dark);
+}
+
+.hero-content p {
+    font-size: 1.15rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+    margin-bottom: 40px;
+}
+
+.botones-hero {
+    display: flex;
+    gap: 15px;
+}
+
+/*
+   TARJETA DE ENTREGAS
+ */
+.tarjeta-entregas {
+    flex: 1;
+    background-color: var(--white);
+    border-radius: 12px;
+    padding: 30px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+    border: 1px solid var(--border-color);
+    max-width: 500px;
+}
+
+.tarjeta-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.tarjeta-header h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.badge-entregado {
+    background-color: #E8F5E9;
+    color: #2E7D32;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+.lista-entregas {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.item-entrega {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    border-bottom: 1px solid #F0F0F0;
+    padding-bottom: 15px;
+}
+
+.item-entrega:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.item-imagen {
+    width: 48px;
+    height: 48px;
+    background-color: var(--primary-color);
+    border-radius: 8px;
+}
+
+.item-info {
+    flex: 1;
+}
+
+.item-info h4 {
+    font-size: 0.95rem;
+    margin-bottom: 4px;
+    color: var(--accent-dark);
+}
+
+.item-info p {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.item-fecha {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.link-mapa {
+    display: block;
+    margin-top: 25px;
+    font-size: 0.9rem;
+    color: var(--accent-green);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+/*
+   SECCIÓN CÓMO FUNCIONA
+*/
+.como-funciona-etiqueta {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--accent-green);
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+}
+
+.seccion-pasos h2 {
+    font-size: 2rem;
+    margin-bottom: 40px;
+}
+
+.grid-pasos {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 25px;
+}
+
+.tarjeta-paso {
+    background-color: var(--white);
+    padding: 30px;
+    border-radius: 10px;
+    border: 1px solid var(--border-color);
+}
+
+.tarjeta-paso .numero {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--accent-green);
+    margin-bottom: 15px;
+}
+
+.tarjeta-paso h3 {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+}
+
+.tarjeta-paso p {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+}
+
+footer {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px 60px;
+    border-top: 1px solid var(--border-color);
+    background-color: var(--primary-color);
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+footer a {
+    color: var(--text-muted);
+    text-decoration: none;
+}

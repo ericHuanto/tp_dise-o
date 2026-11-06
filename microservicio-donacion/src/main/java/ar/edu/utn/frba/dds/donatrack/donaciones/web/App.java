@@ -91,6 +91,7 @@ public class App {
     Javalin app = Javalin.create(config -> {
       config.jsonMapper(GsonConfig.jsonMapper());
       config.http.defaultContentType = "application/json";
+      config.staticFiles.add("/presentacion", io.javalin.http.staticfiles.Location.CLASSPATH);
       TemplateLoader loader = new ClassPathTemplateLoader("/presentacion", "");
       Handlebars motorHandlebars = new Handlebars(loader);
       for (ConditionalHelpers helper : ConditionalHelpers.values()) {
