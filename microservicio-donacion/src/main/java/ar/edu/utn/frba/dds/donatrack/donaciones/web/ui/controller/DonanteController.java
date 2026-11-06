@@ -1,8 +1,10 @@
 package ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.controller;
+import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.beneficiario.Beneficiario;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.donacion.Donacion;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.donacion.TipoEstadoDonacion;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.donante.Donante;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.usuario.Usuario;
+import ar.edu.utn.frba.dds.donatrack.donaciones.persistencia.BeneficiarioRepository;
 import ar.edu.utn.frba.dds.donatrack.donaciones.persistencia.CategoriaRepository;
 import ar.edu.utn.frba.dds.donatrack.donaciones.persistencia.DonacionRepository;
 import ar.edu.utn.frba.dds.donatrack.donaciones.persistencia.DonanteRepository;
@@ -18,26 +20,21 @@ public class DonanteController {
   private final DonacionRepository repoDonaciones;
   private final CategoriaRepository repoCategorias;
   private final SubcategoriaRepository repoSubcategorias;
+  private final BeneficiarioRepository repoBeneficiarios;
 
   public DonanteController(DonanteRepository repoDonantes, DonacionRepository repoDonaciones,
-                           CategoriaRepository repoCategorias, SubcategoriaRepository repoSubcategorias) {
+                           CategoriaRepository repoCategorias, SubcategoriaRepository repoSubcategorias,
+                           BeneficiarioRepository repoBeneficiarios) {
     this.repoDonantes = repoDonantes;
     this.repoDonaciones = repoDonaciones;
     this.repoCategorias = repoCategorias;
     this.repoSubcategorias = repoSubcategorias;
+    this.repoBeneficiarios = repoBeneficiarios;
   }
 
   public void donacionesPropias(Context context){
-
-    Usuario usuarioActual = context.sessionAttribute("usuario_actual");
-    if (usuarioActual == null) {
-      context.redirect("/login");
-      return;
-    }
-
-    Donante donante = repoDonantes.buscarPorUsuario(usuarioActual);
+    Donante donante = donanteLogueado(context);
     if (donante == null) {
-      context.redirect("/");
       return;
     }
 
@@ -58,7 +55,7 @@ public class DonanteController {
     List<Donacion> donaciones = repoDonaciones.buscarPorDonante(donante, estado, idCategoria, idsSubcategorias);
 
     Map<String, Object> modelo = new HashMap<>();
-    modelo.put("usuario", usuarioActual);
+    modelo.put("usuario", context.sessionAttribute("usuario_actual"));
     modelo.put("donaciones", donaciones);
     modelo.put("estados", TipoEstadoDonacion.values());
     modelo.put("categorias", repoCategorias.buscarTodas());
@@ -68,6 +65,59 @@ public class DonanteController {
     modelo.put("subcategoriasElegidas", idsSubcategorias);
 
     context.render("mis_donaciones.hbs", modelo);
+  }
+
+  public void beneficiarios(Context context) {
+    if (donanteLogueado(context) == null) {
+      return;
+    }
+
+    Map<String, Object> modelo = new HashMap<>();
+    modelo.put("usuario", context.sessionAttribute("usuario_actual"));
+    modelo.put("beneficiarios", repoBeneficiarios.buscarTodos());
+
+    context.render("beneficiarios.hbs", modelo);
+  }
+
+  public void detalleBeneficiario(Context context) {
+    if (donanteLogueado(context) == null) {
+      return;
+    }
+
+    Long id;
+    try {
+      id = context.pathParamAsClass("id", Long.class).get();
+    } catch (ValidationException e) {
+      // /donante/beneficiarios/hola → vuelvo al listado
+      context.redirect("/donante/beneficiarios");
+      return;
+    }
+
+    Beneficiario beneficiario = repoBeneficiarios.buscarPorId(id);
+    if (beneficiario == null) {
+      context.redirect("/donante/beneficiarios");
+      return;
+    }
+
+    Map<String, Object> modelo = new HashMap<>();
+    modelo.put("usuario", context.sessionAttribute("usuario_actual"));
+    modelo.put("beneficiario", beneficiario);
+
+    context.render("detalle_beneficiario.hbs", modelo);
+  }
+
+  private Donante donanteLogueado(Context context) {
+    Usuario usuarioActual = context.sessionAttribute("usuario_actual");
+    if (usuarioActual == null) {
+      context.redirect("/login");
+      return null;
+    }
+    Donante donante = repoDonantes.buscarPorUsuario(usuarioActual);
+    if (donante == null) {
+      context.redirect("/");
+      return null;
+    }
+    return donante;
   }
 
   private TipoEstadoDonacion leerEstado(Context context) {
