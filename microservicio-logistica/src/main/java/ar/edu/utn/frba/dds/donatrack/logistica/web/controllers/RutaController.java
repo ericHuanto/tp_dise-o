@@ -7,7 +7,7 @@ import ar.edu.utn.frba.dds.donatrack.logistica.web.convers.ChoferMapper;
 import ar.edu.utn.frba.dds.donatrack.logistica.web.convers.RutaMapper;
 import ar.edu.utn.frba.dds.donatrack.logistica.web.dto.chofer.ChoferDto;
 import ar.edu.utn.frba.dds.donatrack.logistica.persistencia.RutaRepository;
-import ar.edu.utn.frba.dds.donatrack.logistica.web.integracion.microserviciosdonaciones.ConectorDonacionesApi;
+import ar.edu.utn.frba.dds.donatrack.logistica.web.integracion.microserviciosdonaciones.ConectorDonaciones;
 import io.javalin.http.Context;
 
 import ar.edu.utn.frba.dds.donatrack.shared.excepciones.RecursoNoEncontradoException;
@@ -15,9 +15,9 @@ import java.util.List;
 
 public class RutaController {
   private final RutaRepository repoRutas;
-  private final ConectorDonacionesApi donacionesBridge;
+  private final ConectorDonaciones donacionesBridge;
 
-  public RutaController(RutaRepository repository, ConectorDonacionesApi donacionesClient) {
+  public RutaController(RutaRepository repository, ConectorDonaciones donacionesClient) {
     this.repoRutas = repository;
     this.donacionesBridge = donacionesClient;
   }

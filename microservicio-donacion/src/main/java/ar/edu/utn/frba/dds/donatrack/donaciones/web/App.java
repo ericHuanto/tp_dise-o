@@ -17,26 +17,50 @@ import ar.edu.utn.frba.dds.donatrack.shared.GsonConfig;
 import com.github.jknack.handlebars.Handlebars;
 import com.github.jknack.handlebars.io.ClassPathTemplateLoader;
 import com.github.jknack.handlebars.io.TemplateLoader;
+import io.github.flbulgarelli.jpa.extras.simple.WithSimplePersistenceUnit;
 import io.javalin.Javalin;
 import io.javalin.rendering.template.JavalinHandlebars;
 import com.github.jknack.handlebars.helper.ConditionalHelpers;
 import static io.javalin.apibuilder.ApiBuilder.path;
+import ar.edu.utn.frba.dds.donatrack.donaciones.web.grpc.DonacionesGrpc;
+import io.grpc.Server;
+import io.grpc.ServerBuilder;
+import java.io.IOException;
+
 
 public class App {
 
   public static final int PUERTO = 7070;
+  public static final int PUERTO_GRPC = 7072;
 
-  public static void main(String[] args) {
+  public static void main(String[] args) throws IOException {
     ConfiguracionEntorno config = ConfiguracionEntorno.getInstance();
 
-    //Cargo credenciales para la db desde el .env TODO esta configuración debería estar en persistence.xml
-    System.setProperty("hibernate.connection.url", config.getDbUrlDonaciones());
-    System.setProperty("hibernate.connection.username", config.getDbUser());
-    System.setProperty("hibernate.connection.password", config.getDbPassword());
-    //Si te sale error por el momento puedes usar la opción: 3 del meta-inf
+    //Cargo credenciales para la db desde el .env TODO esta configuracion deberia estar en persistence.xml
+    setPropiedad("hibernate.connection.driver_class", config.getDbDriver());
+    setPropiedad("hibernate.connection.url",          config.getDbUrlDonaciones());
+    setPropiedad("hibernate.connection.username",     config.getDbUser());
+    setPropiedad("hibernate.connection.password",     config.getDbPassword());
+    setPropiedad("hibernate.dialect",                 config.getDbDialect());
+
     DatosIniciales.init();
     SuscriptorNotificacion.init();
+
+    Server grpc = ServerBuilder
+        .forPort(config.puertoGrpcDonaciones(PUERTO_GRPC))
+        .addService(new DonacionesGrpc(DonacionRepository.getInstancia()))
+        .build()
+        .start();
+    System.out.println("[gRPC] Servidor de donaciones escuchando en el puerto " + grpc.getPort());
+    Runtime.getRuntime().addShutdownHook(new Thread(grpc::shutdown));
+
     crearApp().start(config.puertoDonaciones(PUERTO));
+  }
+
+  private static void setPropiedad(String clave, String valor) {
+    if (valor != null) {
+      System.setProperty(clave, valor);
+    }
   }
 
   public static Javalin crearApp() {
@@ -92,6 +116,14 @@ public class App {
 
       //Registramos las excepciones
       ExceptionHandlers.registrar(config.routes);
+
+      config.routes.after(ctx -> {
+        var acceso = WithSimplePersistenceUnit.PER_THREAD_ENTITY_MANAGER_ACCESS;
+        if (acceso.isAttached() && acceso.get().getTransaction().isActive()) {
+          acceso.get().getTransaction().rollback();
+        }
+        WithSimplePersistenceUnit.dispose();
+      });
     });
 
     return app;
