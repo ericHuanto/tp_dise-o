@@ -37,11 +37,11 @@ public class App {
     ConfiguracionEntorno config = ConfiguracionEntorno.getInstance();
 
     //Cargo credenciales para la db desde el .env TODO esta configuracion deberia estar en persistence.xml
-    // setPropiedad("hibernate.connection.driver_class", config.getDbDriver());   // LOCAL: no commitear
-    // setPropiedad("hibernate.connection.url",          config.getDbUrlDonaciones());   // LOCAL: no commitear
-    // setPropiedad("hibernate.connection.username",     config.getDbUser());   // LOCAL: no commitear
-    // setPropiedad("hibernate.connection.password",     config.getDbPassword());   // LOCAL: no commitear
-    // setPropiedad("hibernate.dialect",                 config.getDbDialect());   // LOCAL: no commitear
+    setPropiedad("hibernate.connection.driver_class", config.getDbDriver());   // LOCAL: no commitear
+    setPropiedad("hibernate.connection.url",          config.getDbUrlDonaciones());   // LOCAL: no commitear
+    setPropiedad("hibernate.connection.username",     config.getDbUser());   // LOCAL: no commitear
+    setPropiedad("hibernate.connection.password",     config.getDbPassword());   // LOCAL: no commitear
+    setPropiedad("hibernate.dialect",                 config.getDbDialect());   // LOCAL: no commitear
 
     DatosIniciales.init();
     SuscriptorNotificacion.init();
