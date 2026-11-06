@@ -1,0 +1,61 @@
+@startuml
+left to right direction
+skinparam DefaultFontName Arial
+
+actor "admin" as admin
+actor "Donante" as donante
+actor "Beneficiario" as beneficiario
+
+node "Dispositivo Cliente / Local" {
+  component "Cliente" as cliente
+  component "Cliente SQL" as clienteSql
+}
+
+admin --> cliente
+donante --> cliente
+beneficiario --> cliente
+admin --> clienteSql
+
+node "Microsoft Azure Cloud" as azure {
+  node "Máquina Virtual (Ubuntu)" as vm {
+    
+    node "Docker Engine (--network host)" {
+      component "Microservicio Logistica\n(logistica-app)" as logistica
+      component "Microservicio Donaciones\n(donaciones-app)" as donaciones
+    }
+
+    node "Host Nativo" {
+      database "MySQL 8 Server" as mysql {
+        artifact "Esquema: logistica" as db_log
+        artifact "Esquema: donaciones" as db_don
+      }
+      component "Servidor SSH" as sshd
+    }
+  }
+}
+
+cloud "Broker" as broker
+node "Gps" as gps
+cloud "Correo" as correo
+cloud "Sms" as sms
+cloud "Whatsapp" as whatsapp
+
+' Tráfico hacia Azure
+cliente --> logistica : HTTP (Puerto 7071)
+cliente --> donaciones : HTTP (Puerto 7070)
+clienteSql --> sshd : SSH (Puerto 22)
+sshd ..> mysql : Túnel a 3306
+
+' Tráfico Interno
+logistica --> donaciones : gRPC
+logistica --> db_log : JDBC / TCP (localhost:3306)
+donaciones --> db_don : JDBC / TCP (localhost:3306)
+
+' Tráfico Externo
+gps --> broker : mqtt
+logistica --> broker : mqtt
+donaciones --> correo : smtp
+donaciones --> sms : https
+donaciones --> whatsapp : https
+
+@enduml
