@@ -15,4 +15,14 @@ public interface WithLogisticaPersistenceUnit extends WithPerThreadEntityManager
   default PerThreadEntityManagerAccess perThreadEntityManagerAccess() {
     return PER_THREAD_ENTITY_MANAGER_ACCESS;
   }
+
+  static void dispose() {
+    if (PER_THREAD_ENTITY_MANAGER_ACCESS.isAttached()) {
+      if (PER_THREAD_ENTITY_MANAGER_ACCESS.get().getTransaction().isActive()) {
+        throw new IllegalStateException(
+            "Can not dispose entity manager if a transaction is active. Ensure it has been already terminated");
+      }
+      PER_THREAD_ENTITY_MANAGER_ACCESS.dispose();
+    }
+  }
 }

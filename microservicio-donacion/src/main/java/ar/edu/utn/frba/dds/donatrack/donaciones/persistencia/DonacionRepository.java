@@ -3,13 +3,9 @@ package ar.edu.utn.frba.dds.donatrack.donaciones.persistencia;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.donacion.Donacion;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.donacion.TipoEstadoDonacion;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.donante.Donante;
-import ar.edu.utn.frba.dds.donatrack.shared.excepciones.BaseDatoException;
 import ar.edu.utn.frba.dds.donatrack.shared.excepciones.RegistroNoEncontradoException;
 import io.github.flbulgarelli.jpa.extras.simple.WithSimplePersistenceUnit;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 
 public class DonacionRepository implements WithSimplePersistenceUnit {
   private static final DonacionRepository INSTANCE = new DonacionRepository();
@@ -23,6 +19,16 @@ public class DonacionRepository implements WithSimplePersistenceUnit {
   }
   public static DonacionRepository getInstancia() {
     return INSTANCE;
+  }
+
+  public List<Donacion> buscarPorEstadoActualCoincidenteCon(TipoEstadoDonacion estado) {
+    return entityManager()
+        .createQuery("SELECT d FROM Donacion d " +
+            "JOIN d.historialEstados e " +
+            "WHERE INDEX(e) = (SELECT MAX(INDEX(e2)) FROM Donacion d2 JOIN d2.historialEstados e2 WHERE d2 = d) " +
+            "AND e.tipoEstado = :estado", Donacion.class)
+        .setParameter("estado", estado)
+        .getResultList();
   }
 
   public List<Donacion> buscarTodoPorEstado(TipoEstadoDonacion estado) {

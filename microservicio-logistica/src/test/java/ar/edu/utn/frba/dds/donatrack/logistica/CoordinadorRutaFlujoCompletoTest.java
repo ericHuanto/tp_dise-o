@@ -22,6 +22,7 @@ import ar.edu.utn.frba.dds.donatrack.logistica.persistencia.EntregaRepository;
 import ar.edu.utn.frba.dds.donatrack.logistica.persistencia.RutaRepository;
 import ar.edu.utn.frba.dds.donatrack.logistica.web.coordinadores.CoordinadorRuta;
 import ar.edu.utn.frba.dds.donatrack.logistica.web.dto.planificacion.CallbackPlanificacionRequest;
+import ar.edu.utn.frba.dds.donatrack.logistica.web.integracion.microserviciosdonaciones.ConectorDonaciones;
 import ar.edu.utn.frba.dds.donatrack.logistica.web.integracion.microserviciosdonaciones.ConectorDonacionesApi;
 import ar.edu.utn.frba.dds.donatrack.logistica.web.integracion.planificadorexterno.ClientePlanificadorExterno;
 import java.time.LocalDate;
@@ -33,7 +34,7 @@ import org.junit.jupiter.api.Test;
 class CoordinadorRutaFlujoCompletoTest {
   private static final String CALLBACK_URL_ESPERADA = "http://localhost:7071/planificaciones/callback-externo";
   private CoordinadorRuta coordinador;
-  private ConectorDonacionesApi donacionesClient;
+  private ConectorDonaciones donacionesClient;
   private ClientePlanificadorExterno clienteExterno;
   private RutaRepository rutaRepository;
   private CamionRepository camionRepository;
@@ -46,7 +47,7 @@ class CoordinadorRutaFlujoCompletoTest {
     camionRepository = CamionRepository.getInstancia();
     entregaRepository = EntregaRepository.getInstancia();
     beneficiarioRepository = BeneficiarioRepository.getInstancia();
-    donacionesClient = mock(ConectorDonacionesApi.class);
+    donacionesClient = mock(ConectorDonaciones.class);
     clienteExterno = mock(ClientePlanificadorExterno.class);
 
     coordinador = new CoordinadorRuta(

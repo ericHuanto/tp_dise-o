@@ -14,12 +14,12 @@ public class DonacionApiRoutes {
     ruta.patch("/api/donaciones/{id}", controller::actualizar);
     ruta.delete("/api/donaciones/{id}", controller::eliminar);
     ruta.get("/api/donaciones/{id}/estados", controller::historialEstados);
-    ruta.patch("/api/donaciones/{id}/lista-para-entregar", controller::donacionListaParaEntregar); //paso 3 Lista Para Entregar
-    ruta.patch("/api/donaciones/{id}/en-camino", controller::donacionEnCamino); //paso 4 En Traslado
-    ruta.patch("/api/donaciones/{id}/entregada", controller::donacionEntregada); //paso 5 Entregada (Fin)
-    ruta.patch("/api/donaciones/{id}/error-entrega", controller::donacionEntregaFallida); //paso 5B
-    ruta.patch("/api/donaciones/{id}/vuelta-deposito", controller::donacionDevueltaADeposito); //paso 6B que viene de 5B
-    ruta.patch("/api/donaciones/{id}/vencida", controller::donacionVencida); //paso 2B (Fin)
+    //ruta.patch("/api/donaciones/{id}/lista-para-entregar", controller::donacionListaParaEntregar); //paso 3 Lista Para Entregar
+    //ruta.patch("/api/donaciones/{id}/en-camino", controller::donacionEnCamino); //paso 4 En Traslado
+    //ruta.patch("/api/donaciones/{id}/entregada", controller::donacionEntregada); //paso 5 Entregada (Fin)
+    //ruta.patch("/api/donaciones/{id}/error-entrega", controller::donacionEntregaFallida); //paso 5B
+    //ruta.patch("/api/donaciones/{id}/vuelta-deposito", controller::donacionDevueltaADeposito); //paso 6B que viene de 5B
+    //ruta.patch("/api/donaciones/{id}/vencida", controller::donacionVencida); //paso 2B (Fin)
   }
 
 }

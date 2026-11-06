@@ -8,7 +8,7 @@ public class ConfiguracionEntorno {
   private final Dotenv dotenv;
 
   private ConfiguracionEntorno() {
-    this.dotenv = Dotenv.load();
+    this.dotenv = Dotenv.configure().ignoreIfMissing().load();
   }
 
   public static ConfiguracionEntorno getInstance() {
@@ -51,6 +51,19 @@ public class ConfiguracionEntorno {
     return elegirUrl("URL_API_DONACIONES", urlPorDefecto);
   }
 
+  public Integer puertoGrpcDonaciones(int puertoPorDefecto) {
+    return elegirPuerto("PUERTO_GRPC_DONACIONES", puertoPorDefecto);
+  }
+
+  public String hostGrpcDonaciones(String hostPorDefecto) {
+    String valor = dotenv.get("HOST_GRPC_DONACIONES");
+    if (valor == null || valor.isBlank()) {
+      System.out.println("Falta la variable de entorno: 'HOST_GRPC_DONACIONES' Se va a usar el host por default: " + hostPorDefecto);
+      return hostPorDefecto;
+    }
+    return valor;
+  }
+
   public String getDbUrlDonaciones() {
     return obtenerObligatorio("DB_URL_DONACIONES");
   }
@@ -65,6 +78,14 @@ public class ConfiguracionEntorno {
 
   public String getDbPassword() {
     return obtenerObligatorio("DB_PASSWORD");
+  }
+
+  public String getDbDriver()  {
+    return obtenerObligatorio("DB_DRIVER");
+  }
+
+  public String getDbDialect() {
+    return obtenerObligatorio("DB_DIALECT");
   }
 
   //=================== FUNCIONES AUXILIARES =====================

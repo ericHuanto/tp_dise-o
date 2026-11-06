@@ -18,7 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ConectorDonacionesApi {
+public class ConectorDonacionesApi implements ConectorDonaciones {
   private static final String TIPO_ESTADO_REALIZADA = "ASIGNACION_REALIZADA";
   private static final Type LISTA_DONACIONES_REMOTAS =
       new TypeToken<List<DonacionRemotaResponse>>() {
@@ -33,6 +33,7 @@ public class ConectorDonacionesApi {
     this.gson = GsonConfig.crear();
   }
 
+  @Override
   public List<DonacionEnTransito> buscarDonacionesAsignadas() {
     String url = baseUrl + "/donaciones?estado=" + TIPO_ESTADO_REALIZADA;
     HttpRequest request = HttpRequest.newBuilder()
@@ -54,25 +55,30 @@ public class ConectorDonacionesApi {
   }
 
   //activa el paso 3 de la donacion (Lista Para Entregar)
+  @Override
   public void marcarDonacionListaParaEntregar(Long donacionId) {
     cambiarEstadoDonacion(donacionId, null, buildUrl(donacionId, "lista-para-entregar"));
   }
   //activa el paso 4 de la donacion (En Traslado)
+  @Override
   public void marcarDonacionEnCamino(Long donacionId, String linkMapa) {
     CambioEstadoInicioRutaRequest body = new CambioEstadoInicioRutaRequest(linkMapa);
     cambiarEstadoDonacion(donacionId, gson.toJson(body), buildUrl(donacionId, "en-camino"));
   }
   //activa el paso 5 de la donacion (Entregada)
+  @Override
   public void marcarDonacionEntregaExitosa(Long donacionId, String linkComprobante) {
     CambioEstadoEntregadaRequest body = new CambioEstadoEntregadaRequest(linkComprobante);
     cambiarEstadoDonacion(donacionId, gson.toJson(body), buildUrl(donacionId, "entregada"));
   }
   //activa el paso 5B de la donacion (Error Al Entregar)
+  @Override
   public void marcarDonacionErrorEntrega(Long donacionId, String motivo) {
     CambioEstadoErrorEntregaRequest body = new CambioEstadoErrorEntregaRequest(motivo);
     cambiarEstadoDonacion(donacionId, gson.toJson(body), buildUrl(donacionId, "error-entrega"));
   }
   //activa el paso 6B de la donacion (Devuelta A Deposito)
+  @Override
   public void marcarDonacionVueltaDeposito(Long donacionId) {
     cambiarEstadoDonacion(donacionId, null, buildUrl(donacionId, "vuelta-deposito"));
   }
