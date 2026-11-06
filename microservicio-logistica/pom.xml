@@ -125,24 +125,27 @@
     </dependencies>
 
     <build>
+        <finalName>donatrack-logistica</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-assembly-plugin</artifactId>
+                <artifactId>maven-shade-plugin</artifactId>
                 <version>3.6.0</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
-                        <goals><goal>single</goal></goals>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
                         <configuration>
-                            <descriptorRefs><descriptorRef>jar-with-dependencies</descriptorRef></descriptorRefs>
-                            <archive>
-                                <manifest>
-                                    <!-- Apunta al Main de Logística -->
+                            <createDependencyReducedPom>false</createDependencyReducedPom>
+                            <shadedArtifactAttached>false</shadedArtifactAttached>
+                            <transformers>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <mainClass>ar.edu.utn.frba.dds.donatrack.logistica.web.App</mainClass>
-                                </manifest>
-                            </archive>
-                            <finalName>donatrack-logistica</finalName>
+                                </transformer>
+                            </transformers>
                         </configuration>
                     </execution>
                 </executions>
