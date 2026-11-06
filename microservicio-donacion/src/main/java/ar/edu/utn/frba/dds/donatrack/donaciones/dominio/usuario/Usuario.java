@@ -15,8 +15,9 @@ import java.util.List;
 public class Usuario {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
-  @Column(name = "usuario", unique = true)
+  //@Column(name = "id_usuario") //añadir
+  private Long id; //Cambiar a idUsuario
+  @Column(name = "usuario", unique = true) //Cambiar a nombre_usuario
   private String nombreUsuario;
   @Column(name = "contraseña")
   private String contraseña;
@@ -24,7 +25,7 @@ public class Usuario {
   @Enumerated(EnumType.STRING)
   @CollectionTable(name = "usuario_permiso", joinColumns = @JoinColumn(name = "id_usuario"))
   @Column(name = "permiso")
-  private List<Permiso> permisos;
+  private List<Permiso> permisos; //Ver de cambiar por un Set para no permitir repetidos
 
   public Usuario(String nombreUsuario, String contraseña) {
     this.nombreUsuario = nombreUsuario;
