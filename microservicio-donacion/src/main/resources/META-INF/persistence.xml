@@ -7,23 +7,13 @@
     <persistence-unit name="simple-persistence-unit" transaction-type="RESOURCE_LOCAL">
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
         <properties>
-            <!--Siempre activas-->
             <property name="hibernate.archive.autodetection" value="class"/>
-            <property name="hibernate.show_sql" value="true"/>
-            <property name="hibernate.format_sql" value="true"/>
-            <property name="hibernate.use_sql_comments" value="true"/>
 
-            <!-- create-drop: borra todo al cerrar (solo HSQLDB / tests)
-             update: conserva datos y agrega lo que falte (MySQL)  -->
-            <property name="hibernate.hbm2ddl.auto" value="create-drop"/>
-
-            <!-- opción 1: DB real, forma desplegada
+            <!-- opción 1: DB real, forma desplegada -->
             <property name="hibernate.connection.driver_class" value="com.mysql.cj.jdbc.Driver"/>
             <property name="hibernate.connection.url" value="jdbc:mysql://localhost:3306/donaciones?serverTimezone=UTC&amp;allowPublicKeyRetrieval=true&amp;useSSL=false"/>
-            <property name="hibernate.connection.username" value="usuario"/>
-            <property name="hibernate.connection.password" value="password"/>
             <property name="hibernate.dialect" value="org.hibernate.dialect.MySQL8Dialect"/>
-             -->
+            <!-- -->
 
             <!-- opción 2: DB real, forma Local
             <property name="hibernate.connection.driver_class" value="com.mysql.cj.jdbc.Driver"/>
@@ -33,19 +23,19 @@
             <property name="hibernate.dialect" value="org.hibernate.dialect.MySQL8Dialect"/>
             -->
 
-            <!-- opción 3: DB falso, solo para test -->
+            <!-- opción 3: DB falso, solo para test
             <property name="hibernate.connection.driver_class" value="org.hsqldb.jdbcDriver"/>
             <property name="hibernate.connection.url" value="jdbc:hsqldb:mem:donaciones-db"/>
             <property name="hibernate.connection.username" value=""/>
             <property name="hibernate.connection.password" value=""/>
             <property name="hibernate.dialect" value="org.hibernate.dialect.HSQLDialect"/>
-            <!-- LOCAL: no commitear -->
+            -->
 
             <property name="hibernate.show_sql" value="true"/>
             <property name="hibernate.format_sql" value="true"/>
             <property name="use_sql_comments" value="true"/>
             <property name="hibernate.hbm2ddl.auto" value="create-drop"/> <!-- Cambiar de "create-drop" a "update", TODO Importante.-->
 
-       </properties>
-   </persistence-unit>
+        </properties>
+    </persistence-unit>
 </persistence>
