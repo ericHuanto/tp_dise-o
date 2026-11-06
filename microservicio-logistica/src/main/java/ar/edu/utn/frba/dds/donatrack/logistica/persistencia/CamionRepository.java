@@ -18,7 +18,7 @@ public class CamionRepository implements WithLogisticaPersistenceUnit {
   }
 
   public void guardar(Camion camion) {
-    withTransaction(() -> entityManager().persist(camion));
+    entityManager().persist(camion);
   }
 
   public Camion buscarPorPatente(String patente) {
@@ -42,7 +42,7 @@ public class CamionRepository implements WithLogisticaPersistenceUnit {
       throw new RegistroNoEncontradoException(
           "No se puede actualizar: no existe en la base de datos la patente " + camion.getPatente());
     }
-    withTransaction(() -> entityManager().merge(camion));
+    entityManager().merge(camion);
   }
 
   public void eliminar(String patente) {
@@ -50,6 +50,7 @@ public class CamionRepository implements WithLogisticaPersistenceUnit {
     if (camion == null) {
       throw new RegistroNoEncontradoException("No existe camión con patente " + patente);
     }
-    withTransaction(() -> entityManager().remove(camion));
+    entityManager().remove(camion);
   }
+
 }

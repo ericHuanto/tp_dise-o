@@ -7,8 +7,8 @@ public class PlanificacionRoutes {
   private PlanificacionRoutes() {}
 
   public static void registrar(RoutesConfig ruta, PlanificacionController planificacionController) {
-    ruta.post("/planificaciones", planificacionController::planificar);
-    ruta.post("/planificaciones/callback-externo", planificacionController::callback);// webhook del proveedor
-    ruta.post("/planificaciones/manual", planificacionController::ejecutarManual);      // disparo manual del cron
+    ruta.post("/api/planificaciones", planificacionController::planificar);
+    ruta.post("/api/planificaciones/callback-externo", planificacionController::callback);// webhook del proveedor
+    ruta.post("/api/planificaciones/manual", planificacionController::ejecutarManual);      // disparo manual del cron
   }
 }

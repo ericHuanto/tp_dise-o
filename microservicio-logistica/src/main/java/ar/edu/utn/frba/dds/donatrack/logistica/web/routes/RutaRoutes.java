@@ -8,10 +8,10 @@ public class RutaRoutes {
   private RutaRoutes() {}
 
   public static void registrar(RoutesConfig ruta, RutaController rutaController) {
-    ruta.get("/rutas", rutaController::obtenerTodas);
-    ruta.get("/rutas/{id}", rutaController::obtener);
-    ruta.patch("/rutas/{id}/chofer", rutaController::asignarChofer);
-    ruta.patch("/rutas/{id}/inicio", rutaController::iniciar); //activa el paso 4 de la donación (En Traslado)
+    ruta.get("/api/rutas", rutaController::obtenerTodas);
+    ruta.get("/api/rutas/{id}", rutaController::obtener);
+    ruta.patch("/api/rutas/{id}/chofer", rutaController::asignarChofer);
+    ruta.patch("/api/rutas/{id}/inicio", rutaController::iniciar); //activa el paso 4 de la donación (En Traslado)
   }
 
 }
