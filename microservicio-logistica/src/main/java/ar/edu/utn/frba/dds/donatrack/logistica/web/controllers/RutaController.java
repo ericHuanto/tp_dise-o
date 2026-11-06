@@ -8,10 +8,22 @@ import ar.edu.utn.frba.dds.donatrack.logistica.web.convers.RutaMapper;
 import ar.edu.utn.frba.dds.donatrack.logistica.web.dto.chofer.ChoferDto;
 import ar.edu.utn.frba.dds.donatrack.logistica.persistencia.RutaRepository;
 import ar.edu.utn.frba.dds.donatrack.logistica.web.integracion.microserviciosdonaciones.ConectorDonacionesApi;
+import com.google.gson.Gson;
 import io.javalin.http.Context;
 
 import ar.edu.utn.frba.dds.donatrack.shared.excepciones.RecursoNoEncontradoException;
 import java.util.List;
+import ar.edu.utn.frba.dds.donatrack.logistica.dominio.camion.Camion;
+import ar.edu.utn.frba.dds.donatrack.logistica.dominio.camion.Coordenada;
+import ar.edu.utn.frba.dds.donatrack.logistica.dominio.entrega.Entrega;
+import ar.edu.utn.frba.dds.donatrack.logistica.dominio.entrega.TipoEstadoEntrega;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import ar.edu.utn.frba.dds.donatrack.logistica.dominio.camion.Camion;
+import ar.edu.utn.frba.dds.donatrack.logistica.dominio.camion.Coordenada;
+import ar.edu.utn.frba.dds.donatrack.logistica.dominio.entrega.Entrega;
+import ar.edu.utn.frba.dds.donatrack.logistica.dominio.entrega.TipoEstadoEntrega;
 
 public class RutaController {
   private final RutaRepository repoRutas;
@@ -73,6 +85,50 @@ public class RutaController {
   public void comunicarAlasDonacionesQueEstanEnCamino(List<DonacionEnTransito> donaciones, String linkMapa) {
     donaciones.forEach(d ->
         donacionesBridge.marcarDonacionEnCamino(d.getId(), linkMapa)
+    );
+  }
+
+
+  public void verSeguimiento(Context ctx) throws Exception {
+    List<Map<String, Object>> marcadores = new ArrayList<>();
+
+    for (Ruta ruta : repoRutas.buscarTodas()) {
+
+      if (!ruta.isEstaIniciada()) {
+        continue;
+      }
+
+      boolean tieneEntregasActivas = ruta.getEntregasOrdenadas()
+          .stream()
+          .anyMatch(entrega ->
+              entrega.getEstadoActual() == TipoEstadoEntrega.EN_TRASLADO
+          );
+
+      if (!tieneEntregasActivas) {
+        continue;
+      }
+
+      Camion camion = ruta.getCamion();
+      Coordenada ubicacion = camion.getUbicacionActual();
+
+      if (ubicacion == null) {
+        continue;
+      }
+
+      Map<String, Object> marcador = new HashMap<>();
+
+      marcador.put("patente", camion.getPatente());
+      marcador.put("latitud", ubicacion.getLatitud());
+      marcador.put("longitud", ubicacion.getLongitud());
+      marcador.put("ultimaActualizacion", "No disponible");
+
+      marcadores.add(marcador);
+    }
+
+    String marcadoresJson = new Gson().toJson(marcadores);
+    ctx.render(
+        "seguimiento_entregas.hbs",
+        Map.of("marcadoresJson", marcadoresJson)
     );
   }
 
