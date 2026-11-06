@@ -26,6 +26,7 @@ public class DonanteController {
     this.repoCategorias = repoCategorias;
     this.repoSubcategorias = repoSubcategorias;
   }
+
   public void donacionesPropias(Context context){
 
     Usuario usuarioActual = context.sessionAttribute("usuario_actual");
@@ -68,6 +69,7 @@ public class DonanteController {
 
     context.render("mis_donaciones.hbs", modelo);
   }
+
   private TipoEstadoDonacion leerEstado(Context context) {
     String estado = context.queryParam("estado");
     if (estado == null || estado.isBlank()) {

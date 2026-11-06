@@ -8,8 +8,8 @@ import java.util.Map;
 public class HomeController {
 
   public void mostrarHome(Context context) {
-    Map<String, Object> modelo = new HashMap<>();
     Usuario usuarioActual = context.sessionAttribute("usuario_actual");
+    Map<String, Object> modelo = new HashMap<>();
 
     if(usuarioActual != null) {
       modelo.put("saludo", "¡Bienvenido al sistema DonaTrack! " + usuarioActual.getNombreUsuario() + " un gusto volver a verlo");
