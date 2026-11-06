@@ -15,7 +15,7 @@
 
             <!-- create-drop: borra todo al cerrar (solo HSQLDB / tests)
              update: conserva datos y agrega lo que falte (MySQL)  -->
-            <property name="hibernate.hbm2ddl.auto" value="update"/>
+            <property name="hibernate.hbm2ddl.auto" value="create-drop"/>
 
             <!-- opción 1: DB real, forma desplegada
             <property name="hibernate.connection.driver_class" value="com.mysql.cj.jdbc.Driver"/>
