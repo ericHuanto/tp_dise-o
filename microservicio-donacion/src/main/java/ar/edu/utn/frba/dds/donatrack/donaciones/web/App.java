@@ -66,7 +66,7 @@ public class App {
     SesionController sesionController = new SesionController(usuarioRepository);
     PerfilController perfilController = new PerfilController(donanteRepository, beneficiarioRepository, usuarioRepository);
     MapaController mapaController = new MapaController(beneficiarioRepository);
-    DonanteController donanteController = new DonanteController(donanteRepository, donacionRepository, categoriaRepository, subcategoriaRepository);
+    DonanteController donanteController = new DonanteController(donanteRepository, donacionRepository, categoriaRepository, subcategoriaRepository, beneficiarioRepository);
 
     Javalin app = Javalin.create(config -> {
       config.jsonMapper(GsonConfig.jsonMapper());

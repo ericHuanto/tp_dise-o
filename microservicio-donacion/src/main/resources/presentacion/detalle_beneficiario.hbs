@@ -1,0 +1,48 @@
+{{#partial "nombre_pestaña"}}
+    {{beneficiario.razonSocial}} - DonaTrack
+{{/partial}}
+
+{{#partial "breadcrumbs"}}
+    <a href="/">Inicio</a> &gt;
+    <a href="/donante/beneficiarios">Entidades beneficiarias</a> &gt;
+    <span>{{beneficiario.razonSocial}}</span>
+{{/partial}}
+
+{{#partial "contenido_propio"}}
+    <h1>{{beneficiario.razonSocial}}</h1>
+    <p><strong>Dirección:</strong> {{beneficiario.direccion}}</p>
+
+    <h2>Necesidades</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Descripción</th>
+                <th>Tipo</th>
+                <th>Categoría</th>
+                <th>Subcategoría</th>
+                <th>Requerido</th>
+                <th>Recibido</th>
+                <th>Unidad</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each beneficiario.necesidades}}
+                <tr>
+                    <td>{{descripcion}}</td>
+                    <td>{{tipo}}{{#if frecuencia}} ({{frecuencia}}){{/if}}</td>
+                    <td>{{subcategoria.categoria.nombre}}</td>
+                    <td>{{subcategoria.nombre}}</td>
+                    <td>{{cantidadRequerida}}</td>
+                    <td>{{cantidadRecibida}}</td>
+                    <td>{{unidadMedida}}</td>
+                </tr>
+            {{else}}
+                <tr><td colspan="7">Esta entidad no tiene necesidades cargadas.</td></tr>
+            {{/each}}
+        </tbody>
+    </table>
+
+    <a href="/donante/beneficiarios">Volver al listado</a>
+{{/partial}}
+
+{{> plantillas/layout.hbs}}

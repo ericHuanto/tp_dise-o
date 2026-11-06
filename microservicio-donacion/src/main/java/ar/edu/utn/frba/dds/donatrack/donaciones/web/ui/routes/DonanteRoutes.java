@@ -8,7 +8,8 @@ public class DonanteRoutes {
 
   public static void registrar(RoutesConfig ruta, DonanteController controller) {
     ruta.get("/donante/donaciones", controller::donacionesPropias);
+    ruta.get("/donante/beneficiarios", controller::beneficiarios);
+    ruta.get("/donante/beneficiarios/{id}", controller::detalleBeneficiario);
   }
-
 
 }
