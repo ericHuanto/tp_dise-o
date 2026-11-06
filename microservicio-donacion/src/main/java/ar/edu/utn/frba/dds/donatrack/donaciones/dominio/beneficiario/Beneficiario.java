@@ -2,6 +2,7 @@ package ar.edu.utn.frba.dds.donatrack.donaciones.dominio.beneficiario;
 
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.donacion.Donacion;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.donacion.TipoEstadoDonacion;
+import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.usuario.Usuario;
 import ar.edu.utn.frba.dds.donatrack.shared.excepciones.DominioException;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.mediocontacto.MedioContacto;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.necesidades.Necesidad;
@@ -9,10 +10,9 @@ import ar.edu.utn.frba.dds.donatrack.shared.excepciones.RecursoNoEncontradoExcep
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.*;
-
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import java.util.Random;
 
 @Getter
 @NoArgsConstructor
@@ -26,6 +26,10 @@ public class Beneficiario {
   private String razonSocial;
   @Column(name = "direccion")
   private String direccion;
+  @Column(name = "latitud_direccion")
+  private String latitud;
+  @Column(name = "longitud_direccion")
+  private String longitud;
   @OneToMany(cascade = CascadeType.ALL)
   @JoinColumn(name = "id_beneficiario")
   private List<MedioContacto> contactos;
@@ -34,14 +38,20 @@ public class Beneficiario {
   private List<Necesidad> necesidades;
   @OneToMany(mappedBy = "beneficiario") //Intentar evitar mappedBy. Relaciones bidireccionales son costosas de mantener
   private List<Donacion> donaciones;
+  @OneToOne
+  @JoinColumn(name = "id_usuario")
+  private Usuario usuario;
 
   public Beneficiario(String razonSocial, String direccion, List<MedioContacto> contactos) {
     checkDatos(razonSocial, contactos);
     this.razonSocial = razonSocial;
     this.direccion = direccion;
+    this.latitud = calcularLatitud(direccion);
+    this.longitud = calcularLongitud(direccion);
     this.contactos = new ArrayList<>(contactos);
     this.necesidades = new ArrayList<>();
     this.donaciones = new ArrayList<>();
+    this.usuario = null;
   }
 
   private void checkDatos(String razonSocial, List<MedioContacto> contactos) {
@@ -89,6 +99,10 @@ public class Beneficiario {
     contactos.forEach(c -> c.enviarMensaje(mensaje));
   }
 
+  public void vincularUsuario(Usuario usuario) {
+    this.usuario = usuario;
+  }
+
   public Boolean esIgual(Beneficiario otroBeneficiario) {
     return razonSocial.equalsIgnoreCase(otroBeneficiario.getRazonSocial());
   }
@@ -100,9 +114,16 @@ public class Beneficiario {
     this.contactos = new ArrayList<>(contactos);
   }
 
-  public void addContacto(MedioContacto contacto) {
-    if (contacto != null) {
-      this.contactos.add(contacto);
-    }
+  //=============== FUNCIONES AUXILIARES =================
+  private String calcularLatitud(String direccion) {
+    //Usar un servicio externo que al pasarle la direccion devuelva la latitud
+    Double latitudFalsa = -34.705 + (new Random()).nextDouble() * ((-34.526) - (-34.705));
+    return String.valueOf(latitudFalsa);
+  }
+
+  public String calcularLongitud(String direccion) {
+    //Usar un servicio externo que al pasarle la direccion devuelva la longitud
+    Double longitudFalsa = -58.531 + (new Random()).nextDouble() * ((-58.335) - (-58.531));
+    return String.valueOf(longitudFalsa);
   }
 }

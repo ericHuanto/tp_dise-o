@@ -51,6 +51,22 @@ public class ConfiguracionEntorno {
     return elegirUrl("URL_API_DONACIONES", urlPorDefecto);
   }
 
+  public String getDbUrlDonaciones() {
+    return obtenerObligatorio("DB_URL_DONACIONES");
+  }
+
+  public String getDbUrlLogistica() {
+    return obtenerObligatorio("DB_URL_LOGISTICA");
+  }
+
+  public String getDbUser() {
+    return obtenerObligatorio("DB_USER");
+  }
+
+  public String getDbPassword() {
+    return obtenerObligatorio("DB_PASSWORD");
+  }
+
   //=================== FUNCIONES AUXILIARES =====================
   private String obtenerObligatorio(String nombre) {
     String clave = dotenv.get(nombre);

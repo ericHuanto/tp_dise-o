@@ -1,0 +1,66 @@
+{{#partial "nombre_pestaña"}}
+    Mis donaciones - DonaTrack
+{{/partial}}
+
+{{#partial "breadcrumbs"}}
+    <a href="/">Inicio</a> &gt; <span>Mis donaciones</span>
+{{/partial}}
+
+{{#partial "contenido_propio"}}
+    <h1>Mis donaciones</h1>
+
+    <form method="get" action="/donante/donaciones">
+        <label for="estado">Estado:</label>
+        <select id="estado" name="estado">
+            <option value="">Todos</option>
+            {{#each estados}}
+                <option value="{{this}}" {{#if (eq this ../estadoElegido)}}selected{{/if}}>{{this}}</option>
+            {{/each}}
+        </select>
+
+        <label for="categoria">Categoría:</label>
+        <select id="categoria" name="categoria">
+            <option value="">Todas</option>
+            {{#each categorias}}
+                <option value="{{id}}" {{#if (eq id ../categoriaElegida)}}selected{{/if}}>{{nombre}}</option>
+            {{/each}}
+        </select>
+
+        <label for="subcategoria">Subcategorías:</label>
+        <select id="subcategoria" name="subcategoria" multiple>
+            {{#each subcategorias}}
+                <option value="{{id}}">{{categoria.nombre}} - {{nombre}}</option>
+            {{/each}}
+        </select>
+
+        <button type="submit">Filtrar</button>
+        <a href="/donante/donaciones">Limpiar filtros</a>
+    </form>
+
+    <table>
+        <thead>
+        <tr>
+            <th>Descripción</th>
+            <th>Categoría</th>
+            <th>Subcategoría</th>
+            <th>Estado</th>
+        </tr>
+        </thead>
+        <tbody>
+        {{#each donaciones}}
+            <tr>
+                <td>{{descripcion}}</td>
+                <td>{{subcategoria.categoria.nombre}}</td>
+                <td>{{subcategoria.nombre}}</td>
+                <td>{{estadoActual}}</td>
+            </tr>
+        {{else}}
+            <tr>
+                <td colspan="4">No hay donaciones con esos filtros.</td>
+            </tr>
+        {{/each}}
+        </tbody>
+    </table>
+{{/partial}}
+
+{{> plantillas/layout.hbs}}

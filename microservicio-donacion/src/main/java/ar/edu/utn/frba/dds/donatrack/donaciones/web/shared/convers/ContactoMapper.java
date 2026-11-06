@@ -46,7 +46,6 @@ public class ContactoMapper {
     return new ContactoDto("WHATSAPP", whatsapp.getDetalle(), whatsapp.getEsPrincipal());
   }
 
-  //====================  FUNCIONES AUXILIARES =====================
   public static List<MedioContacto> aDominio(List<ContactoDto> contactosDto) {
     if (contactosDto == null || contactosDto.isEmpty()) {
       throw new DominioException("La lista de 'contactos' no puede estar vacía ni ser null");

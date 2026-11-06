@@ -9,14 +9,18 @@ import ar.edu.utn.frba.dds.donatrack.donaciones.web.api.routes.DonacionApiRoutes
 import ar.edu.utn.frba.dds.donatrack.donaciones.web.api.routes.DonanteApiRoutes;
 import ar.edu.utn.frba.dds.donatrack.donaciones.web.api.routes.NecesidadApiRoutes;
 import ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.controller.DonacionBeneficiarioController;
+import ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.controller.DonanteController;
 import ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.controller.HomeController;
 import ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.controller.MapaController;
 import ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.controller.NecesidadController;
+import ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.controller.PerfilController;
 import ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.controller.SesionController;
 import ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.routes.DonacionBeneficiarioRoutes;
+import ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.routes.DonanteRoutes;
 import ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.routes.HomeRoutes;
 import ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.routes.MapaRoutes;
 import ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.routes.NecesidadRoutes;
+import ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.routes.PerfilRoutes;
 import ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.routes.SesionRoutes;
 import ar.edu.utn.frba.dds.donatrack.shared.ConfiguracionEntorno;
 import ar.edu.utn.frba.dds.donatrack.shared.ExceptionHandlers;
@@ -26,6 +30,7 @@ import com.github.jknack.handlebars.io.ClassPathTemplateLoader;
 import com.github.jknack.handlebars.io.TemplateLoader;
 import io.javalin.Javalin;
 import io.javalin.rendering.template.JavalinHandlebars;
+import com.github.jknack.handlebars.helper.ConditionalHelpers;
 import static io.javalin.apibuilder.ApiBuilder.path;
 
 public class App {
@@ -33,29 +38,39 @@ public class App {
   public static final int PUERTO = 7070;
 
   public static void main(String[] args) {
+    ConfiguracionEntorno config = ConfiguracionEntorno.getInstance();
+
+    //Cargo credenciales para la db desde el .env TODO esta configuración debería estar en persistence.xml
+    System.setProperty("hibernate.connection.url", config.getDbUrlDonaciones());
+    System.setProperty("hibernate.connection.username", config.getDbUser());
+    System.setProperty("hibernate.connection.password", config.getDbPassword());
+    //Si te sale error por el momento puedes usar la opción: 3 del meta-inf
     DatosIniciales.init();
     SuscriptorNotificacion.init();
-    crearApp().start(ConfiguracionEntorno.getInstance().puertoDonaciones(PUERTO));
+    crearApp().start(config.puertoDonaciones(PUERTO));
   }
 
   public static Javalin crearApp() {
     //Repositorios
     DonanteRepository donanteRepository = DonanteRepository.getInstancia();
     DonacionRepository donacionRepository = DonacionRepository.getInstancia();
-    BeneficiarioRepository benificiarioRepository = BeneficiarioRepository.getInstancia();
+    BeneficiarioRepository beneficiarioRepository = BeneficiarioRepository.getInstancia();
     RankingRepository rankingRepository = RankingRepository.getInstancia();
     SubcategoriaRepository subcategoriaRepository = SubcategoriaRepository.getInstancia();
     CategoriaRepository categoriaRepository = CategoriaRepository.getInstancia();
+    UsuarioRepository usuarioRepository = UsuarioRepository.getInstancia();
 
     //Controllers
     DonanteApiController donanteApiController = new DonanteApiController(donanteRepository);
     DonacionApiController donacionApiController = new DonacionApiController(donacionRepository, donanteRepository, subcategoriaRepository, categoriaRepository);
-    BeneficiarioApiController beneficiarioApiController = new BeneficiarioApiController(benificiarioRepository);
-    NecesidadApiController necesidadApiController = new NecesidadApiController(benificiarioRepository, subcategoriaRepository);
-    AsignacionApiController asignacionApiController = new AsignacionApiController(donacionRepository, benificiarioRepository, rankingRepository);
+    BeneficiarioApiController beneficiarioApiController = new BeneficiarioApiController(beneficiarioRepository);
+    NecesidadApiController necesidadApiController = new NecesidadApiController(beneficiarioRepository, subcategoriaRepository);
+    AsignacionApiController asignacionApiController = new AsignacionApiController(donacionRepository, beneficiarioRepository, rankingRepository);
     HomeController homeController = new HomeController();
-    SesionController sesionController = new SesionController();
-    MapaController mapaController = new MapaController();
+    SesionController sesionController = new SesionController(usuarioRepository);
+    PerfilController perfilController = new PerfilController(donanteRepository, beneficiarioRepository, usuarioRepository);
+    MapaController mapaController = new MapaController(beneficiarioRepository);
+    DonanteController donanteController = new DonanteController(donanteRepository, donacionRepository, categoriaRepository, subcategoriaRepository);
 
     NecesidadController necesidadController = new NecesidadController( BeneficiarioRepository.getInstancia(), CategoriaRepository.getInstancia(), SubcategoriaRepository.getInstancia());
     DonacionBeneficiarioController donacionBeneficiarioController = new DonacionBeneficiarioController( BeneficiarioRepository.getInstancia(),DonacionRepository.getInstancia());
@@ -65,6 +80,9 @@ public class App {
       config.http.defaultContentType = "application/json";
       TemplateLoader loader = new ClassPathTemplateLoader("/presentacion", "");
       Handlebars motorHandlebars = new Handlebars(loader);
+      for (ConditionalHelpers helper : ConditionalHelpers.values()) {
+        motorHandlebars.registerHelper(helper.name(), helper);
+      }
       config.fileRenderer(new JavalinHandlebars(motorHandlebars));
 
       //Registramos las rutas
@@ -78,7 +96,9 @@ public class App {
       //rutas que devuelven vistas
       HomeRoutes.registrar(config.routes, homeController);
       SesionRoutes.registrar(config.routes, sesionController);
+      PerfilRoutes.registrar(config.routes, perfilController);
       MapaRoutes.registrar(config.routes, mapaController);
+      DonanteRoutes.registrar(config.routes, donanteController);
 
       NecesidadRoutes.registrar(config.routes, necesidadController);
       DonacionBeneficiarioRoutes.registrar( config.routes, donacionBeneficiarioController);

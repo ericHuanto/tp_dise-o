@@ -26,10 +26,9 @@ public class CategoriaRepository implements WithSimplePersistenceUnit {
         .findFirst()
         .orElse(null);
   }
-
   public List<Categoria> buscarTodos() {
     return entityManager()
-        .createQuery("SELECT c FROM Categoria c", Categoria.class)
+        .createQuery("SELECT c FROM Categoria c ORDER BY c.nombre", Categoria.class)
         .getResultList();
   }
 }
