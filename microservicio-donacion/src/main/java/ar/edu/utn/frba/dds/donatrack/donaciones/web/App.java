@@ -36,7 +36,7 @@ public class App {
   public static void main(String[] args) {
     ConfiguracionEntorno config = ConfiguracionEntorno.getInstance();
 
-    //Cargo credenciales para la db desde el .env TODO esta configuracion deberia estar en persistence.xml
+    //Cargo credenciales para la db desde el .env TODO esta configuración debería estar en persistence.xml
     System.setProperty("hibernate.connection.url", config.getDbUrlDonaciones());
     System.setProperty("hibernate.connection.username", config.getDbUser());
     System.setProperty("hibernate.connection.password", config.getDbPassword());
@@ -65,7 +65,7 @@ public class App {
     HomeController homeController = new HomeController();
     SesionController sesionController = new SesionController(usuarioRepository);
     PerfilController perfilController = new PerfilController(donanteRepository, beneficiarioRepository, usuarioRepository);
-    MapaController mapaController = new MapaController();
+    MapaController mapaController = new MapaController(beneficiarioRepository);
     DonanteController donanteController = new DonanteController(donanteRepository, donacionRepository, categoriaRepository, subcategoriaRepository);
 
     Javalin app = Javalin.create(config -> {

@@ -8,7 +8,7 @@ public class MapaRoutes {
   private MapaRoutes() { }
 
   public static void registrar(RoutesConfig ruta, MapaController controller) {
-    ruta.get("/donaciones/entregas/galeria", controller::mostrarDonacionesEntregadas);
+    ruta.get("/beneficiarios/donaciones/recibidas", controller::mostrarDonacionesRecibidas);
   }
 
 }
