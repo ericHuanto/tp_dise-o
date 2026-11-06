@@ -31,9 +31,9 @@ public class BeneficiarioRepository implements WithSimplePersistenceUnit {
         .getResultList().stream().findFirst().orElse(null);  */
   }
 
-  public List<Beneficiario> buscarTodos() {
-    return entityManager().createQuery("SELECT b FROM Beneficiario b", Beneficiario.class).getResultList();
-  }
+    public List<Beneficiario> buscarTodos() {
+      return entityManager().createQuery("SELECT b FROM Beneficiario b", Beneficiario.class).getResultList();
+    }
 
   public void actualizar(Beneficiario beneficiario) {
     if (beneficiario.getId() == null || buscarPorId(beneficiario.getId()) == null) {

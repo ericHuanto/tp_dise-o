@@ -1,0 +1,60 @@
+```hbs
+{{#partial "nombre_pestaña"}}
+    Mis necesidades
+{{/partial}}
+
+{{#partial "breadcrumbs"}}
+    Mis necesidades
+{{/partial}}
+
+{{#partial "contenido_propio"}}
+    <section class="mis-necesidades">
+        <div class="encabezado-seccion">
+            <div>
+                <h1>Mis necesidades</h1>
+                <p>Administrá las necesidades de tu organización.</p>
+            </div>
+
+            <a href="/mis-necesidades/nueva" class="boton-principal">
+                Nueva necesidad
+            </a>
+        </div>
+
+        {{#if necesidades}}
+            <div class="lista-necesidades">
+                {{#each necesidades}}
+                    <article class="tarjeta-necesidad">
+                        <div class="tarjeta-necesidad__encabezado">
+                            <h2>{{descripcion}}</h2>
+                            <span>{{tipo}}</span>
+                        </div>
+
+                        <p>{{categoria}} / {{subcategoria}}</p>
+
+                        {{#if cantidadPorPeriodo}}
+                            <p>{{cantidadPorPeriodo}} {{unidadMedida}} por {{periodo}}</p>
+                        {{else}}
+                            <p>Cantidad requerida: {{cantidadRequerida}} {{unidadMedida}}</p>
+                        {{/if}}
+
+                        <p>Cantidad recibida: {{cantidadRecibida}}</p>
+
+                        {{#if estaSatisfecha}}
+                            <span>Necesidad satisfecha</span>
+                        {{else}}
+                            <span>Pendiente de completar</span>
+                        {{/if}}
+
+                    </article>
+                {{/each}}
+            </div>
+        {{else}}
+            <div class="sin-necesidades">
+                <h2>Todavía no registraste necesidades</h2>
+                <p>Podés comenzar registrando los materiales que necesita tu organización.</p>
+            </div>
+        {{/if}}
+    </section>
+{{/partial}}
+
+{{> plantillas/layout.hbs}}

@@ -8,11 +8,15 @@ import ar.edu.utn.frba.dds.donatrack.donaciones.web.api.routes.BeneficiarioApiRo
 import ar.edu.utn.frba.dds.donatrack.donaciones.web.api.routes.DonacionApiRoutes;
 import ar.edu.utn.frba.dds.donatrack.donaciones.web.api.routes.DonanteApiRoutes;
 import ar.edu.utn.frba.dds.donatrack.donaciones.web.api.routes.NecesidadApiRoutes;
+import ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.controller.DonacionBeneficiarioController;
 import ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.controller.HomeController;
 import ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.controller.MapaController;
+import ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.controller.NecesidadController;
 import ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.controller.SesionController;
+import ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.routes.DonacionBeneficiarioRoutes;
 import ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.routes.HomeRoutes;
 import ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.routes.MapaRoutes;
+import ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.routes.NecesidadRoutes;
 import ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.routes.SesionRoutes;
 import ar.edu.utn.frba.dds.donatrack.shared.ConfiguracionEntorno;
 import ar.edu.utn.frba.dds.donatrack.shared.ExceptionHandlers;
@@ -53,6 +57,9 @@ public class App {
     SesionController sesionController = new SesionController();
     MapaController mapaController = new MapaController();
 
+    NecesidadController necesidadController = new NecesidadController( BeneficiarioRepository.getInstancia(), CategoriaRepository.getInstancia(), SubcategoriaRepository.getInstancia());
+    DonacionBeneficiarioController donacionBeneficiarioController = new DonacionBeneficiarioController( BeneficiarioRepository.getInstancia(),DonacionRepository.getInstancia());
+
     Javalin app = Javalin.create(config -> {
       config.jsonMapper(GsonConfig.jsonMapper());
       config.http.defaultContentType = "application/json";
@@ -72,6 +79,9 @@ public class App {
       HomeRoutes.registrar(config.routes, homeController);
       SesionRoutes.registrar(config.routes, sesionController);
       MapaRoutes.registrar(config.routes, mapaController);
+
+      NecesidadRoutes.registrar(config.routes, necesidadController);
+      DonacionBeneficiarioRoutes.registrar( config.routes, donacionBeneficiarioController);
 
       //Registramos las excepciones
       ExceptionHandlers.registrar(config.routes);

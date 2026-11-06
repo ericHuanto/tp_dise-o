@@ -3,6 +3,7 @@ package ar.edu.utn.frba.dds.donatrack.donaciones.persistencia;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.bien.Categoria;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.bien.Subcategoria;
 import io.github.flbulgarelli.jpa.extras.simple.WithSimplePersistenceUnit;
+import java.util.List;
 
 public class CategoriaRepository implements WithSimplePersistenceUnit {
   private static final CategoriaRepository INSTACE = new CategoriaRepository();
@@ -24,5 +25,11 @@ public class CategoriaRepository implements WithSimplePersistenceUnit {
         .getResultStream()
         .findFirst()
         .orElse(null);
+  }
+
+  public List<Categoria> buscarTodos() {
+    return entityManager()
+        .createQuery("SELECT c FROM Categoria c", Categoria.class)
+        .getResultList();
   }
 }
