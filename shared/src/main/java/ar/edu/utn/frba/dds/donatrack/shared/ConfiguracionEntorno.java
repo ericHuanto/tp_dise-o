@@ -80,6 +80,14 @@ public class ConfiguracionEntorno {
     return obtenerObligatorio("DB_PASSWORD");
   }
 
+  public String getDbDriver()  {
+    return obtenerObligatorio("DB_DRIVER");
+  }
+
+  public String getDbDialect() {
+    return obtenerObligatorio("DB_DIALECT");
+  }
+
   //=================== FUNCIONES AUXILIARES =====================
   private String obtenerObligatorio(String nombre) {
     String clave = dotenv.get(nombre);

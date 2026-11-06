@@ -42,14 +42,16 @@ public class App {
 
   public static void main(String[] args) throws IOException {
     ConfiguracionEntorno config = ConfiguracionEntorno.getInstance();
-    DatosIniciales.init();
-    SuscriptorNotificacion.init();
 
     //Cargo credenciales para la db desde el .env TODO esta configuracion deberia estar en persistence.xml
-    System.setProperty("hibernate.connection.url", config.getDbUrlDonaciones());
-    System.setProperty("hibernate.connection.username", config.getDbUser());
-    System.setProperty("hibernate.connection.password", config.getDbPassword());
-    //Si te sale error por el momento puedes usar la opción: 3 del meta-inf
+    setPropiedad("hibernate.connection.driver_class", config.getDbDriver());
+    setPropiedad("hibernate.connection.url",          config.getDbUrlDonaciones());
+    setPropiedad("hibernate.connection.username",     config.getDbUser());
+    setPropiedad("hibernate.connection.password",     config.getDbPassword());
+    setPropiedad("hibernate.dialect",                 config.getDbDialect());
+
+    DatosIniciales.init();
+    SuscriptorNotificacion.init();
 
     Server grpc = ServerBuilder
         .forPort(config.puertoGrpcDonaciones(PUERTO_GRPC))
@@ -60,6 +62,12 @@ public class App {
     Runtime.getRuntime().addShutdownHook(new Thread(grpc::shutdown));
 
     crearApp().start(config.puertoDonaciones(PUERTO));
+  }
+
+  private static void setPropiedad(String clave, String valor) {
+    if (valor != null) {
+      System.setProperty(clave, valor);
+    }
   }
 
   public static Javalin crearApp() {
