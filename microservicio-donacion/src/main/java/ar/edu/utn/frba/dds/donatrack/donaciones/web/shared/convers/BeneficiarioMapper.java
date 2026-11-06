@@ -2,6 +2,7 @@ package ar.edu.utn.frba.dds.donatrack.donaciones.web.shared.convers;
 
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.beneficiario.Beneficiario;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.mediocontacto.MedioContacto;
+import ar.edu.utn.frba.dds.donatrack.donaciones.web.shared.dto.beneficiario.BeneficiarioMapaResponse;
 import ar.edu.utn.frba.dds.donatrack.donaciones.web.shared.dto.beneficiario.BeneficiarioRequest;
 import ar.edu.utn.frba.dds.donatrack.donaciones.web.shared.dto.beneficiario.BeneficiarioResponse;
 import ar.edu.utn.frba.dds.donatrack.donaciones.web.shared.dto.beneficiario.BeneficiarioResumenResponse;
@@ -44,6 +45,21 @@ public class BeneficiarioMapper {
     List<MedioContacto> contactosMerge = request.contactos() != null ? ContactoMapper.aDominio(request.contactos()) : beneficiario.getContactos();
 
     beneficiario.actualizarDatos(razonSocialMerge, direccionMerge, contactosMerge);
+  }
+
+  public static BeneficiarioMapaResponse aDtoMapa(Beneficiario beneficiario) {
+    return new BeneficiarioMapaResponse(
+        beneficiario.getId(),
+        beneficiario.getRazonSocial(),
+        beneficiario.getDireccion(),
+        beneficiario.getLatitud(),
+        beneficiario.getLongitud(),
+        DonacionMapper.aDtoMapa(beneficiario.getDonaciones())
+    );
+  }
+
+  public static List<BeneficiarioMapaResponse> aDtoMapa(List<Beneficiario> beneficiarios) {
+    return beneficiarios.stream().map(BeneficiarioMapper::aDtoMapa).toList();
   }
 
 }

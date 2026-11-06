@@ -3,6 +3,7 @@ package ar.edu.utn.frba.dds.donatrack.donaciones.web.shared.convers;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.donacion.Donacion;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.donante.Donante;
 import ar.edu.utn.frba.dds.donatrack.donaciones.web.shared.dto.bien.BienDto;
+import ar.edu.utn.frba.dds.donatrack.donaciones.web.shared.dto.donacion.DonacionMapaResponse;
 import ar.edu.utn.frba.dds.donatrack.donaciones.web.shared.dto.donacion.DonacionResponse;
 
 import ar.edu.utn.frba.dds.donatrack.donaciones.web.shared.dto.donacion.DonacionResumenResponse;
@@ -37,6 +38,18 @@ public class DonacionMapper {
 
   public static List<DonacionResumenResponse> aDto(List<Donacion> donaciones) {
     return donaciones.stream().map(DonacionMapper::aDtoResumen).toList();
+  }
+
+  public static DonacionMapaResponse aDtoMapa(Donacion donacion) {
+    return new DonacionMapaResponse(
+        donacion.getId(),
+        donacion.getDescripcion(),
+        donacion.getEstadoActual().name()
+    );
+  }
+
+  public static List<DonacionMapaResponse> aDtoMapa(List<Donacion> donaciones) {
+    return donaciones.stream().map(DonacionMapper::aDtoMapa).toList();
   }
 
 }

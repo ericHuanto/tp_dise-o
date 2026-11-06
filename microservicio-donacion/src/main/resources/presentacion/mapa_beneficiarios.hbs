@@ -1,0 +1,43 @@
+{{#partial "nombre_pestaña"}}
+    Mapa de Beneficiarios - DonaTrack
+{{/partial}}
+
+{{#partial "contenido_propio"}}
+    <section>
+        <h2>Mapa de Donaciones Entregadas</h2>
+        <p>Haz clic en los marcadores para ver el detalle de lo que recibió cada beneficiario.</p>
+
+        <div id="mapa" style="height: 500px; width: 100%; border: 2px solid #ccc; border-radius: 8px;"></div>
+    </section>
+{{/partial}}
+
+{{#partial "scripts"}}
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script>
+        var map = L.map('mapa').setView([-34.6037, -58.3816], 11);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '© OpenStreetMap'
+        }).addTo(map);
+
+        const beneficiarios = JSON.parse('{{{marcadoresJson}}}');
+
+        beneficiarios.forEach(beneficiario => {
+            //Lo ubicamos en el mapa
+            let marker = L.marker([parseFloat(beneficiario.latitud), parseFloat(beneficiario.longitud)]).addTo(map);
+            // Armamos el popUp
+            let popupHTML = `<h4 style="margin-bottom: 5px;">${beneficiario.razonSocial}</h4>`;
+            popupHTML += `<span>${beneficiario.direccion}</span><hr>`;
+            popupHTML += `<b>Donaciones Recibidas:</b><ul style="padding-left: 20px; margin-top: 5px;">`;
+            beneficiario.donaciones.forEach(donacion => {
+                popupHTML += `<li>${donacion.descripcion}</li>`;
+                });
+            popupHTML += `</ul>`;
+            marker.bindPopup(popupHTML);
+        });
+    </script>
+{{/partial}}
+
+{{> plantillas/layout_publico.hbs}}

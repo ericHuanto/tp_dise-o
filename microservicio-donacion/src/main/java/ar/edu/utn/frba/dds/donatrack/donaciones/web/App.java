@@ -89,7 +89,7 @@ public class App {
     HomeController homeController = new HomeController();
     SesionController sesionController = new SesionController(usuarioRepository);
     PerfilController perfilController = new PerfilController(donanteRepository, beneficiarioRepository, usuarioRepository);
-    MapaController mapaController = new MapaController();
+    MapaController mapaController = new MapaController(beneficiarioRepository);
     DonanteController donanteController = new DonanteController(donanteRepository, donacionRepository, categoriaRepository, subcategoriaRepository);
 
     Javalin app = Javalin.create(config -> {

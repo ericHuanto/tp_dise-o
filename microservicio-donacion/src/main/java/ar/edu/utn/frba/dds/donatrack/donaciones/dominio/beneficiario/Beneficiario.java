@@ -12,6 +12,7 @@ import java.util.List;
 import javax.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import java.util.Random;
 
 @Getter
 @NoArgsConstructor
@@ -25,6 +26,10 @@ public class Beneficiario {
   private String razonSocial;
   @Column(name = "direccion")
   private String direccion;
+  @Column(name = "latitud_direccion")
+  private String latitud;
+  @Column(name = "longitud_direccion")
+  private String longitud;
   @OneToMany(cascade = CascadeType.ALL)
   @JoinColumn(name = "id_beneficiario")
   private List<MedioContacto> contactos;
@@ -41,6 +46,8 @@ public class Beneficiario {
     checkDatos(razonSocial, contactos);
     this.razonSocial = razonSocial;
     this.direccion = direccion;
+    this.latitud = calcularLatitud(direccion);
+    this.longitud = calcularLongitud(direccion);
     this.contactos = new ArrayList<>(contactos);
     this.necesidades = new ArrayList<>();
     this.donaciones = new ArrayList<>();
@@ -105,6 +112,19 @@ public class Beneficiario {
     this.razonSocial = razonSocial;
     this.direccion = direccion;
     this.contactos = new ArrayList<>(contactos);
+  }
+
+  //=============== FUNCIONES AUXILIARES =================
+  private String calcularLatitud(String direccion) {
+    //Usar un servicio externo que al pasarle la direccion devuelva la latitud
+    Double latitudFalsa = -34.705 + (new Random()).nextDouble() * ((-34.526) - (-34.705));
+    return String.valueOf(latitudFalsa);
+  }
+
+  public String calcularLongitud(String direccion) {
+    //Usar un servicio externo que al pasarle la direccion devuelva la longitud
+    Double longitudFalsa = -58.531 + (new Random()).nextDouble() * ((-58.335) - (-58.531));
+    return String.valueOf(longitudFalsa);
   }
 
 }
