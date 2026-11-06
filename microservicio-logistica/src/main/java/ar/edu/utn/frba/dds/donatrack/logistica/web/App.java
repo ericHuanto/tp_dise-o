@@ -28,6 +28,15 @@ import java.time.temporal.ChronoUnit;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import com.github.jknack.handlebars.Handlebars;
+import com.github.jknack.handlebars.io.ClassPathTemplateLoader;
+import com.github.jknack.handlebars.io.TemplateLoader;
+import com.github.jknack.handlebars.helper.ConditionalHelpers;
+import io.javalin.rendering.template.JavalinHandlebars;
+import ar.edu.utn.frba.dds.donatrack.logistica.web.controllers.HomeController;
+import ar.edu.utn.frba.dds.donatrack.logistica.web.routes.HomeRoutes;
+import io.javalin.http.staticfiles.Location;
+import java.nio.file.Path;
 
 public class App {
   public static final int PUERTO = 7071;
@@ -59,7 +68,7 @@ public class App {
     );
 
     System.out.println("[Cron] Planificación programada en " + minutosHasta + " minutos");
-    DatosIniciales.init();
+   // DatosIniciales.init();
     resultado.app().start(config.puertoLogistica(PUERTO));
   }
 
@@ -89,10 +98,28 @@ public class App {
     RutaController rutaController = new RutaController(rutaRepository, donacionesClient);
     EntregaController entregaController = new EntregaController(entregaRepository, donacionesClient);
     CamionController camionController = new CamionController(camionRepository, gpsRepository);
+    HomeController homeController = new HomeController();
 
     Javalin app = Javalin.create(config -> {
       config.jsonMapper(GsonConfig.jsonMapper());
       config.http.defaultContentType = "application/json";
+
+      // Permitir acceder a las fotografías de las entregas
+      config.staticFiles.add(staticFiles -> {
+        staticFiles.hostedPath = "/uploads";
+        staticFiles.directory = Path.of(
+            "microservicio-logistica", "uploads"
+        ).toAbsolutePath().toString();
+        staticFiles.location = Location.EXTERNAL;
+      });
+
+      // Configuración de Handlebars
+      TemplateLoader loader = new ClassPathTemplateLoader("/presentacion", "");
+      Handlebars motorHandlebars = new Handlebars(loader);
+      for (ConditionalHelpers helper : ConditionalHelpers.values()) {
+        motorHandlebars.registerHelper(helper.name(), helper);
+      }
+      config.fileRenderer(new JavalinHandlebars(motorHandlebars));
 
       // Registramos las Rutas usando config.routes
       config.routes.get("/health", ctx -> ctx.json("Micro servicio de logística funcionando"));
@@ -100,6 +127,7 @@ public class App {
       RutaRoutes.registrar(config.routes, rutaController);
       EntregaRoutes.registrar(config.routes, entregaController);
       PlanificacionRoutes.registrar(config.routes, planificacionController);
+      HomeRoutes.registrar(config.routes, homeController);
 
       // Registramos las excepciones usando config.routes
       ExceptionHandlers.registrar(config.routes);
