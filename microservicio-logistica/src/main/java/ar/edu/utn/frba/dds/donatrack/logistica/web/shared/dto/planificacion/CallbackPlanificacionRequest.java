@@ -1,0 +1,10 @@
+package ar.edu.utn.frba.dds.donatrack.logistica.web.shared.dto.planificacion;
+
+import java.util.List;
+import java.util.Map;
+
+public record CallbackPlanificacionRequest(
+    Map<String, List<Long>> entregasPorPatente,
+    List<Long> entregasSinAsignar,
+    String fecha
+) {}

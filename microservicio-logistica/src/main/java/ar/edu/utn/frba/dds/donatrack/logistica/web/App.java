@@ -4,18 +4,21 @@ import ar.edu.utn.frba.dds.donatrack.logistica.persistencia.BeneficiarioReposito
 import ar.edu.utn.frba.dds.donatrack.logistica.persistencia.DatosIniciales;
 import ar.edu.utn.frba.dds.donatrack.logistica.persistencia.GpsRepository;
 import ar.edu.utn.frba.dds.donatrack.logistica.persistencia.WithLogisticaPersistenceUnit;
-import ar.edu.utn.frba.dds.donatrack.logistica.web.controllers.*;
+import ar.edu.utn.frba.dds.donatrack.logistica.web.api.controllers.*;
+import ar.edu.utn.frba.dds.donatrack.logistica.web.api.routes.*;
 import ar.edu.utn.frba.dds.donatrack.logistica.web.coordinadores.CoordinadorRuta;
 import ar.edu.utn.frba.dds.donatrack.logistica.cron.ProcesoLogistica;
-import ar.edu.utn.frba.dds.donatrack.logistica.web.integracion.planificadorexterno.ClientePlanificadorExterno;
-import ar.edu.utn.frba.dds.donatrack.logistica.web.integracion.planificadorexterno.ClientePlanificadorExternoMock;
-import ar.edu.utn.frba.dds.donatrack.logistica.web.integracion.microserviciosdonaciones.ConectorDonacionesApi;
-import ar.edu.utn.frba.dds.donatrack.logistica.web.integracion.microserviciosdonaciones.ConectorDonacionesGrpc;
-import ar.edu.utn.frba.dds.donatrack.logistica.web.integracion.microserviciosdonaciones.ConectorDonaciones;
+import ar.edu.utn.frba.dds.donatrack.logistica.dominio.planificadorexterno.ClientePlanificadorExterno;
+import ar.edu.utn.frba.dds.donatrack.logistica.dominio.planificadorexterno.ClientePlanificadorExternoMock;
+import ar.edu.utn.frba.dds.donatrack.logistica.web.shared.integracion.microserviciosdonaciones.ConectorDonacionesGrpc;
+import ar.edu.utn.frba.dds.donatrack.logistica.web.shared.integracion.microserviciosdonaciones.ConectorDonaciones;
 import ar.edu.utn.frba.dds.donatrack.logistica.persistencia.CamionRepository;
 import ar.edu.utn.frba.dds.donatrack.logistica.persistencia.RutaRepository;
-import ar.edu.utn.frba.dds.donatrack.logistica.web.routes.*;
 import ar.edu.utn.frba.dds.donatrack.logistica.persistencia.EntregaRepository;
+import ar.edu.utn.frba.dds.donatrack.logistica.web.ui.controllers.CamionController;
+import ar.edu.utn.frba.dds.donatrack.logistica.web.ui.routes.CamionRoutes;
+import ar.edu.utn.frba.dds.donatrack.logistica.web.ui.controllers.HomeController;
+import ar.edu.utn.frba.dds.donatrack.logistica.web.ui.routes.HomeRoutes;
 import ar.edu.utn.frba.dds.donatrack.shared.ConfiguracionEntorno;
 import ar.edu.utn.frba.dds.donatrack.shared.ExceptionHandlers;
 import ar.edu.utn.frba.dds.donatrack.shared.GsonConfig;
@@ -31,13 +34,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import com.github.jknack.handlebars.Handlebars;
-import com.github.jknack.handlebars.io.ClassPathTemplateLoader;
-import com.github.jknack.handlebars.io.TemplateLoader;
-import com.github.jknack.handlebars.helper.ConditionalHelpers;
-import io.javalin.rendering.template.JavalinHandlebars;
-import ar.edu.utn.frba.dds.donatrack.logistica.web.controllers.HomeController;
-import ar.edu.utn.frba.dds.donatrack.logistica.web.routes.HomeRoutes;
+
 import io.javalin.http.staticfiles.Location;
 import java.nio.file.Path;
 
@@ -99,12 +96,12 @@ public class App {
 
     //Controllers
     //para api (json)
-    PlanificacionController planificacionController = new PlanificacionController(coordinadorRuta, procesoLogistica);
-    RutaController rutaController = new RutaController(rutaRepository, donacionesClient);
-    EntregaController entregaController = new EntregaController(entregaRepository, donacionesClient);
-    CamionController camionController = new CamionController(camionRepository, gpsRepository);
+    PlanificacionApiController planificacionApiController = new PlanificacionApiController(coordinadorRuta, procesoLogistica);
+    RutaApiController rutaApiController = new RutaApiController(rutaRepository, donacionesClient);
+    EntregaApiController entregaApiController = new EntregaApiController(entregaRepository, donacionesClient);
+    CamionApiController camionApiController = new CamionApiController(camionRepository, gpsRepository);
     //para web (html)
-    CamionControllerUI camionControllerUI = new CamionControllerUI(camionRepository, gpsRepository);
+    CamionController camionController = new CamionController(camionRepository, gpsRepository);
     HomeController homeController = new HomeController();
 
     Javalin app = Javalin.create(config -> {
@@ -127,12 +124,12 @@ public class App {
       //Registramos las Rutas
       //rutas de la api
       config.routes.get("/health", ctx -> ctx.json("Micro servicio de logística funcionando"));
-      CamionRoutes.registrar(config.routes, camionController);
-      RutaRoutes.registrar(config.routes, rutaController);
-      EntregaRoutes.registrar(config.routes, entregaController);
-      PlanificacionRoutes.registrar(config.routes, planificacionController);
+      CamionApiRoutes.registrar(config.routes, camionApiController);
+      RutaApiRoutes.registrar(config.routes, rutaApiController);
+      EntregaApiRoutes.registrar(config.routes, entregaApiController);
+      PlanificacionApiRoutes.registrar(config.routes, planificacionApiController);
       //rutas de la web
-      CamionRoutesUI.registrar(config.routes, camionControllerUI);
+      CamionRoutes.registrar(config.routes, camionController);
       HomeRoutes.registrar(config.routes, homeController);
 
       // Registramos las excepciones usando config.routes

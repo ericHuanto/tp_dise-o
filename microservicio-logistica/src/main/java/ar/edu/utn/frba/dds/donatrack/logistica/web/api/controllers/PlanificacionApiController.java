@@ -1,0 +1,54 @@
+package ar.edu.utn.frba.dds.donatrack.logistica.web.api.controllers;
+
+import ar.edu.utn.frba.dds.donatrack.logistica.web.shared.convers.EntregaMapper;
+import ar.edu.utn.frba.dds.donatrack.logistica.web.coordinadores.CoordinadorRuta;
+import ar.edu.utn.frba.dds.donatrack.logistica.cron.ProcesoLogistica;
+import ar.edu.utn.frba.dds.donatrack.logistica.dominio.entrega.Entrega;
+import ar.edu.utn.frba.dds.donatrack.logistica.dominio.ruta.Ruta;
+import ar.edu.utn.frba.dds.donatrack.logistica.web.shared.dto.planificacion.CallbackPlanificacionRequest;
+import ar.edu.utn.frba.dds.donatrack.shared.ExceptionHandlers;
+import ar.edu.utn.frba.dds.donatrack.shared.excepciones.BodyException;
+import ar.edu.utn.frba.dds.donatrack.shared.excepciones.RecursoNoEncontradoException;
+import ar.edu.utn.frba.dds.donatrack.shared.excepciones.ServicioExternoException;
+import com.google.gson.JsonSyntaxException;
+import java.util.List;
+import io.javalin.http.Context;
+
+public class PlanificacionApiController {
+
+  private final CoordinadorRuta coordinadorRuta;
+  private final ProcesoLogistica procesoLogistica;
+
+  public PlanificacionApiController(CoordinadorRuta coordinadorRuta, ProcesoLogistica procesoLogistica) {
+    this.coordinadorRuta = coordinadorRuta;
+    this.procesoLogistica = procesoLogistica;
+  }
+
+  public void planificar(Context ctx) {
+    List<Entrega> entregas = coordinadorRuta.planificarEntregasPendientes();
+    ctx.status(202).json(EntregaMapper.aDtoResumen(entregas));
+  }
+
+  public void callback(Context ctx) {
+    try {
+      CallbackPlanificacionRequest request = ctx.bodyAsClass(CallbackPlanificacionRequest.class);
+      if (request.entregasPorPatente() == null) throw new BodyException("Bad Request, necesita: 'entregas_por_patente' ");
+      List<Ruta> rutas = coordinadorRuta.procesarCallback(request);
+      ctx.status(201).json(rutas);
+    } catch (JsonSyntaxException e) {
+      ctx.status(400).json(new ExceptionHandlers.ErrorResponse(400, "El body no es un JSON valido"));
+    } catch (RecursoNoEncontradoException e) {
+      ctx.status(404).json(new ExceptionHandlers.ErrorResponse(404, e.getMessage()));
+    }
+  }
+
+  public void ejecutarManual(Context ctx) {
+    try {
+      procesoLogistica.ejecutar();
+      ctx.status(202);
+    } catch (ServicioExternoException e) {
+      ctx.status(502).json(new ExceptionHandlers.ErrorResponse(502,
+          "No se pudo completar la planificación: " + e.getMessage()));
+    }
+  }
+}
