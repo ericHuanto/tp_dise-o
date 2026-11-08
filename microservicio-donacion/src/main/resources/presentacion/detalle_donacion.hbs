@@ -1,0 +1,36 @@
+{{#partial "nombre_pestaña"}}
+    Detalle de donación
+{{/partial}}
+
+{{#partial "breadcrumbs"}}
+    <span>Inicio</span>
+    <span>Mis donaciones</span>
+    <span>Detalle</span>
+{{/partial}}
+
+{{#partial "contenido_propio"}}
+    <h1>Detalle de donación</h1>
+
+    <section>
+        <h2>Información de la donación</h2>
+
+        <p>
+            <strong>Descripción:</strong>
+            {{donacion.descripcion}}
+        </p>
+
+        <p>
+            <strong>Estado actual:</strong>
+            {{donacion.estadoActual}}
+        </p>
+
+        <p>
+            <strong>Fecha de asignación:</strong>
+            {{fechaAsignacion}}
+        </p>
+    </section>
+
+    <a href="/mis-donaciones">Volver a mis donaciones</a>
+{{/partial}}
+
+{{> plantillas/layout.hbs}}

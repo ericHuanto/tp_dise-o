@@ -126,5 +126,4 @@ public class Beneficiario {
     Double longitudFalsa = -58.531 + (new Random()).nextDouble() * ((-58.335) - (-58.531));
     return String.valueOf(longitudFalsa);
   }
-
 }

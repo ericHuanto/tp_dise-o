@@ -31,6 +31,15 @@ import java.time.temporal.ChronoUnit;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import com.github.jknack.handlebars.Handlebars;
+import com.github.jknack.handlebars.io.ClassPathTemplateLoader;
+import com.github.jknack.handlebars.io.TemplateLoader;
+import com.github.jknack.handlebars.helper.ConditionalHelpers;
+import io.javalin.rendering.template.JavalinHandlebars;
+import ar.edu.utn.frba.dds.donatrack.logistica.web.controllers.HomeController;
+import ar.edu.utn.frba.dds.donatrack.logistica.web.routes.HomeRoutes;
+import io.javalin.http.staticfiles.Location;
+import java.nio.file.Path;
 
 public class App {
   public static final int PUERTO = 7071;
@@ -96,11 +105,18 @@ public class App {
     CamionController camionController = new CamionController(camionRepository, gpsRepository);
     //para web (html)
     CamionControllerUI camionControllerUI = new CamionControllerUI(camionRepository, gpsRepository);
+    HomeController homeController = new HomeController();
 
     Javalin app = Javalin.create(config -> {
       config.jsonMapper(GsonConfig.jsonMapper());
       config.http.defaultContentType = "application/json";
-
+      config.staticFiles.add(staticFiles -> {
+        staticFiles.hostedPath = "/uploads";
+        staticFiles.directory = Path.of(
+            "microservicio-logistica", "uploads"
+        ).toAbsolutePath().toString();
+        staticFiles.location = Location.EXTERNAL;
+      });
       TemplateLoader loader = new ClassPathTemplateLoader("/presentacion", "");
       Handlebars motorHandlebars = new Handlebars(loader);
       for (ConditionalHelpers helper : ConditionalHelpers.values()) {
@@ -108,7 +124,7 @@ public class App {
       }
       config.fileRenderer(new JavalinHandlebars(motorHandlebars));
 
-      //Registramos las Rutas 
+      //Registramos las Rutas
       //rutas de la api
       config.routes.get("/health", ctx -> ctx.json("Micro servicio de logística funcionando"));
       CamionRoutes.registrar(config.routes, camionController);
@@ -117,6 +133,7 @@ public class App {
       PlanificacionRoutes.registrar(config.routes, planificacionController);
       //rutas de la web
       CamionRoutesUI.registrar(config.routes, camionControllerUI);
+      HomeRoutes.registrar(config.routes, homeController);
 
       // Registramos las excepciones usando config.routes
       ExceptionHandlers.registrar(config.routes);

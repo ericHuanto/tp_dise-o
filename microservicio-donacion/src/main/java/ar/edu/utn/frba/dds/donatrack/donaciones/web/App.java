@@ -9,6 +9,20 @@ import ar.edu.utn.frba.dds.donatrack.donaciones.web.api.routes.BeneficiarioApiRo
 import ar.edu.utn.frba.dds.donatrack.donaciones.web.api.routes.DonacionApiRoutes;
 import ar.edu.utn.frba.dds.donatrack.donaciones.web.api.routes.DonanteApiRoutes;
 import ar.edu.utn.frba.dds.donatrack.donaciones.web.api.routes.NecesidadApiRoutes;
+import ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.controller.DonacionBeneficiarioController;
+import ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.controller.DonanteController;
+import ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.controller.HomeController;
+import ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.controller.MapaController;
+import ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.controller.NecesidadController;
+import ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.controller.PerfilController;
+import ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.controller.SesionController;
+import ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.routes.DonacionBeneficiarioRoutes;
+import ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.routes.DonanteRoutes;
+import ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.routes.HomeRoutes;
+import ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.routes.MapaRoutes;
+import ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.routes.NecesidadRoutes;
+import ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.routes.PerfilRoutes;
+import ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.routes.SesionRoutes;
 import ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.controller.*;
 import ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.routes.*;
 import ar.edu.utn.frba.dds.donatrack.shared.ConfiguracionEntorno;
@@ -36,13 +50,14 @@ public class App {
   public static void main(String[] args) throws IOException {
     ConfiguracionEntorno config = ConfiguracionEntorno.getInstance();
 
-    //Cargo credenciales para la db desde el .env TODO esta configuracion deberia estar en persistence.xml
-    setPropiedad("hibernate.connection.driver_class", config.getDbDriver());   // LOCAL: no commitear
-    setPropiedad("hibernate.connection.url",          config.getDbUrlDonaciones());   // LOCAL: no commitear
-    setPropiedad("hibernate.connection.username",     config.getDbUser());   // LOCAL: no commitear
-    setPropiedad("hibernate.connection.password",     config.getDbPassword());   // LOCAL: no commitear
-    setPropiedad("hibernate.dialect",                 config.getDbDialect());   // LOCAL: no commitear
+    //Cargo credenciales para la db desde el .env TODO esta configuración debería estar en persistence.xml
+    //setPropiedad("hibernate.connection.driver_class", config.getDbDriver());   // LOCAL: no commitear
+    System.setProperty("hibernate.connection.url", config.getDbUrlDonaciones());
+    System.setProperty("hibernate.connection.username", config.getDbUser());
+    System.setProperty("hibernate.connection.password", config.getDbPassword());
+    //setPropiedad("hibernate.dialect",                 config.getDbDialect());   // LOCAL: no commitear
 
+    //Si te sale error por el momento puedes usar la opción: 3 del meta-inf
     DatosIniciales.init();
     SuscriptorNotificacion.init();
 
@@ -87,11 +102,13 @@ public class App {
     MapaController mapaController = new MapaController(beneficiarioRepository);
     DonanteController donanteController = new DonanteController(donanteRepository, donacionRepository, categoriaRepository, subcategoriaRepository, beneficiarioRepository);
     DonacionController donacionController = new DonacionController(donacionRepository);
+    NecesidadController necesidadController = new NecesidadController( BeneficiarioRepository.getInstancia(), CategoriaRepository.getInstancia(), SubcategoriaRepository.getInstancia());
+    DonacionBeneficiarioController donacionBeneficiarioController = new DonacionBeneficiarioController( BeneficiarioRepository.getInstancia(),DonacionRepository.getInstancia());
 
     Javalin app = Javalin.create(config -> {
       config.jsonMapper(GsonConfig.jsonMapper());
       config.http.defaultContentType = "application/json";
-      config.staticFiles.add("/presentacion", io.javalin.http.staticfiles.Location.CLASSPATH);
+      config.staticFiles.add("/presentacion", io.javalin.http.staticfiles.Location.CLASSPATH);//TODO después ver para que es ?
       TemplateLoader loader = new ClassPathTemplateLoader("/presentacion", "");
       Handlebars motorHandlebars = new Handlebars(loader);
       for (ConditionalHelpers helper : ConditionalHelpers.values()) {
@@ -114,6 +131,9 @@ public class App {
       MapaRoutes.registrar(config.routes, mapaController);
       DonanteRoutes.registrar(config.routes, donanteController);
       DonacionRoutes.registrar(config.routes, donacionController);
+
+      NecesidadRoutes.registrar(config.routes, necesidadController);
+      DonacionBeneficiarioRoutes.registrar(config.routes, donacionBeneficiarioController);
 
       //Registramos las excepciones
       ExceptionHandlers.registrar(config.routes);

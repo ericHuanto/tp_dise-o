@@ -37,17 +37,18 @@ public class BeneficiarioRepository implements WithSimplePersistenceUnit {
 
   public List<Beneficiario> buscarBeneficiariosConDonacionesRecibidas() {
     return entityManager().createQuery("SELECT DISTINCT b FROM Beneficiario b " +
-                "JOIN FETCH b.donaciones d " +
-                "JOIN d.historialEstados h " +
-                "WHERE h.tipoEstado = :estado", Beneficiario.class)
+            "JOIN FETCH b.donaciones d " +
+            "JOIN d.historialEstados h " +
+            "WHERE h.tipoEstado = :estado", Beneficiario.class)
         .setParameter("estado", TipoEstadoDonacion.ENTREGADA)
         .getResultList();
   }
 
   public List<Beneficiario> buscarTodos() {
-    return entityManager().createQuery("SELECT b FROM Beneficiario b", Beneficiario.class).getResultList();
+    return entityManager().createQuery(
+        "SELECT b FROM Beneficiario b", Beneficiario.class
+    ).getResultList();
   }
-
   public void actualizar(Beneficiario beneficiario) {
     if (beneficiario.getId() == null || buscarPorId(beneficiario.getId()) == null) {
       throw new RegistroNoEncontradoException("No se puede actualizar: no existe en la base de datos el beneficiario: " + beneficiario.getId());

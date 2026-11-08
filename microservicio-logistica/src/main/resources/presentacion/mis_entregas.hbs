@@ -1,0 +1,37 @@
+
+{{#partial "nombre_pestaña"}}
+    Mis entregas
+{{/partial}}
+
+{{#partial "breadcrumbs"}}
+    <a href="/">Inicio</a>
+    <span>Mis entregas</span>
+{{/partial}}
+
+{{#partial "contenido_propio"}}
+    <h1>Mis entregas</h1>
+
+    {{#if entregas}}
+        <div class="lista-entregas">
+            {{#each entregas}}
+                <article class="entrega-card">
+                    <h2>Entrega #{{id}}</h2>
+
+                    <p>
+                        <strong>Estado:</strong> {{estado}}
+                    </p>
+
+                    {{#if puedeConfirmar}}
+                        <a href="/mis-entregas/{{id}}/confirmar">Confirmar recepción</a>
+                    {{else}}
+                        <p>Esta entrega ya no puede confirmarse.</p>
+                    {{/if}}
+                </article>
+            {{/each}}
+        </div>
+    {{else}}
+        <p>No tenés entregas disponibles.</p>
+    {{/if}}
+{{/partial}}
+
+{{> plantillas/layout.hbs}}

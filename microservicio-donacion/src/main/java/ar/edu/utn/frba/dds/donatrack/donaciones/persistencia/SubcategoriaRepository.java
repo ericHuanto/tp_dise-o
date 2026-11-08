@@ -26,9 +26,12 @@ public class SubcategoriaRepository implements WithSimplePersistenceUnit {
         .orElse(null);
   }
 
-  public List<Subcategoria> buscarTodas() {
+  public List<Subcategoria> buscarTodos() {
     return entityManager()
-        .createQuery("SELECT s FROM Subcategoria s ORDER BY s.categoria.nombre, s.nombre", Subcategoria.class)
+        .createQuery(
+            "SELECT s FROM Subcategoria s ORDER BY s.categoria.nombre, s.nombre",
+            Subcategoria.class
+        )
         .getResultList();
   }
 

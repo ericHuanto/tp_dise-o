@@ -58,13 +58,13 @@ public class DonanteController {
     modelo.put("usuario", context.sessionAttribute("usuario_actual"));
     modelo.put("donaciones", donaciones);
     modelo.put("estados", TipoEstadoDonacion.values());
-    modelo.put("categorias", repoCategorias.buscarTodas());
-    modelo.put("subcategorias", repoSubcategorias.buscarTodas());
+    modelo.put("categorias", repoCategorias.buscarTodos());
+    modelo.put("subcategorias", repoSubcategorias.buscarTodos());
     modelo.put("estadoElegido", estado);
     modelo.put("categoriaElegida", idCategoria);
     modelo.put("subcategoriasElegidas", idsSubcategorias);
 
-    context.render("mis_donaciones.hbs", modelo);
+    context.render("donaciones_donante.hbs", modelo);
   }
 
   public void beneficiarios(Context context) {

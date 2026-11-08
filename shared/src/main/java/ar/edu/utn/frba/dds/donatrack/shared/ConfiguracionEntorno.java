@@ -76,8 +76,17 @@ public class ConfiguracionEntorno {
     return obtenerObligatorio("DB_USER");
   }
 
+
   public String getDbPassword() {
-    return obtenerObligatorio("DB_PASSWORD");
+    String password = dotenv.get("DB_PASSWORD");
+
+    if (password == null) {
+      throw new ConfigurationEntornoException(
+          "Falta la variable de entorno: 'DB_PASSWORD'"
+      );
+    }
+
+    return password;
   }
 
   public String getDbDriver()  {
