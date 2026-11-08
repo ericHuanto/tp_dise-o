@@ -7,3 +7,6 @@ gps*-tcpbrokerhivemqcom1883
 Estacion-dds-*/
 /.devcontainer/devcontainer.json
 
+*.iml
+/microservicio-logistica/uploads/entregas/*
+!/microservicio-logistica/uploads/entregas/.gitkeep
