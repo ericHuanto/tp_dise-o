@@ -1,4 +1,3 @@
-
 {{#partial "nombre_pestaña"}}
     Mis entregas
 {{/partial}}
@@ -16,16 +15,8 @@
             {{#each entregas}}
                 <article class="entrega-card">
                     <h2>Entrega #{{id}}</h2>
-
-                    <p>
-                        <strong>Estado:</strong> {{estado}}
-                    </p>
-
-                    {{#if puedeConfirmar}}
-                        <a href="/mis-entregas/{{id}}/confirmar">Confirmar recepción</a>
-                    {{else}}
-                        <p>Esta entrega ya no puede confirmarse.</p>
-                    {{/if}}
+                    <p> <strong>Estado:</strong> {{estadoActual}} </p>
+                    <a href="/mis-entregas/{{id}}/confirmar">Confirmar recepción</a>
                 </article>
             {{/each}}
         </div>

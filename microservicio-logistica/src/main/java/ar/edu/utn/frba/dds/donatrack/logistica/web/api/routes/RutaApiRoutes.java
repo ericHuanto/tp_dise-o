@@ -12,8 +12,6 @@ public class RutaApiRoutes {
     ruta.get("/api/rutas/{id}", controller::obtener);
     ruta.patch("/api/rutas/{id}/chofer", controller::asignarChofer);
     ruta.patch("/api/rutas/{id}/inicio", controller::iniciar); //activa el paso 4 de la donación (En Traslado)
-    //Todo descpues cambiarlo a otra carpeta
-    ruta.get("/seguimiento_entregas", controller::verSeguimiento);
   }
 
 }

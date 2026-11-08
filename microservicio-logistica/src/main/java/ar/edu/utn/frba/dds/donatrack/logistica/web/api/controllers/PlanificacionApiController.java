@@ -15,7 +15,6 @@ import java.util.List;
 import io.javalin.http.Context;
 
 public class PlanificacionApiController {
-
   private final CoordinadorRuta coordinadorRuta;
   private final ProcesoLogistica procesoLogistica;
 
@@ -47,8 +46,8 @@ public class PlanificacionApiController {
       procesoLogistica.ejecutar();
       ctx.status(202);
     } catch (ServicioExternoException e) {
-      ctx.status(502).json(new ExceptionHandlers.ErrorResponse(502,
-          "No se pudo completar la planificación: " + e.getMessage()));
+      ctx.status(502).json(new ExceptionHandlers.ErrorResponse(502,"No se pudo completar la planificación: " + e.getMessage()));
     }
   }
+
 }

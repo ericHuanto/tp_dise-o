@@ -83,49 +83,4 @@ public class RutaApiController {
     );
   }
 
-
-  //Todo despues cambiarlo a otra carpeta de controller
-  public void verSeguimiento(Context ctx) throws Exception {
-    List<Map<String, Object>> marcadores = new ArrayList<>();
-
-    for (Ruta ruta : repoRutas.buscarTodas()) {
-
-      if (!ruta.isEstaIniciada()) {
-        continue;
-      }
-
-      boolean tieneEntregasActivas = ruta.getEntregasOrdenadas()
-          .stream()
-          .anyMatch(entrega ->
-              entrega.getEstadoActual() == TipoEstadoEntrega.EN_TRASLADO
-          );
-
-      if (!tieneEntregasActivas) {
-        continue;
-      }
-
-      Camion camion = ruta.getCamion();
-      Coordenada ubicacion = camion.getUbicacionActual();
-
-      if (ubicacion == null) {
-        continue;
-      }
-
-      Map<String, Object> marcador = new HashMap<>();
-
-      marcador.put("patente", camion.getPatente());
-      marcador.put("latitud", ubicacion.getLatitud());
-      marcador.put("longitud", ubicacion.getLongitud());
-      marcador.put("ultimaActualizacion", "No disponible");
-
-      marcadores.add(marcador);
-    }
-
-    String marcadoresJson = new Gson().toJson(marcadores);
-    ctx.render(
-        "seguimiento_entregas.hbs",
-        Map.of("marcadoresJson", marcadoresJson)
-    );
-  }
-
 }

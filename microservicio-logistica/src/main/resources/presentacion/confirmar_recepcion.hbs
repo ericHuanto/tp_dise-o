@@ -1,4 +1,3 @@
-
 {{#partial "nombre_pestaña"}}
     Confirmar recepción
 {{/partial}}
@@ -11,34 +10,14 @@
 
 {{#partial "contenido_propio"}}
     <h1>Confirmar recepción de entrega</h1>
-
-    <p>
-        <strong>Entrega:</strong> #{{entrega.id}}
-    </p>
-
-    <p>
-        <strong>Estado actual:</strong> {{entrega.estado}}
-    </p>
-
-    <form action="/mis-entregas/{{entrega.id}}/confirmar"
-          method="POST"
-          enctype="multipart/form-data">
-
+    <p> <strong>Entrega:</strong> #{{entrega.id}} </p>
+    <p> <strong>Estado actual:</strong> {{entrega.estadoActual}} </p>
+    <form action="/mis-entregas/{{entrega.id}}/confirmar" method="post" enctype="multipart/form-data">
         <div>
             <label for="fotos">Fotografías de la recepción:</label>
-
-            <input
-                    type="file"
-                    id="fotos"
-                    name="fotos"
-                    accept="image/*"
-                    multiple
-                    required>
+            <input type="file" id="fotos" name="fotos" accept="image/*" multiple required>
         </div>
-
-        <button type="submit">
-            Confirmar recepción
-        </button>
+        <button type="submit"> Confirmar recepción </button>
     </form>
 
     <a href="/mis-entregas">Volver a mis entregas</a>

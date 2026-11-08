@@ -7,3 +7,8 @@ gps*-tcpbrokerhivemqcom1883
 Estacion-dds-*/
 /.devcontainer/devcontainer.json
 
+# Ignorar el contenido dentro de uploads (y sus subcarpetas)
+**/uploads/**/*
+
+# Excepción: NO ignorar los archivos .gitkeep
+!**/uploads/**/.gitkeep

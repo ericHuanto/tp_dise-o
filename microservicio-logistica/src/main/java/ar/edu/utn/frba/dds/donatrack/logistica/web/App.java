@@ -16,9 +16,13 @@ import ar.edu.utn.frba.dds.donatrack.logistica.persistencia.CamionRepository;
 import ar.edu.utn.frba.dds.donatrack.logistica.persistencia.RutaRepository;
 import ar.edu.utn.frba.dds.donatrack.logistica.persistencia.EntregaRepository;
 import ar.edu.utn.frba.dds.donatrack.logistica.web.ui.controllers.CamionController;
+import ar.edu.utn.frba.dds.donatrack.logistica.web.ui.controllers.EntregaController;
+import ar.edu.utn.frba.dds.donatrack.logistica.web.ui.controllers.RutaController;
 import ar.edu.utn.frba.dds.donatrack.logistica.web.ui.routes.CamionRoutes;
 import ar.edu.utn.frba.dds.donatrack.logistica.web.ui.controllers.HomeController;
+import ar.edu.utn.frba.dds.donatrack.logistica.web.ui.routes.EntregaRoutes;
 import ar.edu.utn.frba.dds.donatrack.logistica.web.ui.routes.HomeRoutes;
+import ar.edu.utn.frba.dds.donatrack.logistica.web.ui.routes.RutaRoutes;
 import ar.edu.utn.frba.dds.donatrack.shared.ConfiguracionEntorno;
 import ar.edu.utn.frba.dds.donatrack.shared.ExceptionHandlers;
 import ar.edu.utn.frba.dds.donatrack.shared.GsonConfig;
@@ -101,17 +105,17 @@ public class App {
     EntregaApiController entregaApiController = new EntregaApiController(entregaRepository, donacionesClient);
     CamionApiController camionApiController = new CamionApiController(camionRepository, gpsRepository);
     //para web (html)
-    CamionController camionController = new CamionController(camionRepository, gpsRepository);
     HomeController homeController = new HomeController();
+    CamionController camionController = new CamionController(camionRepository, gpsRepository);
+    EntregaController entregaController = new EntregaController(entregaRepository);
+    RutaController rutaController = new RutaController(rutaRepository);
 
     Javalin app = Javalin.create(config -> {
       config.jsonMapper(GsonConfig.jsonMapper());
       config.http.defaultContentType = "application/json";
       config.staticFiles.add(staticFiles -> {
         staticFiles.hostedPath = "/uploads";
-        staticFiles.directory = Path.of(
-            "microservicio-logistica", "uploads"
-        ).toAbsolutePath().toString();
+        staticFiles.directory = Path.of("microservicio-logistica", "uploads").toAbsolutePath().toString();
         staticFiles.location = Location.EXTERNAL;
       });
       TemplateLoader loader = new ClassPathTemplateLoader("/presentacion", "");
@@ -129,8 +133,10 @@ public class App {
       EntregaApiRoutes.registrar(config.routes, entregaApiController);
       PlanificacionApiRoutes.registrar(config.routes, planificacionApiController);
       //rutas de la web
-      CamionRoutes.registrar(config.routes, camionController);
       HomeRoutes.registrar(config.routes, homeController);
+      CamionRoutes.registrar(config.routes, camionController);
+      EntregaRoutes.registrar(config.routes, entregaController);
+      RutaRoutes.registrar(config.routes, rutaController);
 
       // Registramos las excepciones usando config.routes
       ExceptionHandlers.registrar(config.routes);

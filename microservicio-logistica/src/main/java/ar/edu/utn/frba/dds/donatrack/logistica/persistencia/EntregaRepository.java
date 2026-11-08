@@ -2,6 +2,7 @@ package ar.edu.utn.frba.dds.donatrack.logistica.persistencia;
 
 import ar.edu.utn.frba.dds.donatrack.logistica.dominio.entrega.Entrega;
 
+import ar.edu.utn.frba.dds.donatrack.logistica.dominio.entrega.TipoEstadoEntrega;
 import ar.edu.utn.frba.dds.donatrack.shared.excepciones.BaseDatoException;
 import ar.edu.utn.frba.dds.donatrack.shared.excepciones.RegistroNoEncontradoException;
 import io.github.flbulgarelli.jpa.extras.simple.WithSimplePersistenceUnit;
@@ -17,15 +18,26 @@ public class EntregaRepository implements WithLogisticaPersistenceUnit {
   }
 
   public void guardar(Entrega entrega) {
-    withTransaction(() -> entityManager().persist(entrega));
+    entityManager().persist(entrega);
   }
 
   public Entrega buscarPorId(Long id) {
     return entityManager().find(Entrega.class, id);
   }
 
+  public List<Entrega> buscarPorEstadoActual(TipoEstadoEntrega estadoBuscado) {
+    return entityManager()
+        .createQuery("SELECT e FROM Entrega e " +
+            "JOIN e.historialEstados h " +
+            "WHERE INDEX(h) = (SELECT MAX(INDEX(h2)) FROM Entrega e2 JOIN e2.historialEstados h2 WHERE e2 = e) " +
+            "AND h.tipoEstado = :estado", Entrega.class)
+        .setParameter("estado", estadoBuscado)
+        .getResultList();
+  }
+
   public List<Entrega> buscarTodas() {
-    return entityManager().createQuery("SELECT e FROM Entrega e", Entrega.class)
+    return entityManager()
+        .createQuery("SELECT e FROM Entrega e", Entrega.class)
         .getResultList();
   }
 
@@ -34,7 +46,7 @@ public class EntregaRepository implements WithLogisticaPersistenceUnit {
       throw new RegistroNoEncontradoException(
           "No se puede actualizar: no existe en la base de datos la entrega: " + entrega.getId());
     }
-    withTransaction(() -> entityManager().merge(entrega));
+    entityManager().merge(entrega);
   }
 
   public void eliminar(Long id) {
@@ -42,6 +54,6 @@ public class EntregaRepository implements WithLogisticaPersistenceUnit {
     if (entrega == null) {
       throw new RegistroNoEncontradoException("No existe entrega con id " + id);
     }
-    withTransaction(() -> entityManager().remove(entrega));
+    entityManager().remove(entrega);
   }
 }

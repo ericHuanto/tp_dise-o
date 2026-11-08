@@ -27,20 +27,16 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "entregas")
 public class Entrega {
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "id_entrega")
   private Long id;
-
   @ElementCollection
   @CollectionTable(name = "donaciones", joinColumns = @JoinColumn(name = "id_entrega"))
   private List<DonacionEnTransito> donaciones;
-
   @ElementCollection
   @CollectionTable(name = "historial_estados_entrega", joinColumns = @JoinColumn(name = "id_entrega"))
   @OrderColumn(name = "orden")
   private List<EstadoEntrega> historialEstados;
-
   @ElementCollection
   @CollectionTable(name = "fotos", joinColumns = @JoinColumn(name = "id_entrega"))
   @Column(name = "url_foto")
@@ -73,16 +69,6 @@ public class Entrega {
     cambiarEstado(TipoEstadoEntrega.PENDIENTE, null, camion);
   }
 
-  public void agregarFotoRecepcion(String url) {
-    if (getEstadoActual() != TipoEstadoEntrega.ENTREGADA)
-      throw new IllegalStateException("Solo se pueden cargar fotos de una entrega ya confirmada como entregada");
-
-    if (url == null || url.isBlank())
-      throw new DominioException("La URL de la foto es obligatoria");
-
-    fotosRecepcion.add(url);
-  }
-
   public void confirmarListaParaEntregar() {
     validarTransicionDesde(TipoEstadoEntrega.PENDIENTE, "confirmar como lista para entregar");
     cambiarEstado(TipoEstadoEntrega.LISTA_PARA_ENTREGAR, "Asignada a camión " + getCamionAsignado().getPatente(), getCamionAsignado());
@@ -109,6 +95,16 @@ public class Entrega {
   public void reingresarDeposito() {
     validarTransicionDesde(TipoEstadoEntrega.NO_RECIBIDA, "reingresar a depósito");
     cambiarEstado(TipoEstadoEntrega.PENDIENTE, "Entrega devuelta al depósito", null);
+  }
+
+  public void agregarFotoRecepcion(String url) {
+    if (getEstadoActual() != TipoEstadoEntrega.ENTREGADA)
+      throw new IllegalStateException("Solo se pueden cargar fotos de una entrega ya confirmada como entregada");
+
+    if (url == null || url.isBlank())
+      throw new DominioException("La URL de la foto es obligatoria");
+
+    fotosRecepcion.add(url);
   }
 
   //==================== FUNCIONES AUXILIARES =====================
