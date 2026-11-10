@@ -1,0 +1,82 @@
+{{#partial "nombre_pestaña"}}
+    Procesando Importación - DonaTrack
+{{/partial}}
+
+{{#partial "contenido_propio"}}
+    <div style="background-color: #f7f6f2; min-height: 100vh; padding: 40px 20px;">
+        <div style="max-width: 800px; margin: 0 auto; font-family: Arial, sans-serif;">
+
+            <h1 style="font-size: 2em; color: #1a1a1a; margin-bottom: 25px; letter-spacing: -0.5px;">Importar donantes desde CSV</h1>
+
+            <!-- Pasos -->
+            <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 30px; font-size: 0.9em;">
+                <!-- Paso 1 -->
+                <div style="display: flex; align-items: center; gap: 8px; color: #555;">
+                    <span style="display: flex; justify-content: center; align-items: center; width: 24px; height: 24px; background-color: #2e7d32; color: white; border-radius: 50%; font-size: 14px;">✓</span>
+                    <span>Subir archivo </span>
+                </div>
+                <div style="height: 1px; width: 40px; background-color: #ccc;"></div>
+                <!-- Paso 2 (Actual) -->
+                <div style="display: flex; align-items: center; gap: 8px; font-weight: bold; color: #1a1a1a;">
+                    <span style="display: flex; justify-content: center; align-items: center; width: 24px; height: 24px; background-color: #1a1a1a; color: white; border-radius: 50%; font-size: 12px;">2</span>
+                    <span>Procesando</span>
+                </div>
+                <div style="height: 1px; width: 40px; background-color: #ccc;"></div>
+                <!-- Paso 3 -->
+                <div style="display: flex; align-items: center; gap: 8px; color: #aaa;">
+                    <span style="display: flex; justify-content: center; align-items: center; width: 24px; height: 24px; background-color: #e0e0e0; color: white; border-radius: 50%; font-size: 12px;">3</span>
+                    <span>Finalizado </span>
+                </div>
+            </div>
+
+            <!-- Tarjeta de Procesamiento -->
+            <div style="background-color: white; border-radius: 12px; padding: 30px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #eaeaea; text-align: center;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2 style="margin: 0; font-size: 1.2em;">Procesando</h2>
+                    <span style="background-color: #e0f2f1; color: #00695c; padding: 4px 10px; border-radius: 4px; font-size: 0.8em; font-weight: bold;"> PROCESANDO </span>
+                </div>
+
+                <div style="height: 8px; background-color: #e0e0e0; border-radius: 4px; overflow: hidden; margin-bottom: 10px; position: relative;">
+                    <div id="barraProgreso" style="height: 100%; background-color: #2e7d32; width: 30%; border-radius: 4px; position: absolute; left: 0; transition: left 1s linear;"></div>
+                </div>
+
+                <p id="indicadorCarga" style="color: #555; margin: 0; font-size: 0.9em;">Leyendo filas y guardando en base de datos...</p>
+                <p style="color: #888; font-size: 0.8em; margin-top: 20px;">Puedes navegar por otras secciones, mientras terminamos con esto.</p>
+            </div>
+        </div>
+    </div>
+{{/partial}}
+
+{{#partial "scripts"}}
+    <script>
+        const id_tarea = "{{idTarea}}";
+        const indicadorCarga = document.getElementById('indicadorCarga');
+        const barraProgreso = document.getElementById('barraProgreso');
+
+        // Animación falsa de carga (va de izquierda a derecha)
+        let posicionBarra = 0;
+        setInterval(() => {
+            posicionBarra = (posicionBarra + 5) % 100;
+            barraProgreso.style.left = posicionBarra + "%";
+        }, 500);
+
+        function verificarEstado() {
+            fetch(`/api/donantes/importacion/estado/${id_tarea}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.estado === "COMPLETADO") {
+                            clearInterval(intervalo);
+                            indicadorCarga.innerText = "¡Proceso Finalizado! Redirigiendo...";
+                            barraProgreso.style.width = "100%";
+                            barraProgreso.style.left = "0";
+                            window.location.href = `/donantes/importacion/resultado/${id_tarea}`;
+                        }
+                    })
+                    .catch(err => console.error("Error consultando estado", err));
+        }
+
+        const intervalo = setInterval(verificarEstado, 2000);
+    </script>
+{{/partial}}
+
+{{> plantillas/layout.hbs}}

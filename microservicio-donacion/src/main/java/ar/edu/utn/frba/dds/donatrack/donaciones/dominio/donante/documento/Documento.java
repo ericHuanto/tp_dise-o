@@ -16,7 +16,7 @@ public class Documento {
   @Column(name = "tipo_documento")
   @Enumerated(EnumType.STRING)
   private TipoDocumento tipoDocumento;
-  @Column(name = "detalle")
+  @Column(name = "detalle_documento")
   private String detalle;
 
   public Documento(TipoDocumento tipoDocumento, String detalle) {
@@ -28,6 +28,7 @@ public class Documento {
   private void checkDatos(TipoDocumento tipoDocumento, String detalle) {
     if (tipoDocumento == null) throw new DominioException("El campo 'tipo' de un documento es obligatorio, puede ser: " + Arrays.toString(TipoDocumento.values()));
     if (detalle == null || detalle.isBlank()) throw new DominioException("El campo 'numero' de un documento es obligatorio");
+    if (!detalle.matches("^[0-9-]+$"))  throw new DominioException("El número de documento es inválido, solo se permiten números");
   }
 
   public Boolean esIgualA(Documento otrodocumento) {

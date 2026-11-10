@@ -102,7 +102,7 @@ public class App {
     NecesidadController necesidadController = new NecesidadController( BeneficiarioRepository.getInstancia(), CategoriaRepository.getInstancia(), SubcategoriaRepository.getInstancia());
     DonacionBeneficiarioController donacionBeneficiarioController = new DonacionBeneficiarioController( BeneficiarioRepository.getInstancia(),DonacionRepository.getInstancia());
     AsignacionController asignacionController = new AsignacionController(rankingRepository, beneficiarioRepository, donacionRepository);
-    CsvController csvController = new CsvController(donanteRepository);
+    CsvController csvController = new CsvController(donanteRepository, usuarioRepository);
 
     Javalin app = Javalin.create(config -> {
       config.jsonMapper(GsonConfig.jsonMapper());

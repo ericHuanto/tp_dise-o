@@ -3,44 +3,107 @@
 {{/partial}}
 
 {{#partial "contenido_propio"}}
-    <div style="padding: 40px; max-width: 800px; margin: 0 auto;">
-        <h1 style="margin-bottom: 5px;">Resultado de la Importación</h1>
+    <div style="background-color: #f7f6f2; min-height: 100vh; padding: 40px 20px;">
+        <div style="max-width: 800px; margin: 0 auto; font-family: Arial, sans-serif;">
 
-        <div style="background-color: #e6f4ea; border: 1px solid #ceead6; padding: 15px; border-radius: 5px; color: #137333; font-weight: bold; margin-bottom: 30px;">
-            {{mensaje}}
-        </div>
+            <h1 style="font-size: 2em; color: #1a1a1a; margin-bottom: 25px; letter-spacing: -0.5px;">Importar donantes desde CSV</h1>
 
-        {{#if errores}}
-            <h2 style="color: #d93025; font-size: 1.2em; margin-bottom: 15px;">Se encontraron errores en algunas filas:</h2>
-
-            <table style="width: 100%; border-collapse: collapse; text-align: left; background-color: white; border: 1px solid #e0e0e0; border-radius: 5px; overflow: hidden;">
-                <thead style="background-color: #f8d7da; color: #721c24;">
-                <tr>
-                    <th style="padding: 12px 15px; border-bottom: 1px solid #f5c6cb;">Fila N°</th>
-                    <th style="padding: 12px 15px; border-bottom: 1px solid #f5c6cb;">Motivo del Error</th>
-                </tr>
-                </thead>
-                <tbody>
-                {{#each errores}}
-                    <tr style="border-bottom: 1px solid #eee;">
-                        <td style="padding: 12px 15px; font-weight: bold;">{{this.numeroFila}}</td>
-                        <td style="padding: 12px 15px; color: #555;">{{this.motivoError}}</td>
-                    </tr>
-                {{/each}}
-                </tbody>
-            </table>
-        {{else}}
-            <div style="padding: 30px; text-align: center; background-color: #f8f9fa; border: 1px dashed #ccc; border-radius: 5px; color: #555;">
-                <p style="margin: 0; font-size: 1.1em;"><strong>¡Perfecto!</strong> Todas las filas se importaron correctamente sin ningún error.</p>
+            <!-- Pasos -->
+            <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 30px; font-size: 0.9em;">
+                <!-- Paso 1 (Completado) -->
+                <div style="display: flex; align-items: center; gap: 8px; color: #555;">
+                    <span style="display: flex; justify-content: center; align-items: center; width: 24px; height: 24px; background-color: #2e7d32; color: white; border-radius: 50%; font-size: 14px;">✓</span>
+                    <span>Subir archivo</span>
+                </div>
+                <div style="height: 1px; width: 40px; background-color: #ccc;"></div>
+                <!-- Paso 2 (Completado) -->
+                <div style="display: flex; align-items: center; gap: 8px; color: #555;">
+                    <span style="display: flex; justify-content: center; align-items: center; width: 24px; height: 24px; background-color: #2e7d32; color: white; border-radius: 50%; font-size: 14px;">✓</span>
+                    <span>Procesando</span>
+                </div>
+                <div style="height: 1px; width: 40px; background-color: #ccc;"></div>
+                <!-- Paso 3 (Actual) -->
+                <div style="display: flex; align-items: center; gap: 8px; font-weight: bold; color: #2e7d32;">
+                    <span style="display: flex; justify-content: center; align-items: center; width: 24px; height: 24px; background-color: #2e7d32; color: white; border-radius: 50%; font-size: 14px;">✓</span>
+                    <span>Finalizado</span>
+                </div>
             </div>
-        {{/if}}
 
-        <div style="margin-top: 30px; text-align: center;">
-            <a href="/donantes/importacion" style="display: inline-block; background-color: #1a1a1a; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">
-                Volver a importar
-            </a>
+            <!-- Tarjeta de Resultados -->
+            <div style="background-color: white; border-radius: 12px; padding: 30px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #eaeaea;">
+
+                <div style="background-color: #e6f4ea; border: 1px solid #ceead6; padding: 15px; border-radius: 5px; color: #137333; font-weight: bold; margin-bottom: 30px;">
+                    Se crearon con éxito {{resultado.cantExitosa}} registros, de los antiguos donantes.
+                </div>
+
+                {{#if resultado.erroresEncontrados}}
+                    <h2 style="color: #d93025; font-size: 1.2em; margin-bottom: 15px;">Se encontraron {{resultado.erroresEncontrados.size}} errores, las filas con error son:</h2>
+
+                    <table style="width: 100%; border-collapse: collapse; text-align: left; background-color: white; border: 1px solid #e0e0e0; border-radius: 5px; overflow: hidden;">
+                        <thead style="background-color: #f8d7da; color: #721c24;">
+                        <tr>
+                            <th style="padding: 12px 15px; border-bottom: 1px solid #f5c6cb;">Fila N°</th>
+                            <th style="padding: 12px 15px; border-bottom: 1px solid #f5c6cb;">Motivo del Error</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {{#each resultado.erroresEncontrados}}
+                            <tr style="border-bottom: 1px solid #eee;">
+                                <td style="padding: 12px 15px; font-weight: bold;">{{this.numeroFila}}</td>
+                                <td style="padding: 12px 15px; color: #555;">{{this.motivoError}}</td>
+                            </tr>
+                        {{/each}}
+                        </tbody>
+                    </table>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 30px;">
+                        <a href="/donantes/importacion" style="display: inline-block; background-color: #1a1a1a; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">
+                            Realizar otra importación
+                        </a>
+                        <button onclick="descargarErroresCSV()" style="background-color: white; color: #1a1a1a; border: 1px solid #ccc; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 0.9em; transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='#f0f0f0'" onmouseout="this.style.backgroundColor='white'">
+                            Descargar reporte de errores (.csv)
+                        </button>
+                    </div>
+                {{else}}
+                    <div style="padding: 30px; text-align: center; background-color: #f8f9fa; border: 1px dashed #ccc; border-radius: 5px; color: #555;">
+                        <p style="margin: 0; font-size: 1.1em;"><strong>¡Perfecto!</strong> Todas las filas se procesaron sin errores y los donantes fueron creados.</p>
+                    </div>
+                    <div style="margin-top: 30px; text-align: center;">
+                        <a href="/donantes/importacion" style="display: inline-block; background-color: #1a1a1a; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">
+                            Realizar otra importación
+                        </a>
+                    </div>
+                {{/if}}
+            </div>
+
         </div>
     </div>
+{{/partial}}
+
+{{#partial "scripts"}}
+    <script>
+        function descargarErroresCSV() {
+            let csvContent = "\uFEFF" + "Fila N°,Motivo del Error\n"; // Cabeceras
+
+            //Las filas de la tabla leídas directamente desde el HTML
+            const filas = document.querySelectorAll("tbody tr");
+            filas.forEach(row => {
+                let filaNum = row.cells[0].innerText;
+                let motivo = row.cells[1].innerText.replace(/"/g, '""');
+                csvContent += `${filaNum},"${motivo}"\n`;
+            });
+
+            //Crear el archivo de texto temporalmente en la memoria del navegador
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+
+            const link = document.createElement("a");
+            link.setAttribute("href", url);
+            link.setAttribute("download", "reporte_errores_importacion.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    </script>
 {{/partial}}
 
 {{> plantillas/layout.hbs}}

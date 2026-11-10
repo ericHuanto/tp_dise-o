@@ -3,25 +3,92 @@
 {{/partial}}
 
 {{#partial "contenido_propio"}}
-    <div style="padding: 40px; max-width: 600px; margin: 0 auto;">
-        <h1 style="margin-bottom: 5px;">Importar Donantes</h1>
-        <p style="color: gray; margin-bottom: 30px;">Sube un archivo .csv para registrar usuarios de forma masiva.</p>
+    <!-- Mismo fondo y espaciado que el resto de las pantallas -->
+    <div style="background-color: #f7f6f2; min-height: 100vh; padding: 40px 20px;">
+        <div style="max-width: 800px; margin: 0 auto; font-family: Arial, sans-serif;">
 
-        <form action="/donantes/importacion" method="POST" enctype="multipart/form-data" style="border: 1px solid #e0e0e0; padding: 30px; border-radius: 10px; background-color: white;">
-            <div style="margin-bottom: 25px;">
-                <label for="archivo_csv" style="font-weight: bold; display: block; margin-bottom: 10px;">
-                    Seleccionar archivo CSV
-                </label>
-                <input type="file" id="archivo_csv" name="archivo_csv" accept=".csv" required
-                       style="width: 100%; padding: 10px; border: 1px dashed #ccc; border-radius: 5px; background-color: #fafafa; cursor: pointer;">
+            <h1 style="font-size: 2em; color: #1a1a1a; margin-bottom: 25px; letter-spacing: -0.5px;">Importar donantes desde CSV</h1>
+
+            <!-- Pasos -->
+            <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 30px; font-size: 0.9em;">
+                <!-- Paso 1 (Actual) -->
+                <div style="display: flex; align-items: center; gap: 8px; font-weight: bold; color: #1a1a1a;">
+                    <span style="display: flex; justify-content: center; align-items: center; width: 24px; height: 24px; background-color: #1a1a1a; color: white; border-radius: 50%; font-size: 12px;">1</span>
+                    <span>Subir archivo</span>
+                </div>
+                <div style="height: 1px; width: 40px; background-color: #ccc;"></div>
+                <!-- Paso 2 (Inactivo) -->
+                <div style="display: flex; align-items: center; gap: 8px; color: #aaa;">
+                    <span style="display: flex; justify-content: center; align-items: center; width: 24px; height: 24px; background-color: #e0e0e0; color: white; border-radius: 50%; font-size: 12px;">2</span>
+                    <span>Procesando</span>
+                </div>
+                <div style="height: 1px; width: 40px; background-color: #ccc;"></div>
+                <!-- Paso 3 (Inactivo) -->
+                <div style="display: flex; align-items: center; gap: 8px; color: #aaa;">
+                    <span style="display: flex; justify-content: center; align-items: center; width: 24px; height: 24px; background-color: #e0e0e0; color: white; border-radius: 50%; font-size: 12px;">3</span>
+                    <span>Finalizado</span>
+                </div>
             </div>
-            <div style="text-align: right;">
-                <button type="submit" style="background-color: #1a1a1a; color: white; padding: 12px 24px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">
-                    Importar
-                </button>
-            </div>
-        </form>
+
+            <form id="formImportacion" action="/donantes/importacion" method="POST" enctype="multipart/form-data">
+                <!-- Tarjeta visual -->
+                <div style="background-color: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; border: 1px solid #eaeaea;">
+                    <div style="display: flex; align-items: center; gap: 20px;">
+                        <div style="background-color: #e8f5e9; color: #2e7d32; width: 60px; height: 60px; border-radius: 8px; display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 0.9em; letter-spacing: 1px;">
+                            CSV
+                        </div>
+                        <div>
+                            <h3 id="nombreArchivo" style="margin: 0 0 5px 0; font-size: 1.1em; color: #1a1a1a;">Selecciona un archivo...</h3>
+                            <p id="detallesArchivo" style="margin: 0; color: #777; font-size: 0.85em;">Formato .csv requerido</p>
+                        </div>
+                    </div>
+                    <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 8px;">
+                        <label for="archivo_csv" style="color: #2e7d32; font-weight: bold; font-size: 0.85em; cursor: pointer; text-decoration: none;">
+                            Buscar archivo
+                        </label>
+                        <input type="file" id="archivo_csv" name="archivo_csv" accept=".csv" required style="display: none;" onchange="actualizarTarjeta(this)">
+                        <button type="submit" id="btnProcesar" disabled style="background-color: #1a1a1a; color: white; border: none; padding: 8px 20px; border-radius: 6px; font-weight: bold; cursor: not-allowed; opacity: 0.5; transition: 0.2s;">
+                            Importar
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
     </div>
+{{/partial}}
+
+{{#partial "scripts"}}
+    <script>
+        // Script para que la tarjeta se actualice visualmente al elegir un archivo
+        function actualizarTarjeta(input) {
+            const btnProcesar = document.getElementById('btnProcesar');
+            const nombreArchivo = document.getElementById('nombreArchivo');
+            const detallesArchivo = document.getElementById('detallesArchivo');
+
+            if (input.files && input.files.length > 0) {
+                const archivo = input.files[0];
+                nombreArchivo.innerText = archivo.name;
+
+                let tamano = archivo.size;
+                let textoTamano = tamano > 1024 * 1024 ? (tamano / (1024 * 1024)).toFixed(1) + " MB" : (tamano / 1024).toFixed(1) + " KB";
+
+                const hoy = new Date();
+                const fechaFormateada = hoy.toLocaleDateString('es-AR') + " " + hoy.getHours().toString().padStart(2, '0') + ":" + hoy.getMinutes().toString().padStart(2, '0');
+
+                detallesArchivo.innerText = textoTamano + " · subido " + fechaFormateada;
+
+                btnProcesar.disabled = false;
+                btnProcesar.style.cursor = "pointer";
+                btnProcesar.style.opacity = "1";
+            } else {
+                nombreArchivo.innerText = "Selecciona un archivo...";
+                detallesArchivo.innerText = "Formato .csv requerido";
+                btnProcesar.disabled = true;
+                btnProcesar.style.cursor = "not-allowed";
+                btnProcesar.style.opacity = "0.5";
+            }
+        }
+    </script>
 {{/partial}}
 
 {{> plantillas/layout.hbs}}
