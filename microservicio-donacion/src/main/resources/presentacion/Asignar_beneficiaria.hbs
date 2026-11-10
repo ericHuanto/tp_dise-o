@@ -1,0 +1,124 @@
+{{#partial "nombre_pestaña"}}
+    Asignar beneficiaria - DonaTrack
+{{/partial}}
+
+{{#partial "contenido_propio"}}
+    <!-- Partes superior -->
+    <div style="display: flex; justify-content: space-between; align-items: center; padding: 20px;">
+        <div>
+            <h1 style="display: inline-block; margin: 0;">Asignar beneficiaria</h1>
+            <span style="background-color: #fcf6eb; color: #b08d57; padding: 4px 8px; font-weight: bold; border-radius: 4px; font-size: 0.8em; margin-left: 10px;">PENDIENTES</span>
+        </div>
+
+        <!-- Botones de Navegación del Carrusel -->
+        {{#if rankings}}
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <button onclick="moverCarrusel(-1)" id="btnAnterior" style="padding: 5px 12px; font-size: 1.2em; cursor: pointer; border: 1px solid #ccc; background: white; border-radius: 5px;">&lt;</button>
+                <span id="indicadorPosicion" style="font-weight: bold; color: #555;">1 de {{rankings.length}}</span>
+                <button onclick="moverCarrusel(1)" id="btnSiguiente" style="padding: 5px 12px; font-size: 1.2em; cursor: pointer; border: 1px solid #ccc; background: white; border-radius: 5px;">&gt;</button>
+            </div>
+        {{/if}}
+    </div>
+
+    <!-- Parte inferior -->
+    {{#each rankings}}
+    <div class="ranking-slide" style="display: none; gap: 20px; padding: 0 20px;">
+        <!-- Sección izquierda -->
+        <aside style="width: 30%; border: 1px solid #e0e0e0; padding: 20px; border-radius: 10px; background-color: white;">
+            <h3 style="margin-top: 0;">Donación N° {{this.donacion.id}}</h3>
+            <h4 style="font-size: 1.2em; margin-bottom: 5px;">{{this.donacion.descripcion}}</h4>
+            <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+
+            <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 10px; font-size: 0.9em;">
+                <span style="color: gray;">Estado</span>
+                <strong>{{this.donacion.estado}}</strong>
+                <span style="color: gray;">Bienes</span>
+                <strong>
+                    {{#each this.donacion.donantes}}
+                        {{this.nombre}} <br>
+                    {{/each}}
+                </strong>
+            </div>
+        </aside>
+
+        <!-- Sección derecha -->
+        <section style="width: 70%; border: 1px solid #e0e0e0; border-radius: 10px; background-color: white;">
+            <div style="padding: 20px; border-bottom: 1px solid #e0e0e0;">
+                <h3 style="margin: 0;">Candidatos</h3>
+                <p style="color: gray; font-size: 0.8em; margin-top: 5px;">Ranking calculado el {{this.fechaGeneracion}}</p>
+            </div>
+
+            <form action="/rankings/{{this.id}}" method="post">
+                <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                    <thead style="background-color: #fafafa; font-size: 0.8em; color: gray;">
+                        <tr>
+                            <th style="padding: 15px;">#</th>
+                            <th>ENTIDAD</th>
+                            <th>DIRECCIÓN</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {{#each this.candidatos}}
+                        <tr style="border-bottom: 1px solid #eee;">
+                            <td style="padding: 15px; width: 50px;">
+                                <input type="radio" name="id_beneficiario" value="{{this.beneficiario.id}}" style="accent-color: #2b5c46; transform: scale(1.3);" required>
+                                <span style="font-weight: bold; margin-left: 10px;">0{{this.posicion}}</span>
+                            </td>
+                            <td><strong>{{this.beneficiario.razonSocial}}</strong></td>
+                            <td style="color: gray; font-size: 0.9em;">{{this.beneficiario.direccion}}</td>
+                        </tr>
+                    {{/each}}
+                    </tbody>
+                </table>
+
+                <div style="text-align: right; padding: 20px; background-color: #fafafa; border-radius: 0 0 10px 10px;">
+                    <button type="submit" style="background-color: #1a1a1a; color: white; padding: 12px 24px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">
+                        Confirmar asignación
+                    </button>
+                </div>
+            </form>
+        </section>
+    </div>
+    {{else}}
+    <div style="padding: 40px; text-align: center; color: gray;">
+        <h2>No hay donaciones pendientes de asignación en este momento.</h2>
+    </div>
+    {{/each}}
+{{/partial}}
+
+{{#partial "scripts"}}
+    <script>
+        let indiceActual = 0;
+        const slides = document.querySelectorAll('.ranking-slide');
+        const totalSlides = slides.length;
+
+        function actualizarCarrusel() {
+            if (totalSlides === 0) return;
+
+            slides.forEach((slide, i) => {
+                slide.style.display = (i === indiceActual) ? 'flex' : 'none';
+            });
+
+            document.getElementById('indicadorPosicion').innerText = (indiceActual + 1) + " de " + totalSlides;
+
+            document.getElementById('btnAnterior').disabled = (indiceActual === 0);
+            document.getElementById('btnSiguiente').disabled = (indiceActual === totalSlides - 1);
+
+            document.getElementById('btnAnterior').style.opacity = (indiceActual === 0) ? '0.5' : '1';
+            document.getElementById('btnSiguiente').style.opacity = (indiceActual === totalSlides - 1) ? '0.5' : '1';
+        }
+
+        function moverCarrusel(direccion) {
+            indiceActual += direccion;
+            if (indiceActual < 0) indiceActual = 0;
+            if (indiceActual >= totalSlides) indiceActual = totalSlides - 1;
+            actualizarCarrusel();
+        }
+
+        window.onload = function() {
+            actualizarCarrusel();
+        };
+    </script>
+{{/partial}}
+
+{{> plantillas/layout.hbs}}

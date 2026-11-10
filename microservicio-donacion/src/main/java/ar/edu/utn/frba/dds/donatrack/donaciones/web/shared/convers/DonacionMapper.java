@@ -23,6 +23,7 @@ public class DonacionMapper {
         donacion.getId(),
         donacion.getDescripcion(),
         donacion.getEstadoActual().name(),
+        DonanteMapper.aDtoResumen(donacion.getDonantes()),
         donacion.getBeneficiario() == null ? null : BeneficiarioMapper.aDtoResumen(donacion.getBeneficiario()),
         BienMapper.aDto(donacion.getBienes()));
   }

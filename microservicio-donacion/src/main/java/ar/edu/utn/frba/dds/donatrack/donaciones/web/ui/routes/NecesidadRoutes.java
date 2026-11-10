@@ -7,10 +7,7 @@ public class NecesidadRoutes {
 
   private NecesidadRoutes() { }
 
-  public static void registrar(
-      RoutesConfig ruta,
-      NecesidadController controller
-  ) {
+  public static void registrar(RoutesConfig ruta, NecesidadController controller) {
     ruta.get("/mis-necesidades", controller::listar);
     ruta.get("/mis-necesidades/nueva", controller::mostrarFormulario);
     ruta.post("/mis-necesidades", controller::guardar);

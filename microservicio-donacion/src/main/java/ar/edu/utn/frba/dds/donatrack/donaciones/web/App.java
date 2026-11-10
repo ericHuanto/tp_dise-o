@@ -1,7 +1,6 @@
 package ar.edu.utn.frba.dds.donatrack.donaciones.web;
 
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.comunicaciones.SuscriptorNotificacion;
-import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.donacion.Donacion;
 import ar.edu.utn.frba.dds.donatrack.donaciones.persistencia.*;
 import ar.edu.utn.frba.dds.donatrack.donaciones.web.api.controller.*;
 import ar.edu.utn.frba.dds.donatrack.donaciones.web.api.routes.AsignacionApiRoutes;
@@ -36,21 +35,21 @@ import io.javalin.Javalin;
 import io.javalin.rendering.template.JavalinHandlebars;
 import com.github.jknack.handlebars.helper.ConditionalHelpers;
 import static io.javalin.apibuilder.ApiBuilder.path;
-import ar.edu.utn.frba.dds.donatrack.donaciones.web.grpc.DonacionesGrpc;
+import ar.edu.utn.frba.dds.donatrack.donaciones.web.shared.grpc.DonacionesGrpc;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import java.io.IOException;
 
 
 public class App {
-
   public static final int PUERTO = 7070;
   public static final int PUERTO_GRPC = 7072;
 
   public static void main(String[] args) throws IOException {
     ConfiguracionEntorno config = ConfiguracionEntorno.getInstance();
 
-    //Cargo credenciales para la db desde el .env TODO esta configuración debería estar en persistence.xml
+    //TODO esta configuración debería estar en persistence.xml
+    //Cargo credenciales para la db desde el .env
     //setPropiedad("hibernate.connection.driver_class", config.getDbDriver());   // LOCAL: no commitear
     System.setProperty("hibernate.connection.url", config.getDbUrlDonaciones());
     System.setProperty("hibernate.connection.username", config.getDbUser());
@@ -104,6 +103,7 @@ public class App {
     DonacionController donacionController = new DonacionController(donacionRepository);
     NecesidadController necesidadController = new NecesidadController( BeneficiarioRepository.getInstancia(), CategoriaRepository.getInstancia(), SubcategoriaRepository.getInstancia());
     DonacionBeneficiarioController donacionBeneficiarioController = new DonacionBeneficiarioController( BeneficiarioRepository.getInstancia(),DonacionRepository.getInstancia());
+    AsignacionController asignacionController = new AsignacionController(rankingRepository, beneficiarioRepository, donacionRepository);
 
     Javalin app = Javalin.create(config -> {
       config.jsonMapper(GsonConfig.jsonMapper());
@@ -114,6 +114,7 @@ public class App {
       for (ConditionalHelpers helper : ConditionalHelpers.values()) {
         motorHandlebars.registerHelper(helper.name(), helper);
       }
+      motorHandlebars.registerHelper("inc", (ctx, options) -> (Integer) ctx + 1);
       config.fileRenderer(new JavalinHandlebars(motorHandlebars));
 
       //Registramos las rutas
@@ -131,9 +132,9 @@ public class App {
       MapaRoutes.registrar(config.routes, mapaController);
       DonanteRoutes.registrar(config.routes, donanteController);
       DonacionRoutes.registrar(config.routes, donacionController);
-
       NecesidadRoutes.registrar(config.routes, necesidadController);
       DonacionBeneficiarioRoutes.registrar(config.routes, donacionBeneficiarioController);
+      AsignacionRoutes.registrar(config.routes, asignacionController);
 
       //Registramos las excepciones
       ExceptionHandlers.registrar(config.routes);

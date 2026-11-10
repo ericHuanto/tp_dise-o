@@ -1,6 +1,6 @@
 package ar.edu.utn.frba.dds.donatrack.donaciones.dominio.usuario;
 
-import ar.edu.utn.frba.dds.donatrack.donaciones.web.utils.Integridad;
+import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.generadorhash.Integridad;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -13,19 +13,18 @@ import java.util.List;
 @Entity
 @Table(name = "usuarios")
 public class Usuario {
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  //@Column(name = "id_usuario") //añadir
-  private Long id; //Cambiar a idUsuario
-  @Column(name = "usuario", unique = true) //Cambiar a nombre_usuario
+  @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "id_usuario")
+  private Long id;
+  @Column(name = "nombre_usuario", unique = true)
   private String nombreUsuario;
-  @Column(name = "contraseña")
+  @Column(name = "contraseña_hasheada")
   private String contraseña;
   @ElementCollection
   @Enumerated(EnumType.STRING)
   @CollectionTable(name = "usuario_permiso", joinColumns = @JoinColumn(name = "id_usuario"))
   @Column(name = "permiso")
-  private List<Permiso> permisos; //Ver de cambiar por un Set para no permitir repetidos
+  private List<Permiso> permisos;
 
   public Usuario(String nombreUsuario, String contraseña) {
     this.nombreUsuario = nombreUsuario;

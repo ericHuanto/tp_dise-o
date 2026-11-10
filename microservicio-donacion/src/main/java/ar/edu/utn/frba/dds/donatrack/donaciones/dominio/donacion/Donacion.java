@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 import lombok.Setter;
 
@@ -168,7 +169,7 @@ public class Donacion {
   //====================== FUNCIONES AUXILIARES ==========================
   private String setDescripcionGeneral(List<Bien> bienes) {
     return bienes.stream()
-        .map(b -> b.getCantidad() + " " + b.getUnidadMedida() + " de " + b.getDescripcion())
+        .map(b -> b.getCantidad() + " " + b.getUnidadMedida().toString().toLowerCase() + " de " + b.getDescripcion())
         .collect(Collectors.joining(", "));
   }
 

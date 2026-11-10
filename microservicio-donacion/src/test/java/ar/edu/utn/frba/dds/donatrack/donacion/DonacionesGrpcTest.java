@@ -16,7 +16,7 @@ import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.donante.documento.Docume
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.donante.documento.TipoDocumento;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.mediocontacto.CorreoDeContacto;
 import ar.edu.utn.frba.dds.donatrack.donaciones.persistencia.DonacionRepository;
-import ar.edu.utn.frba.dds.donatrack.donaciones.web.grpc.DonacionesGrpc;
+import ar.edu.utn.frba.dds.donatrack.donaciones.web.shared.grpc.DonacionesGrpc;
 import ar.edu.utn.frba.dds.donatrack.grpc.DonacionId;
 import ar.edu.utn.frba.dds.donatrack.grpc.DonacionesServiceGrpc;
 import ar.edu.utn.frba.dds.donatrack.grpc.EnCaminoRequest;

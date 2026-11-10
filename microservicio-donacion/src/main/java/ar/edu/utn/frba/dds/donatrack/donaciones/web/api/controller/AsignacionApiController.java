@@ -74,17 +74,17 @@ public class AsignacionApiController implements WithSimplePersistenceUnit {
     if (body.beneficiarioId() == null) throw new BodyException("Bad Request, necesita: 'beneficiario_id' ");
     Long idBeneficiario = Long.valueOf(body.beneficiarioId());
 
-    beginTransaction();
     Ranking ranking = buscarRankingPorId(idRanking);
-    Beneficiario beneficiario = buscarBeneficiarioPorId(idBeneficiario);
+    Beneficiario beneficiarioSeleccionado = buscarBeneficiarioPorId(idBeneficiario);
 
-    ranking.invalidar();
+    beginTransaction();
     Donacion donacion = ranking.getDonacion();
-    donacion.asignarA(beneficiario);
+    donacion.asignarA(beneficiarioSeleccionado);
+    ranking.invalidar();
     repoDonaciones.actualizar(donacion);
-    repoBeneficiarios.actualizar(beneficiario);
+    repoBeneficiarios.actualizar(beneficiarioSeleccionado);
     repoRankings.actualizar(ranking);
-    DispatcherEventos.getInstancia().publicar(new EventoAsignacion(beneficiario, donacion.getDonantes(), donacion.getDescripcion()));
+    DispatcherEventos.getInstancia().publicar(new EventoAsignacion(beneficiarioSeleccionado, donacion.getDonantes(), donacion.getDescripcion()));
     ctx.status(200).json(DonacionMapper.aDto(donacion));
     commitTransaction();
   }

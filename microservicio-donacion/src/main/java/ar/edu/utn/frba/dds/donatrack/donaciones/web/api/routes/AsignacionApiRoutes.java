@@ -8,10 +8,10 @@ public class AsignacionApiRoutes {
   private AsignacionApiRoutes() {}
 
   public static void registrar(RoutesConfig ruta, AsignacionApiController controller) {
-    ruta.post("/rankings", controller::crearRankings);
-    ruta.get("/rankings", controller::obtenerTodos);
-    ruta.get("/rankings/{id}", controller::obtener);
-    ruta.patch("/rankings/{id}", controller::confirmar);//paso 2 Asignación Realizada
+    ruta.post("/api/rankings", controller::crearRankings);
+    ruta.get("/api/rankings", controller::obtenerTodos);
+    ruta.get("/api/rankings/{id}", controller::obtener);
+    ruta.patch("/api/rankings/{id}", controller::confirmar);//paso 2 Asignación Realizada
   }
 
 }

@@ -1,4 +1,4 @@
-package ar.edu.utn.frba.dds.donatrack.donaciones.web.utils;
+package ar.edu.utn.frba.dds.donatrack.donaciones.dominio.generadorhash;
 
 import org.mindrot.jbcrypt.BCrypt;
 

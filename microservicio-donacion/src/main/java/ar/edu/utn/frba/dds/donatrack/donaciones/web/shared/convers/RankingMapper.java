@@ -26,6 +26,10 @@ public class RankingMapper {
     );
   }
 
+  public static List<RankingResponse> aDto(List<Ranking> rankings) {
+    return rankings.stream().map(RankingMapper::aDto).toList();
+  }
+
   public static List<RankingResumenResponse> aDtoResumen(List<Ranking> rankings) {
     return rankings.stream().map(RankingMapper::aDtoResumen).toList();
   }

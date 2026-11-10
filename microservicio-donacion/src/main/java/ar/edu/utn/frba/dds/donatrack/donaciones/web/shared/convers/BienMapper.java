@@ -46,14 +46,12 @@ public class BienMapper {
   }
 
   public static List<Bien> aDominio(List<BienDto> bienes) {
-    if (bienes == null || bienes.isEmpty()) throw new DominioException("Una donación debe tener al menos un bien");
-
+    //if (bienes == null || bienes.isEmpty()) throw new DominioException("Una donación debe tener al menos un bien");
     return bienes.stream().map(BienMapper::aDominio).toList();
   }
 
   public static List<BienDto> aDto(List<Bien> bienes) {
-    if (bienes == null || bienes.isEmpty()) throw new DominioException("Una donación debe tener al menos un bien");
-
+    //if (bienes == null || bienes.isEmpty()) throw new DominioException("Una donación debe tener al menos un bien");
     return bienes.stream().map(BienMapper::aDto).toList();
   }
 

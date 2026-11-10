@@ -8,11 +8,11 @@ public class NecesidadApiRoutes {
   private NecesidadApiRoutes() {}
 
   public static void registrar(RoutesConfig ruta, NecesidadApiController controller) {
-    ruta.post("/beneficiarios/{id}/necesidades", controller::crear);
-    ruta.get("/beneficiarios/{id}/necesidades", controller::obtenerTodos);
-    ruta.get("/beneficiarios/{id}/necesidades/{nid}", controller::obtener);
-    ruta.patch("/beneficiarios/{id}/necesidades/{nid}", controller::actualizar);
-    ruta.delete("/beneficiarios/{id}/necesidades/{nid}", controller::eliminar);
+    ruta.post("/api/beneficiarios/{id}/necesidades", controller::crear);
+    ruta.get("/api/beneficiarios/{id}/necesidades", controller::obtenerTodos);
+    ruta.get("/api/beneficiarios/{id}/necesidades/{nid}", controller::obtener);
+    ruta.patch("/api/beneficiarios/{id}/necesidades/{nid}", controller::actualizar);
+    ruta.delete("/api/beneficiarios/{id}/necesidades/{nid}", controller::eliminar);
   }
 
 }

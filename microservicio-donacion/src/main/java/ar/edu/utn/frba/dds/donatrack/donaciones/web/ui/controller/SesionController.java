@@ -2,7 +2,7 @@ package ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.controller;
 
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.usuario.Usuario;
 import ar.edu.utn.frba.dds.donatrack.donaciones.persistencia.UsuarioRepository;
-import ar.edu.utn.frba.dds.donatrack.donaciones.web.utils.Integridad;
+import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.generadorhash.Integridad;
 import io.github.flbulgarelli.jpa.extras.simple.WithSimplePersistenceUnit;
 import io.javalin.http.Context;
 
