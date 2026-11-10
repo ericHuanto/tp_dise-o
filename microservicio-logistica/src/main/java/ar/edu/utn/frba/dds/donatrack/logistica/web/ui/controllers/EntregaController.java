@@ -25,7 +25,7 @@ public class EntregaController implements WithLogisticaPersistenceUnit {
         Files.createDirectories(directorioFotos);
       }
     } catch (IOException e) {
-      throw new RuntimeException("Error fatal: No se pudo crear el directorio para las fotos de entregas en " + directorioFotos.toAbsolutePath(), e);
+      throw new RuntimeException("Error fatal: No se pudo crear la carpeta 'entregas' para las fotos en " + directorioFotos.toAbsolutePath(), e);
     }
   }
 
@@ -55,18 +55,18 @@ public class EntregaController implements WithLogisticaPersistenceUnit {
     Long id = Long.valueOf(context.pathParam("id"));
     Entrega entrega = buscarEntregaPorId(id);
 
-    List<UploadedFile> fotos = context.uploadedFiles("fotos");
-    checkQueTengaFotos(fotos);
-    checkQueSeaFotosValida(fotos);
+    List<UploadedFile> fotosSubidas = context.uploadedFiles("fotos");
+    checkQueTengaFotos(fotosSubidas);
+    checkQueSeaFotosValida(fotosSubidas);
 
     entrega.confirmarRecepcion();
 
     try {
-      for (UploadedFile foto : fotos) {
-        String nombre = UUID.randomUUID().toString().substring(0, 8) + "-" + foto.filename();
-        Path rutaDestino = directorioFotos.resolve(nombre);
+      for (UploadedFile foto : fotosSubidas) {
+        String nombreArchivo = UUID.randomUUID().toString().substring(0, 8) + "-" + foto.filename();
+        Path rutaDestino = directorioFotos.resolve(nombreArchivo);
         Files.copy(foto.content(), rutaDestino, StandardCopyOption.REPLACE_EXISTING);
-        String url = "/uploads/entregas/" + nombre;
+        String url = "/uploads/entregas/" + nombreArchivo;
         entrega.agregarFotoRecepcion(url);
       }
     } catch (IOException e) {

@@ -39,11 +39,15 @@ public class ImportadorCsv {
 
   //================ FUNCIONES AUXILIARES ==================
   private InputStream abrirArchivo(String pathArchivo) {
-    InputStream csvStream = ImportadorCsv.class.getClassLoader().getResourceAsStream(pathArchivo);
-    if (csvStream == null)
-      throw new ImportadorCsvException("No se encontró el archivo CSV en resources: " + pathArchivo);
-
-    return csvStream;
+    //InputStream csvStream = ImportadorCsv.class.getClassLoader().getResourceAsStream(pathArchivo);
+    //if (csvStream == null)
+    //  throw new ImportadorCsvException("No se encontró el archivo CSV en resources: " + pathArchivo);
+    //return csvStream;
+    try {
+      return new java.io.FileInputStream(pathArchivo);
+    } catch (java.io.FileNotFoundException e) {
+      throw new ImportadorCsvException("No se encontró el archivo CSV en la ruta: " + pathArchivo);
+    }
   }
 
   private List<FilaLeida> leerArchivo(InputStream csvStream) {

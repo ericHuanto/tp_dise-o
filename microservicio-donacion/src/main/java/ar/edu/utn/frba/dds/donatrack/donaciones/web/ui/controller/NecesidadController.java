@@ -14,7 +14,6 @@ import io.javalin.http.Context;
 import java.util.Map;
 
 public class NecesidadController implements WithSimplePersistenceUnit {
-
   private final BeneficiarioRepository beneficiarioRepository;
   private final CategoriaRepository categoriaRepository;
   private final SubcategoriaRepository subcategoriaRepository;
@@ -114,6 +113,7 @@ public class NecesidadController implements WithSimplePersistenceUnit {
     }
   }
 
+  //================== FUNCIONES AUXILIARES ==================
   private Integer obtenerEntero(String valor) {
     if (valor == null || valor.isBlank()) {
       return null;

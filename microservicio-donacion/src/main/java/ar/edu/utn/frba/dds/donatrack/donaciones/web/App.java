@@ -55,8 +55,6 @@ public class App {
     System.setProperty("hibernate.connection.username", config.getDbUser());
     System.setProperty("hibernate.connection.password", config.getDbPassword());
     //setPropiedad("hibernate.dialect",                 config.getDbDialect());   // LOCAL: no commitear
-
-    //Si te sale error por el momento puedes usar la opción: 3 del meta-inf
     DatosIniciales.init();
     SuscriptorNotificacion.init();
 
@@ -104,6 +102,7 @@ public class App {
     NecesidadController necesidadController = new NecesidadController( BeneficiarioRepository.getInstancia(), CategoriaRepository.getInstancia(), SubcategoriaRepository.getInstancia());
     DonacionBeneficiarioController donacionBeneficiarioController = new DonacionBeneficiarioController( BeneficiarioRepository.getInstancia(),DonacionRepository.getInstancia());
     AsignacionController asignacionController = new AsignacionController(rankingRepository, beneficiarioRepository, donacionRepository);
+    CsvController csvController = new CsvController(donanteRepository);
 
     Javalin app = Javalin.create(config -> {
       config.jsonMapper(GsonConfig.jsonMapper());
@@ -114,7 +113,6 @@ public class App {
       for (ConditionalHelpers helper : ConditionalHelpers.values()) {
         motorHandlebars.registerHelper(helper.name(), helper);
       }
-      motorHandlebars.registerHelper("inc", (ctx, options) -> (Integer) ctx + 1);
       config.fileRenderer(new JavalinHandlebars(motorHandlebars));
 
       //Registramos las rutas
@@ -135,6 +133,7 @@ public class App {
       NecesidadRoutes.registrar(config.routes, necesidadController);
       DonacionBeneficiarioRoutes.registrar(config.routes, donacionBeneficiarioController);
       AsignacionRoutes.registrar(config.routes, asignacionController);
+      CsvRoutes.registrar(config.routes, csvController);
 
       //Registramos las excepciones
       ExceptionHandlers.registrar(config.routes);

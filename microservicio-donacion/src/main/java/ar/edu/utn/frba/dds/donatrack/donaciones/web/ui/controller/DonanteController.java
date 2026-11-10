@@ -106,6 +106,7 @@ public class DonanteController {
     context.render("detalle_beneficiario.hbs", modelo);
   }
 
+  //================== FUNCIONES AUXILIARES ========================
   private Donante donanteLogueado(Context context) {
     Usuario usuarioActual = context.sessionAttribute("usuario_actual");
     if (usuarioActual == null) {

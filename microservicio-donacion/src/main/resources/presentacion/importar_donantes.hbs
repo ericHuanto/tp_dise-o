@@ -1,0 +1,27 @@
+{{#partial "nombre_pestaña"}}
+    Importar Donantes - DonaTrack
+{{/partial}}
+
+{{#partial "contenido_propio"}}
+    <div style="padding: 40px; max-width: 600px; margin: 0 auto;">
+        <h1 style="margin-bottom: 5px;">Importar Donantes</h1>
+        <p style="color: gray; margin-bottom: 30px;">Sube un archivo .csv para registrar usuarios de forma masiva.</p>
+
+        <form action="/donantes/importacion" method="POST" enctype="multipart/form-data" style="border: 1px solid #e0e0e0; padding: 30px; border-radius: 10px; background-color: white;">
+            <div style="margin-bottom: 25px;">
+                <label for="archivo_csv" style="font-weight: bold; display: block; margin-bottom: 10px;">
+                    Seleccionar archivo CSV
+                </label>
+                <input type="file" id="archivo_csv" name="archivo_csv" accept=".csv" required
+                       style="width: 100%; padding: 10px; border: 1px dashed #ccc; border-radius: 5px; background-color: #fafafa; cursor: pointer;">
+            </div>
+            <div style="text-align: right;">
+                <button type="submit" style="background-color: #1a1a1a; color: white; padding: 12px 24px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">
+                    Importar
+                </button>
+            </div>
+        </form>
+    </div>
+{{/partial}}
+
+{{> plantillas/layout.hbs}}

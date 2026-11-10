@@ -49,9 +49,9 @@ public class App {
     ConfiguracionEntorno config = ConfiguracionEntorno.getInstance();
 
     //Cargo credenciales para la db desde el .env
-    System.setProperty("hibernate.connection.url", config.getDbUrlLogistica());
-    System.setProperty("hibernate.connection.username", config.getDbUser());
-    System.setProperty("hibernate.connection.password", config.getDbPassword());
+    //System.setProperty("hibernate.connection.url", config.getDbUrlLogistica());
+    //System.setProperty("hibernate.connection.username", config.getDbUser());
+    //System.setProperty("hibernate.connection.password", config.getDbPassword());
 
     AppLogistica resultado = crearApp();
 
