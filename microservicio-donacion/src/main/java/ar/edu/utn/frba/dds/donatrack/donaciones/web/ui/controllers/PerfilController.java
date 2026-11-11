@@ -4,6 +4,9 @@ import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.beneficiario.Beneficiari
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.donante.documento.Documento;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.donante.documento.TipoDocumento;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.donante.tipodonantes.Genero;
+import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.donante.tipodonantes.juridica.Juridica;
+import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.donante.tipodonantes.juridica.Representante;
+import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.donante.tipodonantes.juridica.TipoOrganizacion;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.donante.tipodonantes.persona.Humana;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.mediocontacto.MedioContacto;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.usuario.Permiso;
@@ -42,6 +45,14 @@ public class PerfilController implements WithSimplePersistenceUnit {
     modelo.put("tiposDocumento", TipoDocumento.valoresPosiblesHumana());
     modelo.put("generos", Genero.values());
     context.render("views/auth/registro_persona_humana.hbs", modelo);
+  }
+
+  public void mostrarFormularioRegistroDonanteJuridica(Context context) {
+    Map<String, Object> modelo = new HashMap<>();
+    modelo.put("tiposDocumento", TipoDocumento.valoresPosiblesJuridica());
+    modelo.put("tiposDocumentoRepresentante", TipoDocumento.valoresPosiblesHumana());
+    modelo.put("tiposOrganizacion", TipoOrganizacion.values());
+    context.render("views/auth/registro_persona_juridica.hbs", modelo);
   }
 
   public void guardarBeneficiario(Context context) {
@@ -109,6 +120,62 @@ public class PerfilController implements WithSimplePersistenceUnit {
       e.printStackTrace();
       rollbackTransaction();
       context.redirect("/perfil/donante-humana?error=Error_interno_al_guardar");
+    }
+  }
+
+  public void guardarDonanteJuridica(Context context) {
+    Usuario nuevoUsuario = validarYConstruirUsuario(context, "/perfil/donante-juridica");
+    if (nuevoUsuario == null) {
+      return;
+    }
+
+    // Datos de la persona juridica
+    String razonSocial = context.formParam("razonSocial");
+    TipoDocumento tipoDocJuridica = TipoDocumento.valueOf(context.formParam("tipoDocumento"));
+    String numDocJuridica = context.formParam("numeroDocumento");
+    TipoOrganizacion tipoOrg = TipoOrganizacion.valueOf(context.formParam("tipoOrganizacion"));
+    String rubro = context.formParam("rubro");
+
+    // Datos del representante
+    String nombreRep = context.formParam("nombreRepresentante");
+    String apellidoRep = context.formParam("apellidoRepresentante");
+    TipoDocumento tipoDocRep = TipoDocumento.valueOf(context.formParam("tipoDocumentoRepresentante"));
+    String numDocRep = context.formParam("numeroDocumentoRepresentante");
+    String direccionRep = context.formParam("direccionRepresentante");
+    List<MedioContacto> contactosRep = armarContactos(context);
+
+    Representante representante = new Representante(
+        nombreRep,
+        apellidoRep,
+        new Documento(tipoDocRep, numDocRep),
+        direccionRep,
+        contactosRep
+    );
+
+    Juridica nuevaJuridica = new Juridica(
+        razonSocial,
+        new Documento(tipoDocJuridica, numDocJuridica),
+        tipoOrg,
+        rubro,
+        List.of(representante)
+    );
+
+    nuevoUsuario.otorgarPermiso(Permiso.REALIZAR_DONACION);
+    nuevaJuridica.vincularUsuario(nuevoUsuario);
+
+    try {
+      beginTransaction();
+      repoUsuarios.guardar(nuevoUsuario);
+      repoDonantes.guardar(nuevaJuridica);
+      commitTransaction();
+
+      nuevoUsuario.inicializarPermisos();
+      context.sessionAttribute("usuario_actual", nuevoUsuario);
+      context.redirect("/");
+    } catch (Exception e) {
+      e.printStackTrace();
+      rollbackTransaction();
+      context.redirect("/perfil/donante-juridica?error=Error_interno_al_guardar");
     }
   }
 

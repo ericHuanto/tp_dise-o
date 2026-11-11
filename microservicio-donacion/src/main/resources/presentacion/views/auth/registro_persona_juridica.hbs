@@ -1,0 +1,200 @@
+{{#partial "nombre_pestaña"}}
+    Registro Persona Jurídica - DonaTrack
+{{/partial}}
+
+{{#partial "css_extra"}}
+    <link rel="stylesheet" href="/css/formularios.css">
+{{/partial}}
+
+{{#partial "contenido_propio"}}
+    <section class="registro-page">
+        <nav class="breadcrumb">
+            <a href="/">Inicio</a> <span>›</span> Registro
+        </nav>
+
+        <div class="registro-container">
+            <h1>Crear una cuenta</h1>
+            <p class="subtitulo">Elegí cómo vas a usar DonaTrack.</p>
+
+            <!-- Pestañas superiores -->
+            <div class="tabs-perfil">
+                <a href="/perfil/donante-juridica" class="tab-btn active">Persona donante</a>
+                <a href="/perfil/beneficiario" class="tab-btn">Entidad beneficiaria</a>
+            </div>
+
+            <div class="form-card">
+                <form action="/perfil/donante-juridica" method="POST">
+                    <!-- Selector Tipo de persona -->
+                    <div class="form-group">
+                        <label>Tipo de persona</label>
+                        <div class="selector-tipo">
+                            <a href="/perfil/donante-humana" class="chip">Persona humana</a>
+                            <a href="/perfil/donante-juridica" class="chip active">Persona jurídica</a>
+                        </div>
+                    </div>
+
+                    <h3>Datos de la organización</h3>
+
+                    <div class="form-group">
+                        <label for="razonSocial">Razón social</label>
+                        <input type="text" id="razonSocial" name="razonSocial" placeholder="Fundación Alimentos del Sur S.A." required>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-medio">
+                            <label for="tipoDocumento">Tipo de documento</label>
+                            <select id="tipoDocumento" name="tipoDocumento" required>
+                                {{#each tiposDocumento}}
+                                    <option value="{{this}}">{{this}}</option>
+                                {{/each}}
+                            </select>
+                        </div>
+                        <div class="form-group col-valor">
+                            <label for="numeroDocumento">Número de documento</label>
+                            <input type="text" id="numeroDocumento" name="numeroDocumento" class="input-mono" placeholder="30712345679" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="tipoOrganizacion">Tipo de organización</label>
+                            <select id="tipoOrganizacion" name="tipoOrganizacion" required>
+                                {{#each tiposOrganizacion}}
+                                    <option value="{{this}}">{{this}}</option>
+                                {{/each}}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="rubro">Rubro</label>
+                            <input type="text" id="rubro" name="rubro" placeholder="Alimentación / Logística" required>
+                        </div>
+                    </div>
+
+                    <hr class="divisor-seccion">
+
+                    <h3>Representante de la organización</h3>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="nombreRepresentante">Nombre</label>
+                            <input type="text" id="nombreRepresentante" name="nombreRepresentante" placeholder="Martín" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="apellidoRepresentante">Apellido</label>
+                            <input type="text" id="apellidoRepresentante" name="apellidoRepresentante" placeholder="Gómez" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-medio">
+                            <label for="tipoDocumentoRepresentante">Tipo de documento</label>
+                            <select id="tipoDocumentoRepresentante" name="tipoDocumentoRepresentante" required>
+                                {{#each tiposDocumentoRepresentante}}
+                                    <option value="{{this}}">{{this}}</option>
+                                {{/each}}
+                            </select>
+                        </div>
+                        <div class="form-group col-valor">
+                            <label for="numeroDocumentoRepresentante">Número de documento</label>
+                            <input type="text" id="numeroDocumentoRepresentante" name="numeroDocumentoRepresentante" class="input-mono" placeholder="35123456" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="direccionRepresentante">Dirección</label>
+                        <input type="text" id="direccionRepresentante" name="direccionRepresentante" placeholder="Av. Córdoba 2100, CABA" required>
+                    </div>
+
+                    <hr class="divisor-seccion">
+
+                    <h3>Contacto principal del representante</h3>
+
+                    <div class="form-row">
+                        <div class="form-group col-medio">
+                            <label for="medio_principal">Medio</label>
+                            <select id="medio_principal" name="medio_principal" required>
+                                <option value="EMAIL">Email</option>
+                                <option value="WHATSAPP">WhatsApp</option>
+                                <option value="SMS">SMS</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-valor">
+                            <label for="valor_principal">Valor</label>
+                            <input type="text" id="valor_principal" name="valor_principal" placeholder="mgomez@organizacion.com" required>
+                        </div>
+                    </div>
+
+                    <div id="contenedor-contactos"></div>
+                    <button type="button" class="btn-texto-verde" onclick="agregarContacto()">+ Agregar contacto adicional</button>
+
+                    <hr class="divisor-seccion">
+
+                    <h3>Cuenta</h3>
+
+                    <div class="form-group">
+                        <label for="nombre_usuario">Usuario</label>
+                        <input type="text" id="nombre_usuario" name="name" class="input-mono" placeholder="org_alimentos" required>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="contrasenia">Contraseña</label>
+                            <input type="password" id="contrasenia" name="password" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="repetir_contrasenia">Repetir contraseña</label>
+                            <input type="password" id="repetir_contrasenia" name="passwordConfirm" required>
+                        </div>
+                    </div>
+                    <p class="ayuda-input">Mínimo 8 caracteres, con al menos un número.</p>
+
+                    <div id="alerta-registro" class="alerta-error-login oculto"></div>
+
+                    <div class="registro-footer">
+                        <p>¿Ya tenés cuenta? <a href="/login" tabindex="-1">Iniciá sesión</a></p>
+                        <button type="submit" class="btn-crear-cuenta">Crear cuenta</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+{{/partial}}
+
+{{#partial "scripts"}}
+    <script>
+        function agregarContacto() {
+            const contenedor = document.getElementById('contenedor-contactos');
+            const nuevaFila = document.createElement('div');
+            nuevaFila.className = 'contacto-row';
+
+            nuevaFila.innerHTML = `
+                <select name="medios[]" class="col-medio" required>
+                    <option value="EMAIL">Email</option>
+                    <option value="WHATSAPP">WhatsApp</option>
+                    <option value="SMS">SMS</option>
+                </select>
+                <input type="text" name="valores[]" class="col-valor" placeholder="Nuevo contacto" required>
+                <select name="principales[]" class="col-tipo">
+                    <option selected value="false">Secundario</option>
+                    <option value="true">Es Principal</option>
+                </select>
+                <button type="button" class="btn-peligro" onclick="this.parentElement.remove()">✕</button>
+            `;
+
+            contenedor.appendChild(nuevaFila);
+        }
+
+        const params = new URLSearchParams(window.location.search);
+        if (params.has('error')) {
+            const alerta = document.getElementById('alerta-registro');
+            alerta.textContent = params.get('error').replaceAll('_', ' ');
+            alerta.classList.remove('oculto');
+        }
+
+        document.querySelectorAll('#tipoOrganizacion option').forEach(opcion => {
+            opcion.textContent = opcion.textContent.replaceAll('_', ' ');
+        });
+    </script>
+{{/partial}}
+
+{{> partials/layout.hbs}}

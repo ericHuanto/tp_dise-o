@@ -12,6 +12,8 @@ public class PerfilRoutes {
     ruta.post("/perfil/beneficiario", controller::guardarBeneficiario);
     ruta.get("/perfil/donante-humana", controller::mostrarFormularioRegistroDonanteHumano);
     ruta.post("/perfil/donante-humana", controller::guardarDonanteHumana);
+    ruta.get("/perfil/donante-juridica", controller::mostrarFormularioRegistroDonanteJuridica);
+    ruta.post("/perfil/donante-juridica", controller::guardarDonanteJuridica);
   }
 
 }
