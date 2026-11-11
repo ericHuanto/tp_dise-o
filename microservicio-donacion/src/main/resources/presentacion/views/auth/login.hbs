@@ -1,23 +1,57 @@
 {{#partial "nombre_pestaña"}}
-    Iniciar Sesión - DonaTrack
+    Iniciar sesión - DonaTrack
+{{/partial}}
+
+{{#partial "css_extra"}}
+    <link rel="stylesheet" href="/css/formularios.css">
 {{/partial}}
 
 {{#partial "contenido_propio"}}
-    <section>
-        <h2>Iniciar Sesión</h2>
+    <section class="login-wrapper">
+        <div class="form-card login-card">
+            <div class="icono-logo login-logo">D</div>
 
-        <form action="/login" method="post">
-            <label for="nombre_usuario">Nombre de usuario:</label>
-            <input type="text" id="nombre_usuario" name="name" required>
+            <h2>Iniciar sesión</h2>
+            <p class="subtitulo">Un único acceso para personas donantes, entidades beneficiarias y administración.</p>
 
-            <label for="contrasenia">Contraseña:</label>
-            <input type="password" id="contrasenia" name="password" required>
+            <form action="/login" method="post">
+                <div class="form-group">
+                    <label for="nombre_usuario">Usuario</label>
+                    <input type="text" id="nombre_usuario" name="name" class="input-mono" placeholder="lfernandez" required>
+                </div>
 
-            <button type="submit" >Ingresar</button>
-        </form>
+                <div class="form-group">
+                    <div class="label-row">
+                        <label for="contrasenia">Contraseña</label>
+                        <a href="#" class="link-olvido" tabindex="-1">¿La olvidaste?</a>
+                    </div>
+                    <input type="password" id="contrasenia" name="password" required>
+                </div>
 
-        <p>¿No tienes cuenta? <a href="/registro">Regístrate aquí</a></p>
+                <div id="alerta-login" class="alerta-error-login {{#unless error}}oculto{{/unless}}">
+                    {{#if error}}{{error}}{{else}}Usuario o contraseña incorrectos.{{/if}}
+                </div>
+
+                <button type="submit" class="btn-submit btn-login">Ingresar</button>
+            </form>
+
+            <div class="login-footer">
+                <p>¿No tenés cuenta? <a href="/registro">Registrate</a></p>
+            </div>
+        </div>
     </section>
+{{/partial}}
+
+{{#partial "scripts"}}
+    <script>
+        // Si el backend redirige con ?error=... por query param, mostramos el banner
+        const params = new URLSearchParams(window.location.search);
+        if (params.has('error')) {
+            const alerta = document.getElementById('alerta-login');
+            alerta.textContent = params.get('error').replaceAll('_', ' ');
+            alerta.classList.remove('oculto');
+        }
+    </script>
 {{/partial}}
 
 {{> partials/layout.hbs}}
