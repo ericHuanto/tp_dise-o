@@ -1,0 +1,23 @@
+:root {
+    --primary-color: #F1F0E8;
+    --accent-dark: #1A1A1A;
+    --accent-green: #3B6B5B;
+    --text-muted: #555555;
+    --white: #FFFFFF;
+    --border-color: #D1D0C4;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+body {
+    background-color: var(--primary-color);
+    color: var(--accent-dark);
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}

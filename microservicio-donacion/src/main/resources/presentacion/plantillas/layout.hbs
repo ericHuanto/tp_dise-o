@@ -8,15 +8,18 @@
 <body>
     <!-- HEADER -->
     {{> plantillas/header/header.hbs}}
+
     <!-- MAIN -->
     <main>
         <nav> {{#block "breadcrumbs"}} <a href="/">Inicio</a> {{/block}} </nav>
 
         {{#block "contenido_propio"}} {{/block}}
     </main>
+
     <!-- FOOTER -->
     {{> plantillas/footer/footer.hbs}}
-    <!-- Extra Scrips -->
+
+    <!-- Extra Scripts -->
     {{#block "scripts"}}{{/block}}
 </body>
 </html>

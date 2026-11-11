@@ -1,4 +1,4 @@
-package ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.controller;
+package ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.controllers;
 
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.usuario.Usuario;
 import io.javalin.http.Context;
@@ -12,6 +12,7 @@ public class HomeController {
     Map<String, Object> modelo = new HashMap<>();
 
     if(usuarioActual != null) {
+      modelo.put("usuario", usuarioActual);
       modelo.put("saludo", "¡Bienvenido al sistema DonaTrack! " + usuarioActual.getNombreUsuario() + " un gusto volver a verlo");
       context.render("home.hbs", modelo);
     }

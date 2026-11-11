@@ -1,6 +1,6 @@
 package ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.routes;
 
-import ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.controller.CsvController;
+import ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.controllers.CsvController;
 import io.javalin.config.RoutesConfig;
 
 public class CsvRoutes {

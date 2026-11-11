@@ -1,0 +1,141 @@
+/* HEADER GLOBAL*/
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 68px;
+    padding: 0 60px;
+    background-color: var(--white);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.header-left,
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    height: 100%;
+}
+
+.header-left a.logo-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 700;
+    font-size: 1.2rem;
+    color: var(--accent-dark) !important;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.header-left a.logo-link:hover {
+    color: var(--accent-dark) !important;
+    opacity: 0.9;
+}
+
+.icono-logo {
+    background-color: var(--accent-green);
+    color: var(--white);
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    font-size: 1rem;
+}
+
+/* Enlaces generales del header*/
+.header-right a,
+.header-right a:visited {
+    color: var(--accent-dark);
+    text-decoration: none;
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+.btn-primary,
+a.btn-primary:visited {
+    background-color: var(--accent-dark);
+    color: var(--white) !important;
+    padding: 10px 24px;
+    border-radius: 6px;
+    transition: opacity 0.2s;
+    font-weight: 500;
+    text-decoration: none;
+}
+
+.btn-primary:hover {
+    opacity: 0.9;
+}
+
+.btn-secondary {
+    background-color: transparent;
+    color: var(--accent-dark);
+    border: 1px solid var(--border-color);
+    padding: 10px 24px;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+/* PESTAÑA "Ver entregas"*/
+.header-left a.nav-tab,
+.header-left a.nav-tab:visited {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    height: 100%;
+    color: var(--text-muted, #6E6D68);
+    text-decoration: none;
+    font-size: 0.95rem;
+    font-weight: 500;
+    transition: color 0.2s ease;
+}
+
+.header-left a.nav-tab:hover,
+.header-left a.nav-tab.active,
+.header-left a.nav-tab.active:visited {
+    color: var(--accent-dark, #1C201E);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.header-left a.nav-tab:hover::after,
+.header-left a.nav-tab.active::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -1px;
+    width: 100%;
+    height: 2.5px;
+    background-color: var(--accent-green, #3B6B5B);
+    border-radius: 2px;
+}
+
+/*FOOTER*/
+footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 60px;
+    border-top: 1px solid var(--border-color);
+    background-color: var(--primary-color);
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+footer a,
+footer a:visited {
+    color: var(--accent-green);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.logo-footer {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 700;
+    font-size: 1.2rem;
+}

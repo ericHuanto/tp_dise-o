@@ -11,6 +11,8 @@ import io.javalin.Javalin;
 import io.javalin.config.RoutesConfig;
 
 import java.io.FileNotFoundException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ExceptionHandlers {
 
@@ -49,8 +51,14 @@ public class ExceptionHandlers {
     });
     // Comodín atrapa todas las excepciones que no fueron, registradas
     ruta.exception(Exception.class, (e, ctx) -> {
-      ctx.status(500).json(new ErrorResponse(500, "Error interno del servidor"));
       e.printStackTrace();
+      Map<String, Object> modelo = new HashMap<>();
+      modelo.put("codigo", 500);
+      modelo.put("titulo", "Ocurrió un problema inesperado");
+      modelo.put("mensaje", "No pudimos procesar tu solicitud en este momento. Por favor, volvé a intentarlo.");
+
+      ctx.status(500).json(new ErrorResponse(500, "Error interno del servidor"));
+      ctx.render("error.hbs", modelo);
     });
   }
 

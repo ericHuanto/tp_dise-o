@@ -48,10 +48,10 @@ public class App {
   public static void main(String[] args) {
     ConfiguracionEntorno config = ConfiguracionEntorno.getInstance();
 
-    //Cargo credenciales para la db desde el .env
-    //System.setProperty("hibernate.connection.url", config.getDbUrlLogistica());
-    //System.setProperty("hibernate.connection.username", config.getDbUser());
-    //System.setProperty("hibernate.connection.password", config.getDbPassword());
+    //Cargo credenciales para la db desde el .env. NO COMMITEAR COMENTADO!!!
+    System.setProperty("hibernate.connection.url", config.getDbUrlLogistica());
+    System.setProperty("hibernate.connection.username", config.getDbUser());
+    System.setProperty("hibernate.connection.password", config.getDbPassword());
 
     AppLogistica resultado = crearApp();
 

@@ -1,4 +1,4 @@
-package ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.controller;
+package ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.controllers;
 
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.usuario.Usuario;
 import ar.edu.utn.frba.dds.donatrack.donaciones.persistencia.UsuarioRepository;
@@ -58,6 +58,7 @@ public class SesionController implements WithSimplePersistenceUnit {
       if(!Integridad.validar(contraseña, usuario.getContraseña()))
         context.redirect("/login?error=La_contraseña_es_incorrecta");
       else {
+        usuario.inicializarPermisos();
         context.sessionAttribute("usuario_actual", usuario);
         context.redirect("/");
       }

@@ -1,6 +1,6 @@
 package ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.routes;
 
-import ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.controller.MapaController;
+import ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.controllers.MapaController;
 import io.javalin.config.RoutesConfig;
 
 public class MapaRoutes {

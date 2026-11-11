@@ -1,4 +1,4 @@
-package ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.controller;
+package ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.controllers;
 
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.beneficiario.Beneficiario;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.donacion.Donacion;
@@ -8,8 +8,6 @@ import io.github.flbulgarelli.jpa.extras.simple.WithSimplePersistenceUnit;
 import io.javalin.http.Context;
 import java.util.HashMap;
 import java.util.Map;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 public class DonacionBeneficiarioController implements WithSimplePersistenceUnit {
 

@@ -1,4 +1,4 @@
-package ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.controller;
+package ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.controllers;
 
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.donante.Donante;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.generadordonantes.FilaError;

@@ -20,7 +20,7 @@ public class Usuario {
   private String nombreUsuario;
   @Column(name = "contraseña_hasheada")
   private String contraseña;
-  @ElementCollection
+  @ElementCollection(fetch = FetchType.EAGER)
   @Enumerated(EnumType.STRING)
   @CollectionTable(name = "usuario_permiso", joinColumns = @JoinColumn(name = "id_usuario"))
   @Column(name = "permiso")
@@ -38,9 +38,32 @@ public class Usuario {
     }
   }
 
+  public boolean tienePermiso(Permiso permiso) {
+    return this.permisos != null && this.permisos.contains(permiso);
+  }
+
+  // Getters booleanos invocados por Handlebars
+  public boolean isDonante() {
+    return tienePermiso(Permiso.REALIZAR_DONACION);
+  }
+
+  public boolean isBeneficiario() {
+    return tienePermiso(Permiso.SOLICITAR_AYUDA);
+  }
+
+  public boolean isAdmin() {
+    return tienePermiso(Permiso.ADMINISTRADOR);
+  }
+
   //================== FUNCIONES AUXILIARES ===================
   private String hashear(String contraseña){
     return Integridad.hashear(contraseña);
   }
 
+  public void inicializarPermisos() {
+    if (this.permisos != null) {
+      // Reemplaza el PersistentBag de Hibernate por un ArrayList puro en memoria
+      this.permisos = new ArrayList<>(this.permisos);
+    }
+  }
 }

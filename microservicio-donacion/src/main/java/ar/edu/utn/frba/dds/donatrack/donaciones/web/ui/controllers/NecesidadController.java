@@ -1,4 +1,4 @@
-package ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.controller;
+package ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.controllers;
 
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.beneficiario.Beneficiario;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.bien.Subcategoria;

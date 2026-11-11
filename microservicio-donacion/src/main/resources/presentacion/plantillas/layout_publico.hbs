@@ -4,35 +4,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{#block "nombre_pestaña"}}DonaTrack{{/block}}</title>
-    <link rel="stylesheet" href="/css/landing.css">
+
+    <link rel="stylesheet" href="/css/global.css">
+    <link rel="stylesheet" href="/css/layout.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+    <!--Espacio para que cada pantalla implemente su propio css-->
+    {{#block "css_extra"}}{{/block}}
 </head>
 <body>
     <!-- HEADER -->
-    <header>
-        <div class="header-left">
-            <div class="logo-footer">
-                <div class="icono-logo">D</div>
-                <span>DonaTrack</span>
-            </div>
-            <a href="/beneficiarios/donaciones/recibidas">Ver entregas recibidas</a>
-        </div>
-        <div class="header-right">
-            <a href="/login">Iniciar sesión</a>
-            <a href="/registro" class="btn-primary">Registrarse</a>
-        </div>
-    </header>
+    {{> plantillas/header/header.hbs}}
+
     <!-- MAIN -->
-    <main>
-        {{#block "contenido_propio"}}{{/block}}
-    </main>
+    <div class="main-wrapper">
+        <main>
+            {{#block "contenido_propio"}}{{/block}}
+        </main>
+    </div>
+
     <!-- FOOTER -->
-    <footer>
-        <div class="footer">© DonaTrack - Derechos reservados</div>
-        <a href="#">Información Legal y Privacidad</a>
-    </footer>
-    <!-- Extra Scrips -->
+    {{> plantillas/footer/footer.hbs}}
+
+    <!-- Extra Scripts -->
     {{#block "scripts"}}{{/block}}
 </body>
 </html>

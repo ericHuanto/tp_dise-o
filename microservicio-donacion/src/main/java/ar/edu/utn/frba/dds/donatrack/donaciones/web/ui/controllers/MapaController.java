@@ -1,7 +1,8 @@
-package ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.controller;
+package ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.controllers;
 
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.beneficiario.Beneficiario;
 import ar.edu.utn.frba.dds.donatrack.donaciones.persistencia.BeneficiarioRepository;
+import ar.edu.utn.frba.dds.donatrack.donaciones.persistencia.CategoriaRepository;
 import ar.edu.utn.frba.dds.donatrack.donaciones.web.shared.convers.BeneficiarioMapper;
 import ar.edu.utn.frba.dds.donatrack.donaciones.web.shared.dto.beneficiario.BeneficiarioMapaResponse;
 import com.google.gson.Gson;
@@ -13,9 +14,11 @@ import java.util.Map;
 
 public class MapaController {
   private BeneficiarioRepository repoBeneficiarios;
+  private CategoriaRepository repoCategorias;
 
-  public MapaController(BeneficiarioRepository beneficiarioRepository) {
+  public MapaController(BeneficiarioRepository beneficiarioRepository, CategoriaRepository categoriaRepository) {
     this.repoBeneficiarios = beneficiarioRepository;
+    this.repoCategorias = categoriaRepository;
   }
 
   public void mostrarDonacionesRecibidas(Context context) {
@@ -26,6 +29,7 @@ public class MapaController {
     Map<String, Object> modelo = new HashMap<>();
     modelo.put("usuario", context.sessionAttribute("usuario_actual"));
     modelo.put("marcadoresJson", beneficiariosJson);
+    modelo.put("categorias", repoCategorias.buscarTodos());
 
     context.render("mapa_beneficiarios.hbs", modelo);
   }

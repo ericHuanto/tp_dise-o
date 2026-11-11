@@ -1,6 +1,6 @@
 package ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.routes;
 
-import ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.controller.PerfilController;
+import ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.controllers.PerfilController;
 import io.javalin.config.RoutesConfig;
 
 public class PerfilRoutes {

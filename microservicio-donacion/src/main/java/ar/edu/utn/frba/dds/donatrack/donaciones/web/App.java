@@ -8,13 +8,13 @@ import ar.edu.utn.frba.dds.donatrack.donaciones.web.api.routes.BeneficiarioApiRo
 import ar.edu.utn.frba.dds.donatrack.donaciones.web.api.routes.DonacionApiRoutes;
 import ar.edu.utn.frba.dds.donatrack.donaciones.web.api.routes.DonanteApiRoutes;
 import ar.edu.utn.frba.dds.donatrack.donaciones.web.api.routes.NecesidadApiRoutes;
-import ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.controller.DonacionBeneficiarioController;
-import ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.controller.DonanteController;
-import ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.controller.HomeController;
-import ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.controller.MapaController;
-import ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.controller.NecesidadController;
-import ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.controller.PerfilController;
-import ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.controller.SesionController;
+import ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.controllers.DonacionBeneficiarioController;
+import ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.controllers.DonanteController;
+import ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.controllers.HomeController;
+import ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.controllers.MapaController;
+import ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.controllers.NecesidadController;
+import ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.controllers.PerfilController;
+import ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.controllers.SesionController;
 import ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.routes.DonacionBeneficiarioRoutes;
 import ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.routes.DonanteRoutes;
 import ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.routes.HomeRoutes;
@@ -22,7 +22,7 @@ import ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.routes.MapaRoutes;
 import ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.routes.NecesidadRoutes;
 import ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.routes.PerfilRoutes;
 import ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.routes.SesionRoutes;
-import ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.controller.*;
+import ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.controllers.*;
 import ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.routes.*;
 import ar.edu.utn.frba.dds.donatrack.shared.ConfiguracionEntorno;
 import ar.edu.utn.frba.dds.donatrack.shared.ExceptionHandlers;
@@ -96,7 +96,7 @@ public class App {
     HomeController homeController = new HomeController();
     SesionController sesionController = new SesionController(usuarioRepository);
     PerfilController perfilController = new PerfilController(donanteRepository, beneficiarioRepository, usuarioRepository);
-    MapaController mapaController = new MapaController(beneficiarioRepository);
+    MapaController mapaController = new MapaController(beneficiarioRepository, categoriaRepository);
     DonanteController donanteController = new DonanteController(donanteRepository, donacionRepository, categoriaRepository, subcategoriaRepository, beneficiarioRepository);
     DonacionController donacionController = new DonacionController(donacionRepository);
     NecesidadController necesidadController = new NecesidadController( BeneficiarioRepository.getInstancia(), CategoriaRepository.getInstancia(), SubcategoriaRepository.getInstancia());
@@ -123,6 +123,7 @@ public class App {
       BeneficiarioApiRoutes.registrar(config.routes, beneficiarioApiController);
       NecesidadApiRoutes.registrar(config.routes, necesidadApiController);
       AsignacionApiRoutes.registrar(config.routes, asignacionApiController);
+
       //rutas que devuelven vistas
       HomeRoutes.registrar(config.routes, homeController);
       SesionRoutes.registrar(config.routes, sesionController);
