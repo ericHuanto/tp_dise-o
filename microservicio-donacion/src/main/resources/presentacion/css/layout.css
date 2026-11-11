@@ -139,3 +139,43 @@ footer a:visited {
     font-weight: 700;
     font-size: 1.2rem;
 }
+
+/*BARRA DE NAVEGACION*/
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    height: 100%;
+}
+
+.nav-links a,
+.nav-links a:visited {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    height: 100%;
+    color: var(--text-muted, #6E6D68);
+    text-decoration: none;
+    font-size: 0.95rem;
+    font-weight: 500;
+    transition: color 0.2s ease;
+}
+
+.nav-links a:hover,
+.nav-links a.active,
+.nav-links a.active:visited {
+    color: var(--accent-dark, #1C201E);
+    font-weight: 600;
+}
+
+.nav-links a:hover::after,
+.nav-links a.active::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -1px;
+    width: 100%;
+    height: 2.5px;
+    background-color: var(--accent-green, #3B6B5B);
+    border-radius: 2px;
+}

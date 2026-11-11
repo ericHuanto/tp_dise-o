@@ -2,73 +2,77 @@
     Resultado Importación - DonaTrack
 {{/partial}}
 
-{{#partial "contenido_propio"}}
-    <div style="background-color: #f7f6f2; min-height: 100vh; padding: 40px 20px;">
-        <div style="max-width: 800px; margin: 0 auto; font-family: Arial, sans-serif;">
+{{#partial "css_extra"}}
+    <link rel="stylesheet" href="/css/importar_donantes.css">
+{{/partial}}
 
-            <h1 style="font-size: 2em; color: #1a1a1a; margin-bottom: 25px; letter-spacing: -0.5px;">Importar donantes desde CSV</h1>
+{{#partial "contenido_propio"}}
+    <div class="importacion-wrapper">
+        <div class="importacion-container">
+
+            <h1 class="importacion-titulo">Importar donantes desde CSV</h1>
 
             <!-- Pasos -->
-            <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 30px; font-size: 0.9em;">
+            <div class="pasos-container">
                 <!-- Paso 1 (Completado) -->
-                <div style="display: flex; align-items: center; gap: 8px; color: #555;">
-                    <span style="display: flex; justify-content: center; align-items: center; width: 24px; height: 24px; background-color: #2e7d32; color: white; border-radius: 50%; font-size: 14px;">✓</span>
+                <div class="paso-item paso-completado">
+                    <span class="paso-circulo circulo-exito">✓</span>
                     <span>Subir archivo</span>
                 </div>
-                <div style="height: 1px; width: 40px; background-color: #ccc;"></div>
+                <div class="paso-separador"></div>
                 <!-- Paso 2 (Completado) -->
-                <div style="display: flex; align-items: center; gap: 8px; color: #555;">
-                    <span style="display: flex; justify-content: center; align-items: center; width: 24px; height: 24px; background-color: #2e7d32; color: white; border-radius: 50%; font-size: 14px;">✓</span>
+                <div class="paso-item paso-completado">
+                    <span class="paso-circulo circulo-exito">✓</span>
                     <span>Procesando</span>
                 </div>
-                <div style="height: 1px; width: 40px; background-color: #ccc;"></div>
+                <div class="paso-separador"></div>
                 <!-- Paso 3 (Actual) -->
-                <div style="display: flex; align-items: center; gap: 8px; font-weight: bold; color: #2e7d32;">
-                    <span style="display: flex; justify-content: center; align-items: center; width: 24px; height: 24px; background-color: #2e7d32; color: white; border-radius: 50%; font-size: 14px;">✓</span>
+                <div class="paso-item paso-final-activo">
+                    <span class="paso-circulo circulo-exito">✓</span>
                     <span>Finalizado</span>
                 </div>
             </div>
 
             <!-- Tarjeta de Resultados -->
-            <div style="background-color: white; border-radius: 12px; padding: 30px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #eaeaea;">
+            <div class="tarjeta-resultados">
 
-                <div style="background-color: #e6f4ea; border: 1px solid #ceead6; padding: 15px; border-radius: 5px; color: #137333; font-weight: bold; margin-bottom: 30px;">
+                <div class="alerta-exito">
                     Se crearon con éxito {{resultado.cantExitosa}} registros, de los antiguos donantes.
                 </div>
 
                 {{#if resultado.erroresEncontrados}}
-                    <h2 style="color: #d93025; font-size: 1.2em; margin-bottom: 15px;">Se encontraron {{resultado.erroresEncontrados.size}} errores, las filas con error son:</h2>
+                    <h2 class="titulo-errores">Se encontraron {{resultado.erroresEncontrados.size}} errores, las filas con error son:</h2>
 
-                    <table style="width: 100%; border-collapse: collapse; text-align: left; background-color: white; border: 1px solid #e0e0e0; border-radius: 5px; overflow: hidden;">
-                        <thead style="background-color: #f8d7da; color: #721c24;">
+                    <table class="tabla-errores">
+                        <thead>
                         <tr>
-                            <th style="padding: 12px 15px; border-bottom: 1px solid #f5c6cb;">Fila N°</th>
-                            <th style="padding: 12px 15px; border-bottom: 1px solid #f5c6cb;">Motivo del Error</th>
+                            <th>Fila N°</th>
+                            <th>Motivo del Error</th>
                         </tr>
                         </thead>
                         <tbody>
                         {{#each resultado.erroresEncontrados}}
-                            <tr style="border-bottom: 1px solid #eee;">
-                                <td style="padding: 12px 15px; font-weight: bold;">{{this.numeroFila}}</td>
-                                <td style="padding: 12px 15px; color: #555;">{{this.motivoError}}</td>
+                            <tr>
+                                <td class="celda-fila">{{this.numeroFila}}</td>
+                                <td class="celda-motivo">{{this.motivoError}}</td>
                             </tr>
                         {{/each}}
                         </tbody>
                     </table>
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 30px;">
-                        <a href="/donantes/importacion" style="display: inline-block; background-color: #1a1a1a; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">
+                    <div class="acciones-errores">
+                        <a href="/donantes/importacion" class="btn-otra-importacion">
                             Realizar otra importación
                         </a>
-                        <button onclick="descargarErroresCSV()" style="background-color: white; color: #1a1a1a; border: 1px solid #ccc; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 0.9em; transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='#f0f0f0'" onmouseout="this.style.backgroundColor='white'">
+                        <button onclick="descargarErroresCSV()" class="btn-descargar-csv">
                             Descargar reporte de errores (.csv)
                         </button>
                     </div>
                 {{else}}
-                    <div style="padding: 30px; text-align: center; background-color: #f8f9fa; border: 1px dashed #ccc; border-radius: 5px; color: #555;">
-                        <p style="margin: 0; font-size: 1.1em;"><strong>¡Perfecto!</strong> Todas las filas se procesaron sin errores y los donantes fueron creados.</p>
+                    <div class="mensaje-sin-errores">
+                        <p><strong>¡Perfecto!</strong> Todas las filas se procesaron sin errores y los donantes fueron creados.</p>
                     </div>
-                    <div style="margin-top: 30px; text-align: center;">
-                        <a href="/donantes/importacion" style="display: inline-block; background-color: #1a1a1a; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">
+                    <div class="acciones-centradas">
+                        <a href="/donantes/importacion" class="btn-otra-importacion">
                             Realizar otra importación
                         </a>
                     </div>

@@ -3,7 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <title>{{#block "nombre_pestaña"}}DonaTrack{{/block}}</title>
+
+    <link rel="stylesheet" href="/css/global.css">
+    <link rel="stylesheet" href="/css/layout.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+    <!--Espacio para que cada pantalla implemente su propio css-->
+    {{#block "css_extra"}}{{/block}}
 </head>
 <body>
     <!-- HEADER -->
@@ -11,8 +17,6 @@
 
     <!-- MAIN -->
     <main>
-        <nav> {{#block "breadcrumbs"}} <a href="/">Inicio</a> {{/block}} </nav>
-
         {{#block "contenido_propio"}} {{/block}}
     </main>
 
