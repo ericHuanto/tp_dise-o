@@ -14,10 +14,10 @@ public class HomeController {
     if(usuarioActual != null) {
       modelo.put("usuario", usuarioActual);
       modelo.put("saludo", "¡Bienvenido al sistema DonaTrack! " + usuarioActual.getNombreUsuario() + " un gusto volver a verlo");
-      context.render("home.hbs", modelo);
+      context.render("views/home.hbs", modelo);
     }
     else
-      context.render("landing_page.hbs");
+      context.render("views/general/landing.hbs");
   }
 
 }

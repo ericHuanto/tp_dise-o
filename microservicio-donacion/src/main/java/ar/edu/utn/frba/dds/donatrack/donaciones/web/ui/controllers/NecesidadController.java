@@ -42,7 +42,7 @@ public class NecesidadController implements WithSimplePersistenceUnit {
           NecesidadMapper.aDto(beneficiario.getNecesidades())
       );
     }
-    context.render("necesidades.hbs", modelo);
+    context.render("views/beneficiario/necesidades.hbs", modelo);
   }
 
   public void mostrarFormulario(Context context) {
@@ -55,7 +55,7 @@ public class NecesidadController implements WithSimplePersistenceUnit {
     System.out.println("SUBCATEGORIAS: " + subcategoriaRepository.buscarTodos().size());
 
 
-    context.render("nueva_necesidad.hbs", modelo);
+    context.render("views/beneficiario/nueva_necesidad.hbs", modelo);
   }
 
   public void guardar(Context context) {

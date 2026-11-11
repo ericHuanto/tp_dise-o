@@ -1,0 +1,41 @@
+{{#partial "nombre_pestaña"}}
+    Depósito - DonaTrack
+{{/partial}}
+
+{{#partial "contenido_propio"}}
+    <section>
+        <h2>Donaciones en Depósito</h2>
+        <p>Listado de donaciones actualmente en deposito.</p>
+
+        <table>
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Descripción</th>
+                <th>Marcar Como Vencida</th>
+            </tr>
+            </thead>
+            <tbody>
+            {{#each donaciones}}
+                <tr>
+                    <td>{{this.id}}</td>
+                    <td>{{this.descripcion}}</td>
+                    <td>
+                        <form action="/donaciones/{{this.id}}/vencido" method="POST">
+                            <button type="submit">
+                                Marcar Vencida
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            {{else}}
+                <tr>
+                    <td colspan="3">No hay donaciones en depósito actualmente.</td>
+                </tr>
+            {{/each}}
+            </tbody>
+        </table>
+    </section>
+{{/partial}}
+
+{{> partials/layout.hbs}}

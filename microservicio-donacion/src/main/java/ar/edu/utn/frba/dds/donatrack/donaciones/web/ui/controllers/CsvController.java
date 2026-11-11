@@ -46,7 +46,7 @@ public class CsvController implements WithSimplePersistenceUnit {
     Map<String, Object> modelo = new HashMap<>();
     //modelo.put("usuario", context.sessionAttribute("usuario_actual")); de aca vamos a ver si tiene permiso para verlo
 
-    context.render("importar_donantes.hbs", modelo);
+    context.render("views/admin/importar_donantes.hbs", modelo);
   }
 
   public void procesarDonantesAntiguos(Context context) {
@@ -99,7 +99,7 @@ public class CsvController implements WithSimplePersistenceUnit {
     String idTarea = context.pathParam("id_tarea");
     Map<String, Object> modelo = new HashMap<>();
     modelo.put("idTarea", idTarea);
-    context.render("importar_donantes_espera.hbs", modelo);
+    context.render("views/admin/importar_donantes_espera.hbs", modelo);
   }
 
   //(API): Endpoint que JavaScript consulta cada 2 segundos
@@ -124,7 +124,7 @@ public class CsvController implements WithSimplePersistenceUnit {
     Map<String, Object> modelo = new HashMap<>();
     modelo.put("resultado", resultado);
 
-    context.render("importar_donantes_resultado.hbs", modelo);
+    context.render("views/admin/importar_donantes_resultado.hbs", modelo);
   }
 
   //================== FUNCIONES AUXILIARES ====================

@@ -1,0 +1,87 @@
+
+{{#partial "nombre_pestaña"}}
+    Seguimiento de entregas - DonaTrack
+{{/partial}}
+
+{{#partial "breadcrumbs"}}
+    <a href="/">Inicio</a>
+    <span> / Seguimiento de entregas</span>
+{{/partial}}
+
+{{#partial "contenido_propio"}}
+    <section>
+        <h2>Seguimiento de mis entregas</h2>
+
+        <p>
+            Consultá la ubicación de los camiones que transportan tus donaciones.
+        </p>
+
+        <div id="mapa"
+             style="height: 350px; width: 80%; max-width: 750px; margin: 20px auto; border: 2px solid #ccc; border-radius: 8px;">
+        </div>
+
+        <script id="datos-camiones" type="application/json">
+            {{{marcadoresJson}}}
+        </script>
+
+        <p id="mensaje-sin-camiones" style="display: none;">
+            No hay camiones con ubicación disponible en este momento.
+        </p>
+    </section>
+{{/partial}}
+
+{{#partial "scripts"}}
+    <script>
+        const map = L.map('mapa').setView([-34.6037, -58.3816], 11);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; OpenStreetMap'
+        }).addTo(map);
+
+        const camiones = JSON.parse(
+                document.getElementById('datos-camiones').textContent
+        );
+
+        const limites = [];
+
+        camiones.forEach(camion => {
+            const latitud = parseFloat(camion.latitud);
+            const longitud = parseFloat(camion.longitud);
+
+            if (!Number.isFinite(latitud) || !Number.isFinite(longitud)) {
+                return;
+            }
+
+            const posicion = [latitud, longitud];
+
+            const marcador = L.marker(posicion).addTo(map);
+
+            const popup = document.createElement('div');
+
+            const titulo = document.createElement('h4');
+            titulo.textContent = 'Camión ' + camion.patente;
+
+            const actualizacion = document.createElement('p');
+            actualizacion.textContent = 'Última actualización: '
+                    + (camion.ultimaActualizacion || 'No disponible');
+
+            popup.append(titulo, actualizacion);
+
+            marcador.bindPopup(popup);
+
+            limites.push(posicion);
+        });
+
+        if (limites.length > 0) {
+            map.fitBounds(limites, {
+                padding: [40, 40],
+                maxZoom: 15
+            });
+        } else {
+            document.getElementById('mensaje-sin-camiones').style.display = 'block';
+        }
+    </script>
+{{/partial}}
+
+{{> partials/layout.hbs}}

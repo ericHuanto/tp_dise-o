@@ -14,7 +14,7 @@ public class SesionController implements WithSimplePersistenceUnit {
   }
 
   public void mostrarFormularioRegistro(Context context) {
-    context.render("registro.hbs");
+    context.render("views/auth/registro.hbs");
   }
 
   public void iniciarRegistro(Context context) {
@@ -42,7 +42,7 @@ public class SesionController implements WithSimplePersistenceUnit {
   }
 
   public void mostrarFormularioInicioSesion(Context context) {
-    context.render("login.hbs");
+    context.render("views/auth/login.hbs");
   }
 
   public void iniciarSesion(Context context) {

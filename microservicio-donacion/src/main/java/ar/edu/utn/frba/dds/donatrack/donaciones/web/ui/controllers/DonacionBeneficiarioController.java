@@ -40,7 +40,7 @@ public class DonacionBeneficiarioController implements WithSimplePersistenceUnit
 
       commitTransaction();
 
-      context.render("mis_donaciones.hbs", modelo);
+      context.render("views/donante/mis_donaciones.hbs", modelo);
 
     } catch (RuntimeException e) {
       rollbackTransaction();
@@ -72,7 +72,7 @@ public class DonacionBeneficiarioController implements WithSimplePersistenceUnit
 
       commitTransaction();
 
-      context.render("detalle_donacion.hbs", modelo);
+      context.render("views/donante/detalle_donacion.hbs", modelo);
 
     } catch (RuntimeException e) {
       rollbackTransaction();

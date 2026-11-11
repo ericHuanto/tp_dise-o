@@ -1,0 +1,86 @@
+{{#partial "nombre_pestaña"}}
+    Procesando Importación - DonaTrack
+{{/partial}}
+
+{{#partial "css_extra"}}
+    <link rel="stylesheet" href="/css/importar_donantes.css">
+{{/partial}}
+
+{{#partial "contenido_propio"}}
+    <div class="importacion-wrapper">
+        <div class="importacion-container">
+
+            <h1 class="importacion-titulo">Importar donantes desde CSV</h1>
+
+            <!-- Pasos -->
+            <div class="pasos-container">
+                <!-- Paso 1 -->
+                <div class="paso-item paso-completado">
+                    <span class="paso-circulo circulo-exito">✓</span>
+                    <span>Subir archivo </span>
+                </div>
+                <div class="paso-separador"></div>
+                <!-- Paso 2 (Actual) -->
+                <div class="paso-item paso-actual">
+                    <span class="paso-circulo circulo-actual">2</span>
+                    <span>Procesando</span>
+                </div>
+                <div class="paso-separador"></div>
+                <!-- Paso 3 -->
+                <div class="paso-item paso-inactivo">
+                    <span class="paso-circulo circulo-inactivo">3</span>
+                    <span>Finalizado </span>
+                </div>
+            </div>
+
+            <!-- Tarjeta de Procesamiento -->
+            <div class="tarjeta-resultados tarjeta-procesando">
+                <div class="procesando-header">
+                    <h2 class="procesando-titulo">Procesando</h2>
+                    <span class="badge-procesando"> PROCESANDO </span>
+                </div>
+
+                <div class="barra-contenedor">
+                    <div id="barraProgreso" class="barra-progreso"></div>
+                </div>
+
+                <p id="indicadorCarga" class="texto-indicador">Leyendo filas y guardando en base de datos...</p>
+                <p class="texto-secundario">Puedes navegar por otras secciones, mientras terminamos con esto.</p>
+            </div>
+        </div>
+    </div>
+{{/partial}}
+
+{{#partial "scripts"}}
+    <script>
+        const id_tarea = "{{idTarea}}";
+        const indicadorCarga = document.getElementById('indicadorCarga');
+        const barraProgreso = document.getElementById('barraProgreso');
+
+        // Animación falsa de carga (va de izquierda a derecha)
+        let posicionBarra = 0;
+        setInterval(() => {
+            posicionBarra = (posicionBarra + 5) % 100;
+            barraProgreso.style.left = posicionBarra + "%";
+        }, 500);
+
+        function verificarEstado() {
+            fetch(`/api/donantes/importacion/estado/${id_tarea}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.estado === "COMPLETADO") {
+                            clearInterval(intervalo);
+                            indicadorCarga.innerText = "¡Proceso Finalizado! Redirigiendo...";
+                            barraProgreso.style.width = "100%";
+                            barraProgreso.style.left = "0";
+                            window.location.href = `/donantes/importacion/resultado/${id_tarea}`;
+                        }
+                    })
+                    .catch(err => console.error("Error consultando estado", err));
+        }
+
+        const intervalo = setInterval(verificarEstado, 2000);
+    </script>
+{{/partial}}
+
+{{> partials/layout.hbs}}

@@ -31,7 +31,7 @@ public class MapaController {
     modelo.put("marcadoresJson", beneficiariosJson);
     modelo.put("categorias", repoCategorias.buscarTodos());
 
-    context.render("mapa_beneficiarios.hbs", modelo);
+    context.render("views/general/mapa_beneficiarios.hbs", modelo);
   }
 
 }

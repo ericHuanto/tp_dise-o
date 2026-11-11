@@ -35,13 +35,13 @@ public class PerfilController implements WithSimplePersistenceUnit {
   public void mostrarOpcionesPerfil(Context context) {
     Map<String, Object> modelo = new HashMap<>();
     modelo.put("usuario", context.sessionAttribute("usuario_actual"));
-    context.render("registro_elegir_perfil.hbs", modelo);
+    context.render("views/auth/registro_elegir_perfil.hbs", modelo);
   }
 
   public void mostrarFormularioRegistroBeneficiario(Context context) {
     Map<String, Object> modelo = new HashMap<>();
     modelo.put("usuario", context.sessionAttribute("usuario_actual"));
-    context.render("registro_beneficiario.hbs", modelo);
+    context.render("views/auth/registro_beneficiario.hbs", modelo);
   }
 
   public void mostrarFormularioRegistroDonanteHumano(Context context) {
@@ -49,7 +49,7 @@ public class PerfilController implements WithSimplePersistenceUnit {
     modelo.put("tiposDocumento", TipoDocumento.valoresPosiblesHumana());
     modelo.put("generos", Genero.values());
     modelo.put("usuario", context.sessionAttribute("usuario_actual"));
-    context.render("registro_persona_humana.hbs", modelo);
+    context.render("views/auth/registro_persona_humana.hbs", modelo);
   }
 
   public void guardarBeneficiario(Context context) {

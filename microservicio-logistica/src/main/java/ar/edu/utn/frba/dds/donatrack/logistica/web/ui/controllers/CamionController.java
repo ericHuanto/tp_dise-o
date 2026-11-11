@@ -27,13 +27,13 @@ public class CamionController implements WithLogisticaPersistenceUnit {
     Map<String, Object> modelo = new HashMap<>();
     modelo.put("usuario", context.sessionAttribute("usuario_actual"));
     modelo.put("camiones", CamionMapper.aDto(camiones));
-    context.render("camion.hbs", modelo);
+    context.render("views/camion.hbs", modelo);
   }
 
   public void mostrarFormularioCreacion(Context context) {
     Map<String, Object> modelo = new HashMap<>();
     modelo.put("usuario", context.sessionAttribute("usuario_actual"));
-    context.render("camion_formulario_creacion.hbs", modelo);
+    context.render("views/camion_formulario_creacion.hbs", modelo);
   }
 
   public void guardar(Context context) {
@@ -59,7 +59,7 @@ public class CamionController implements WithLogisticaPersistenceUnit {
     modelo.put("usuario", context.sessionAttribute("usuario_actual"));
     modelo.put("camion", CamionMapper.aDto(camion));
 
-    context.render("camion_formulario_edicion.hbs", modelo);
+    context.render("views/camion_formulario_edicion.hbs", modelo);
   }
 
   public void actualizar(Context context) {

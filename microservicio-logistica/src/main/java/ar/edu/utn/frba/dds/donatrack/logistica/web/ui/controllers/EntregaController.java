@@ -38,7 +38,7 @@ public class EntregaController implements WithLogisticaPersistenceUnit {
     modelo.put("entregas", entregasDto);
     //modelo.put("usuario", context.sessionAttribute("usuario_actual"));
 
-    context.render("mis_entregas.hbs", modelo);
+    context.render("views/mis_entregas.hbs", modelo);
   }
 
   public void mostrarFormularioConfirmacion(Context context) {
@@ -48,7 +48,7 @@ public class EntregaController implements WithLogisticaPersistenceUnit {
     Map<String, Object> modelo = new HashMap<>();
     modelo.put("entrega", EntregaMapper.aDto(entrega)); //NO vamos a usar el dtoResumen porque vamos a mostrar mas informacion //TODO acutalizar el .hbs para que muestre mas datos
 
-    context.render("confirmar_recepcion.hbs", modelo);
+    context.render("views/confirmar_recepcion.hbs", modelo);
   }
 
   public void confirmarRecepcion(Context context) {

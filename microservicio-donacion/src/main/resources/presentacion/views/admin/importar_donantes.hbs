@@ -1,0 +1,94 @@
+{{#partial "nombre_pestaña"}}
+    Importar Donantes - DonaTrack
+{{/partial}}
+
+{{#partial "css_extra"}}
+    <link rel="stylesheet" href="/css/admin/importar_donantes.css">
+{{/partial}}
+
+{{#partial "contenido_propio"}}
+    <!-- Mismo fondo y espaciado que el resto de las pantallas -->
+    <div class="importacion-wrapper">
+        <div class="importacion-container">
+
+            <h1 class="importacion-titulo">Importar donantes desde CSV</h1>
+
+            <!-- Pasos -->
+            <div class="pasos-container">
+                <!-- Paso 1 (Actual) -->
+                <div class="paso-item paso-actual">
+                    <span class="paso-circulo circulo-actual">1</span>
+                    <span>Subir archivo</span>
+                </div>
+                <div class="paso-separador"></div>
+                <!-- Paso 2 (Inactivo) -->
+                <div class="paso-item paso-inactivo">
+                    <span class="paso-circulo circulo-inactivo">2</span>
+                    <span>Procesando</span>
+                </div>
+                <div class="paso-separador"></div>
+                <!-- Paso 3 (Inactivo) -->
+                <div class="paso-item paso-inactivo">
+                    <span class="paso-circulo circulo-inactivo">3</span>
+                    <span>Finalizado</span>
+                </div>
+            </div>
+
+            <form id="formImportacion" action="/donantes/importacion" method="POST" enctype="multipart/form-data">
+                <!-- Tarjeta visual -->
+                <div class="tarjeta-subida">
+                    <div class="archivo-info">
+                        <div class="icono-csv">
+                            CSV
+                        </div>
+                        <div>
+                            <h3 id="nombreArchivo" class="nombre-archivo">Selecciona un archivo...</h3>
+                            <p id="detallesArchivo" class="detalles-archivo">Formato .csv requerido</p>
+                        </div>
+                    </div>
+                    <div class="archivo-acciones">
+                        <label for="archivo_csv" class="label-buscar">
+                            Buscar archivo
+                        </label>
+                        <input type="file" id="archivo_csv" name="archivo_csv" accept=".csv" required class="input-oculto" onchange="actualizarTarjeta(this)">
+                        <button type="submit" id="btnProcesar" class="btn-importar" disabled>
+                            Importar
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+{{/partial}}
+
+{{#partial "scripts"}}
+    <script>
+        // Script para que la tarjeta se actualice visualmente al elegir un archivo
+        function actualizarTarjeta(input) {
+            const btnProcesar = document.getElementById('btnProcesar');
+            const nombreArchivo = document.getElementById('nombreArchivo');
+            const detallesArchivo = document.getElementById('detallesArchivo');
+
+            if (input.files && input.files.length > 0) {
+                const archivo = input.files[0];
+                nombreArchivo.innerText = archivo.name;
+
+                let tamano = archivo.size;
+                let textoTamano = tamano > 1024 * 1024 ? (tamano / (1024 * 1024)).toFixed(1) + " MB" : (tamano / 1024).toFixed(1) + " KB";
+
+                const hoy = new Date();
+                const fechaFormateada = hoy.toLocaleDateString('es-AR') + " " + hoy.getHours().toString().padStart(2, '0') + ":" + hoy.getMinutes().toString().padStart(2, '0');
+
+                detallesArchivo.innerText = textoTamano + " · subido " + fechaFormateada;
+
+                btnProcesar.disabled = false;
+            } else {
+                nombreArchivo.innerText = "Selecciona un archivo...";
+                detallesArchivo.innerText = "Formato .csv requerido";
+                btnProcesar.disabled = true;
+            }
+        }
+    </script>
+{{/partial}}
+
+{{> partials/layout.hbs}}

@@ -1,0 +1,167 @@
+
+{{#partial "nombre_pestaña"}}
+    Nueva necesidad
+{{/partial}}
+
+{{#partial "breadcrumbs"}}
+    <a href="/mis-necesidades">Mis necesidades</a> / Nueva necesidad
+{{/partial}}
+
+{{#partial "contenido_propio"}}
+    <section class="formulario-necesidad">
+        <h1>Registrar una necesidad</h1>
+        <p>Completá los datos de los materiales que necesita tu organización.</p>
+
+        <form action="/mis-necesidades" method="post">
+
+            <label for="tipo">Tipo de necesidad</label>
+            <select id="tipo" name="tipo" required>
+                <option value="">Seleccionar tipo</option>
+                <option value="EXTRAORDINARIA">Extraordinaria</option>
+                <option value="RECURRENTE">Recurrente</option>
+            </select>
+
+            <label for="descripcion">Descripción</label>
+            <input
+                    type="text"
+                    id="descripcion"
+                    name="descripcion"
+                    required
+            >
+
+            <label for="categoria">Categoría</label>
+            <select id="categoria" name="categoria" required>
+                <option value="">Seleccionar categoría</option>
+                {{#each categorias}}
+                    <option value="{{nombre}}">{{nombre}}</option>
+                {{/each}}
+            </select>
+
+            <label for="subcategoria">Subcategoría</label>
+            <select id="subcategoria" name="subcategoria" required disabled>
+                <option value="">Primero seleccioná una categoría</option>
+
+                {{#each subcategorias}}
+                    <option
+                            value="{{nombre}}"
+                            data-categoria="{{categoria.nombre}}">
+                        {{nombre}}
+                    </option>
+                {{/each}}
+            </select>
+
+            <label for="unidadMedida">Unidad de medida</label>
+            <select id="unidadMedida" name="unidadMedida" required>
+                <option value="">Seleccionar unidad</option>
+                <option value="KILOGRAMOS">Kilogramos</option>
+                <option value="GRAMOS">Gramos</option>
+                <option value="LITROS">Litros</option>
+                <option value="MILILITROS">Mililitros</option>
+                <option value="UNIDADES">Unidades</option>
+            </select>
+
+            <div id="campos-extraordinaria" hidden>
+                <label for="cantidadRequerida">Cantidad requerida</label>
+                <input
+                        type="number"
+                        id="cantidadRequerida"
+                        name="cantidadRequerida"
+                        min="1"
+                >
+            </div>
+
+            <div id="campos-recurrente" hidden>
+                <label for="cantidadPorPeriodo">Cantidad por período</label>
+                <input
+                        type="number"
+                        id="cantidadPorPeriodo"
+                        name="cantidadPorPeriodo"
+                        min="1"
+                >
+
+                <label for="periodo">Período</label>
+                <select id="periodo" name="periodo">
+                    <option value="">Seleccionar período</option>
+                    <option value="DIARIO">Diario</option>
+                    <option value="SEMANAL">Semanal</option>
+                    <option value="MENSUAL">Mensual</option>
+                </select>
+            </div>
+
+            <button type="submit">Guardar necesidad</button>
+            <a href="/mis-necesidades">Cancelar</a>
+
+        </form>
+    </section>
+{{/partial}}
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        // Elementos del formulario
+        const tipo = document.getElementById("tipo");
+        const camposExtraordinaria = document.getElementById("campos-extraordinaria");
+        const camposRecurrente = document.getElementById("campos-recurrente");
+        const cantidadRequerida = document.getElementById("cantidadRequerida");
+        const cantidadPorPeriodo = document.getElementById("cantidadPorPeriodo");
+        const periodo = document.getElementById("periodo");
+
+        const categoria = document.getElementById("categoria");
+        const subcategoria = document.getElementById("subcategoria");
+
+        // Guardamos las subcategorías originales
+        const opcionesSubcategoria = Array.from(subcategoria.options)
+                .filter(opcion => opcion.value !== "");
+
+        // Filtrar subcategorías según la categoría seleccionada
+        function actualizarSubcategorias() {
+
+            const categoriaSeleccionada = categoria.value;
+
+            subcategoria.innerHTML = "";
+
+            const opcionInicial = document.createElement("option");
+            opcionInicial.value = "";
+            opcionInicial.textContent = "Seleccionar subcategoría";
+
+            subcategoria.appendChild(opcionInicial);
+
+            opcionesSubcategoria.forEach(opcion => {
+
+                if (
+                        opcion.dataset.categoria?.trim().toLowerCase() ===
+                        categoriaSeleccionada.trim().toLowerCase()
+                ) {
+                    subcategoria.appendChild(opcion.cloneNode(true));
+                }
+
+            });
+
+            subcategoria.disabled = categoriaSeleccionada === "";
+        }
+
+        categoria.addEventListener("change", actualizarSubcategorias);
+
+        // Mostrar campos según el tipo de necesidad
+        function actualizarCampos() {
+
+            const esExtraordinaria = tipo.value === "EXTRAORDINARIA";
+            const esRecurrente = tipo.value === "RECURRENTE";
+
+            camposExtraordinaria.hidden = !esExtraordinaria;
+            camposRecurrente.hidden = !esRecurrente;
+
+            cantidadRequerida.required = esExtraordinaria;
+            cantidadPorPeriodo.required = esRecurrente;
+            periodo.required = esRecurrente;
+        }
+
+        tipo.addEventListener("change", actualizarCampos);
+
+        // Estado inicial
+        actualizarCampos();
+
+    });
+</script>
+
+{{> partials/layout.hbs}}

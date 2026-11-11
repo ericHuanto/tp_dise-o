@@ -37,7 +37,7 @@ public class DonacionController implements WithSimplePersistenceUnit {
     modelo.put("usuario", usuarioActual);
     modelo.put("donaciones", DonacionMapper.aDto(donaciones));
 
-    context.render("donaciones_en_deposito.hbs", modelo);
+    context.render("views/admin/donaciones_en_deposito.hbs", modelo);
   }
 
   public void marcarComoVencida(Context context) {

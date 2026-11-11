@@ -64,7 +64,7 @@ public class DonanteController {
     modelo.put("categoriaElegida", idCategoria);
     modelo.put("subcategoriasElegidas", idsSubcategorias);
 
-    context.render("donaciones_donante.hbs", modelo);
+    context.render("views/donante/donaciones_donante.hbs", modelo);
   }
 
   public void beneficiarios(Context context) {
@@ -76,7 +76,7 @@ public class DonanteController {
     modelo.put("usuario", context.sessionAttribute("usuario_actual"));
     modelo.put("beneficiarios", repoBeneficiarios.buscarTodos());
 
-    context.render("beneficiarios.hbs", modelo);
+    context.render("views/donante/beneficiarios.hbs", modelo);
   }
 
   public void detalleBeneficiario(Context context) {
@@ -103,7 +103,7 @@ public class DonanteController {
     modelo.put("usuario", context.sessionAttribute("usuario_actual"));
     modelo.put("beneficiario", beneficiario);
 
-    context.render("detalle_beneficiario.hbs", modelo);
+    context.render("views/donante/detalle_beneficiario.hbs", modelo);
   }
 
   //================== FUNCIONES AUXILIARES ========================

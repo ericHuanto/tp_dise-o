@@ -32,7 +32,7 @@ public class AsignacionController implements WithSimplePersistenceUnit {
     modelo.put("usuario", context.sessionAttribute("usuario_actual"));
     modelo.put("rankings", RankingMapper.aDto(rankingsVigentes));
 
-    context.render("asignar_beneficiaria.hbs", modelo);
+    context.render("views/admin/asignar_beneficiaria.hbs", modelo);
   }
 
   public void confirmarAsignacion(Context context) {
