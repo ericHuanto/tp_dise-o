@@ -32,15 +32,8 @@ public class PerfilController implements WithSimplePersistenceUnit {
     this.repoUsuarios = repoUsuarios;
   }
 
-  public void mostrarOpcionesPerfil(Context context) {
-    Map<String, Object> modelo = new HashMap<>();
-    modelo.put("usuario", context.sessionAttribute("usuario_actual"));
-    context.render("views/auth/registro_elegir_perfil.hbs", modelo);
-  }
-
   public void mostrarFormularioRegistroBeneficiario(Context context) {
     Map<String, Object> modelo = new HashMap<>();
-    modelo.put("usuario", context.sessionAttribute("usuario_actual"));
     context.render("views/auth/registro_beneficiario.hbs", modelo);
   }
 
@@ -48,29 +41,31 @@ public class PerfilController implements WithSimplePersistenceUnit {
     Map<String, Object> modelo = new HashMap<>();
     modelo.put("tiposDocumento", TipoDocumento.valoresPosiblesHumana());
     modelo.put("generos", Genero.values());
-    modelo.put("usuario", context.sessionAttribute("usuario_actual"));
     context.render("views/auth/registro_persona_humana.hbs", modelo);
   }
 
   public void guardarBeneficiario(Context context) {
+    Usuario nuevoUsuario = validarYConstruirUsuario(context, "/perfil/beneficiario");
+    if (nuevoUsuario == null) {
+      return;
+    }
+
     String razonSocial = context.formParam("razonSocial");
     String direccion = context.formParam("direccion");
     List<MedioContacto> contactos = armarContactos(context);
 
-    Usuario usuarioActual = context.sessionAttribute("usuario_actual");
-    if (usuarioActual == null) throw new RuntimeException("Este mensaje no deberías verlo nunca");
     Beneficiario nuevoBeneficiario = new Beneficiario(razonSocial, direccion, contactos);
-
-    usuarioActual.otorgarPermiso(Permiso.SOLICITAR_AYUDA);
-    nuevoBeneficiario.vincularUsuario(usuarioActual);
+    nuevoUsuario.otorgarPermiso(Permiso.SOLICITAR_AYUDA);
+    nuevoBeneficiario.vincularUsuario(nuevoUsuario);
 
     try {
       beginTransaction();
+      repoUsuarios.guardar(nuevoUsuario);
       repoBeneficiarios.guardar(nuevoBeneficiario);
-      repoUsuarios.actualizar(usuarioActual);
       commitTransaction();
 
-      context.sessionAttribute("usuario_actual", usuarioActual);
+      nuevoUsuario.inicializarPermisos();
+      context.sessionAttribute("usuario_actual", nuevoUsuario);
       context.redirect("/");
     } catch (Exception e) {
       e.printStackTrace();
@@ -80,6 +75,11 @@ public class PerfilController implements WithSimplePersistenceUnit {
   }
 
   public void guardarDonanteHumana(Context context) {
+    Usuario nuevoUsuario = validarYConstruirUsuario(context, "/perfil/donante-humana");
+    if (nuevoUsuario == null) {
+      return;
+    }
+
     String nombre = context.formParam("nombre");
     String apellidos = context.formParam("apellidos");
     TipoDocumento tipoDoc = TipoDocumento.valueOf(context.formParam("tipoDocumento"));
@@ -89,20 +89,21 @@ public class PerfilController implements WithSimplePersistenceUnit {
     String direccion = context.formParam("direccion");
     List<MedioContacto> contactos = armarContactos(context);
 
-    Usuario usuarioActual = context.sessionAttribute("usuario_actual");
-    if (usuarioActual == null) throw new RuntimeException("Este mensaje no deberías verlo nunca");
-    Humana nuevoDonanteHumana = new Humana(nombre, apellidos, new Documento(tipoDoc, numDocumento), fechaNac, genero, direccion, contactos);
+    Humana nuevoDonanteHumana = new Humana(
+        nombre, apellidos, new Documento(tipoDoc, numDocumento), fechaNac, genero, direccion, contactos
+    );
 
-    usuarioActual.otorgarPermiso(Permiso.REALIZAR_DONACION);
-    nuevoDonanteHumana.vincularUsuario(usuarioActual);
+    nuevoUsuario.otorgarPermiso(Permiso.REALIZAR_DONACION);
+    nuevoDonanteHumana.vincularUsuario(nuevoUsuario);
 
     try {
       beginTransaction();
+      repoUsuarios.guardar(nuevoUsuario);
       repoDonantes.guardar(nuevoDonanteHumana);
-      repoUsuarios.actualizar(usuarioActual);
       commitTransaction();
 
-      context.sessionAttribute("usuario_actual", usuarioActual);
+      nuevoUsuario.inicializarPermisos();
+      context.sessionAttribute("usuario_actual", nuevoUsuario);
       context.redirect("/");
     } catch (Exception e) {
       e.printStackTrace();
@@ -112,6 +113,24 @@ public class PerfilController implements WithSimplePersistenceUnit {
   }
 
   // =================== FUNCIONES AUXILIARES ===================
+  private Usuario validarYConstruirUsuario(Context context, String rutaFormulario) {
+    String nombreUsuario = context.formParam("name");
+    String password = context.formParam("password");
+    String passwordConfirm = context.formParam("passwordConfirm");
+
+    if (passwordConfirm != null && !password.equals(passwordConfirm)) {
+      context.redirect(rutaFormulario + "?error=Las_contraseñas_no_coinciden");
+      return null;
+    }
+
+    if (repoUsuarios.buscarPorCredenciales(nombreUsuario) != null) {
+      context.redirect(rutaFormulario + "?error=El_nombre_de_usuario_ya_esta_en_uso");
+      return null;
+    }
+
+    return new Usuario(nombreUsuario, password);
+  }
+
   private List<MedioContacto> armarContactos(Context context) {
     List<MedioContacto> todosLosContactos = new ArrayList<>();
 
@@ -139,5 +158,4 @@ public class PerfilController implements WithSimplePersistenceUnit {
 
     return ContactoMapper.aDominio(dtos);
   }
-
 }

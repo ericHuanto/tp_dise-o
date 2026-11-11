@@ -1,60 +1,138 @@
 {{#partial "nombre_pestaña"}}
-    Registro Persona Humana - DonaTrack
+    Crear una cuenta - DonaTrack
+{{/partial}}
+
+{{#partial "css_extra"}}
+    <link rel="stylesheet" href="/css/formularios.css">
 {{/partial}}
 
 {{#partial "contenido_propio"}}
-    <section>
-        <h2>Completar Los Datos</h2>
-        <h3>porfavor {{usuario.nombreUsuario}}, para terminar el registro</h3>
+    <section class="registro-page">
+        <nav class="breadcrumb">
+            <a href="/">Inicio</a> <span>›</span> Registro
+        </nav>
 
-        <form action="/perfil/donante-humana" method="POST">
-            <label>Nombre:</label>
-            <input type="text" name="nombre" required>
+        <div class="registro-container">
+            <h1>Crear una cuenta</h1>
+            <p class="subtitulo">Elegí cómo vas a usar DonaTrack.</p>
 
-            <label>Apellidos:</label>
-            <input type="text" name="apellidos" required>
-
-            <label>Tipo de Documento:</label>
-            <select name="tipoDocumento">
-                {{#each tiposDocumento}}
-                    <option value="{{this}}">{{this}}</option>
-                {{/each}}
-            </select>
-
-            <label>Número de Documento:</label>
-            <input type="text" name="numeroDocumento" required>
-
-            <label>Fecha de Nacimiento:</label>
-            <input type="date" name="fechaNacimiento" required>
-
-            <label>Género:</label>
-            <select name="genero">
-                {{#each generos}}
-                    <option value="{{this}}">{{this}}</option>
-                {{/each}}
-            </select>
-
-            <label>Dirección:</label>
-            <input type="text" name="direccion" required>
-
-            <div class="contacto-principal">
-                <label>Contacto Principal:</label>
-                <select name="medio_principal" required>
-                    <option value="EMAIL">Email</option>
-                    <option value="WHATSAPP">WhatsApp</option>
-                    <option value="SMS">SMS</option>
-                </select>
-                <input type="text" name="valor_principal" required>
+            <!-- Pestañas superiores: Persona donante / Entidad beneficiaria -->
+            <div class="tabs-perfil">
+                <a href="/perfil/donante-humana" class="tab-btn active">Persona donante</a>
+                <a href="/perfil/beneficiario" class="tab-btn">Entidad beneficiaria</a>
             </div>
 
-            <!-- CONTACTOS ADICIONALES OPCIONALES -->
-            <div>
-                <div id="contenedor-contactos"></div>
-                <button type="button" onclick="agregarContacto()">+ Agregar contacto adicional</button>
-            </div>
+            <div class="form-card">
+                <form action="/perfil/donante-humana" method="POST">
+                    <!-- Selector Tipo de persona -->
+                    <div class="form-group">
+                        <label>Tipo de persona</label>
+                        <div class="selector-tipo">
+                            <a href="/perfil/donante-humana" class="chip active">Persona humana</a>
+                            <a href="#" class="chip">Persona jurídica</a>
+                        </div>
+                    </div>
 
-            <button type="submit">Finalizar Registro</button>
-        </form>
+                    <h3>Datos personales</h3>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="nombre">Nombre</label>
+                            <input type="text" id="nombre" name="nombre" placeholder="Lucía" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="apellidos">Apellido</label>
+                            <input type="text" id="apellidos" name="apellidos" placeholder="Fernández" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-medio">
+                            <label for="tipoDocumento">Tipo de documento</label>
+                            <select id="tipoDocumento" name="tipoDocumento" required>
+                                {{#each tiposDocumento}}
+                                    <option value="{{this}}">{{this}}</option>
+                                {{/each}}
+                            </select>
+                        </div>
+                        <div class="form-group col-valor">
+                            <label for="numeroDocumento">Número de documento</label>
+                            <input type="text" id="numeroDocumento" name="numeroDocumento" class="input-mono" placeholder="38452117" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="fechaNacimiento">Fecha de nacimiento</label>
+                            <input type="date" id="fechaNacimiento" name="fechaNacimiento" class="input-mono" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="genero">Género</label>
+                            <select id="genero" name="genero" required>
+                                {{#each generos}}
+                                    <option value="{{this}}">{{this}}</option>
+                                {{/each}}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="direccion">Dirección</label>
+                        <input type="text" id="direccion" name="direccion" placeholder="Av. Medrano 951, CABA" required>
+                    </div>
+
+                    <hr class="divisor-seccion">
+
+                    <h3>Contacto principal</h3>
+
+                    <div class="form-row">
+                        <div class="form-group col-medio">
+                            <label for="medio_principal">Medio</label>
+                            <select id="medio_principal" name="medio_principal" required>
+                                <option value="EMAIL">Email</option>
+                                <option value="WHATSAPP">WhatsApp</option>
+                                <option value="SMS">SMS</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-valor">
+                            <label for="valor_principal">Valor</label>
+                            <input type="text" id="valor_principal" name="valor_principal" placeholder="lucia.fernandez@mail.com" required>
+                        </div>
+                    </div>
+
+                    <div id="contenedor-contactos"></div>
+                    <button type="button" class="btn-texto-verde" onclick="agregarContacto()">+ Agregar contacto adicional</button>
+
+                    <hr class="divisor-seccion">
+
+                    <h3>Cuenta</h3>
+
+                    <div class="form-group">
+                        <label for="nombre_usuario">Usuario</label>
+                        <input type="text" id="nombre_usuario" name="name" class="input-mono" placeholder="lfernandez" value="{{usuario.nombreUsuario}}" required>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="contrasenia">Contraseña</label>
+                            <input type="password" id="contrasenia" name="password" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="repetir_contrasenia">Repetir contraseña</label>
+                            <input type="password" id="repetir_contrasenia" name="passwordConfirm" required>
+                        </div>
+                    </div>
+                    <p class="ayuda-input">Mínimo 8 caracteres, con al menos un número.</p>
+
+                    <div id="alerta-registro" class="alerta-error-login oculto"></div>
+
+                    <div class="registro-footer">
+                        <p>¿Ya tenés cuenta? <a href="/login">Iniciá sesión</a></p>
+                        <button type="submit" class="btn-crear-cuenta">Crear cuenta</button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </section>
 {{/partial}}
 
@@ -66,20 +144,27 @@
             nuevaFila.className = 'contacto-row';
 
             nuevaFila.innerHTML = `
-                <select name="medios[]" required>
+                <select name="medios[]" class="col-medio" required>
                     <option value="EMAIL">Email</option>
                     <option value="WHATSAPP">WhatsApp</option>
                     <option value="SMS">SMS</option>
                 </select>
-                <input type="text" name="valores[]" required>
-                <select name="principales[]">
-                    <option value="true">Es Principal</option>
+                <input type="text" name="valores[]" class="col-valor" placeholder="Nuevo contacto" required>
+                <select name="principales[]" class="col-tipo">
                     <option selected value="false">Secundario</option>
+                    <option value="true">Es Principal</option>
                 </select>
-                <button type="button" onclick="this.parentElement.remove()">Eliminar</button>
+                <button type="button" class="btn-peligro" onclick="this.parentElement.remove()">✕</button>
             `;
 
             contenedor.appendChild(nuevaFila);
+        }
+
+        const params = new URLSearchParams(window.location.search);
+        if (params.has('error')) {
+            const alerta = document.getElementById('alerta-registro');
+            alerta.textContent = params.get('error').replaceAll('_', ' ');
+            alerta.classList.remove('oculto');
         }
     </script>
 {{/partial}}

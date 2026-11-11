@@ -13,34 +13,6 @@ public class SesionController implements WithSimplePersistenceUnit {
     this.repoUsuarios = usuarioRepository;
   }
 
-  public void mostrarFormularioRegistro(Context context) {
-    context.render("views/auth/registro.hbs");
-  }
-
-  public void iniciarRegistro(Context context) {
-    String nombreUsuario = context.formParam("name");
-    String contraseñaPlana = context.formParam("password");
-
-    Usuario usuarioExiste = repoUsuarios.buscarPorCredenciales(nombreUsuario);
-    if (usuarioExiste != null) {
-      context.redirect("/registro?error=El_nombre_ya_esta_en_uso");
-      return;
-    }
-    Usuario usuarioNuevo = new Usuario(nombreUsuario, contraseñaPlana);
-
-    try {
-      beginTransaction();
-      repoUsuarios.guardar(usuarioNuevo);
-      commitTransaction();
-      context.sessionAttribute("usuario_actual", usuarioNuevo);
-      context.redirect("perfil/eleccion");
-    } catch (Exception e) {
-      e.printStackTrace();
-      rollbackTransaction();
-      context.redirect("/registro?error=Error_interno");
-    }
-  }
-
   public void mostrarFormularioInicioSesion(Context context) {
     context.render("views/auth/login.hbs");
   }

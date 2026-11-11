@@ -8,8 +8,6 @@ public class SesionRoutes {
   private SesionRoutes() { }
 
   public static void registrar(RoutesConfig ruta, SesionController controller) {
-    ruta.get("/registro", controller::mostrarFormularioRegistro);
-    ruta.post("/registro", controller::iniciarRegistro);
     ruta.get("/login", controller::mostrarFormularioInicioSesion);
     ruta.post("/login", controller::iniciarSesion);
     ruta.post("/logout", controller::cerrarSesion);

@@ -8,7 +8,6 @@ public class PerfilRoutes {
   private PerfilRoutes() { }
 
   public static void registrar(RoutesConfig ruta, PerfilController controller) {
-    ruta.get("/perfil/eleccion", controller::mostrarOpcionesPerfil);
     ruta.get("/perfil/beneficiario", controller::mostrarFormularioRegistroBeneficiario);
     ruta.post("/perfil/beneficiario", controller::guardarBeneficiario);
     ruta.get("/perfil/donante-humana", controller::mostrarFormularioRegistroDonanteHumano);
