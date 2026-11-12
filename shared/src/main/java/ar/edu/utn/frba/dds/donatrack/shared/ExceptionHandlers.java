@@ -58,7 +58,7 @@ public class ExceptionHandlers {
       modelo.put("mensaje", "No pudimos procesar tu solicitud en este momento. Por favor, volvé a intentarlo.");
 
       ctx.status(500).json(new ErrorResponse(500, "Error interno del servidor"));
-      ctx.render("views/error.hbs", modelo);
+      ctx.render("vistas/error.hbs", modelo);
     });
   }
 

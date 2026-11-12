@@ -5,5 +5,7 @@ public record CamionResponse(
     float capacidadVolumen,
     float altura,
     float capacidadCarga,
+    String ultimaLatitud,
+    String ultimaLongitud,
     String imeiGps
 ) { }

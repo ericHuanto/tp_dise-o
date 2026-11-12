@@ -1,0 +1,59 @@
+{{#partial "nombre_pestaña"}}
+    Nuevo Camión - DonaTrack
+{{/partial}}
+
+{{#partial "contenido_propio"}}
+    <div style="background-color: #f7f6f2; min-height: 100vh; padding: 60px 30px; font-family: Arial, sans-serif; color: #1a1a1a; display: flex; justify-content: center; align-items: flex-start;">
+
+        <section style="width: 100%; max-width: 600px; background-color: white; border-radius: 12px; padding: 40px; border: 1px solid #eaeaea; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
+            <div style="margin-bottom: 30px; border-bottom: 1px solid #f0f0f0; padding-bottom: 15px; text-align: center;">
+                <h2 style="font-size: 1.6em; margin: 0 0 5px 0; letter-spacing: -0.5px;">Registrar Nuevo Camión</h2>
+                <p style="color: #777; font-size: 0.9em; margin: 0;">Ingrese los datos técnicos del vehículo</p>
+            </div>
+            <form action="/camiones" method="POST" style="display: flex; flex-direction: column; gap: 20px;">
+                <div>
+                    <label for="patente" style="display: block; font-size: 0.85em; color: #555; margin-bottom: 8px;">Patente <span style="color: #e74c3c;">*</span></label>
+                    <input type="text" id="patente" name="patente" required placeholder="Ej: ABC-123"
+                           style="width: 100%; padding: 12px 15px; border: 1px solid #ccc; border-radius: 6px; font-size: 1em; text-transform: uppercase; box-sizing: border-box; outline: none;">
+                </div>
+                <div>
+                    <label for="capacidadCarga" style="display: block; font-size: 0.85em; color: #555; margin-bottom: 8px;">Capacidad de Carga (kg) <span style="color: #e74c3c;">*</span></label>
+                    <input type="number" step="0.01" id="capacidadCarga" name="capacidad_carga" required placeholder="Ej: 1500"
+                           style="width: 100%; padding: 12px 15px; border: 1px solid #ccc; border-radius: 6px; font-size: 1em; box-sizing: border-box; outline: none;">
+                </div>
+                <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                    <div style="flex: 1; min-width: 200px;">
+                        <label for="capacidadVolumen" style="display: block; font-size: 0.85em; color: #555; margin-bottom: 8px;">Volumen (m³) <span style="color: #e74c3c;">*</span></label>
+                        <input type="number" step="0.01" id="capacidadVolumen" name="capacidad_volumen" required placeholder="Ej: 10.5"
+                               style="width: 100%; padding: 12px 15px; border: 1px solid #ccc; border-radius: 6px; font-size: 1em; box-sizing: border-box; outline: none;">
+                    </div>
+                    <div style="flex: 1; min-width: 200px;">
+                        <label for="altura" style="display: block; font-size: 0.85em; color: #555; margin-bottom: 8px;">Altura (m) <span style="color: #e74c3c;">*</span></label>
+                        <input type="number" step="0.01" id="altura" name="altura" required placeholder="Ej: 2.5"
+                               style="width: 100%; padding: 12px 15px; border: 1px solid #ccc; border-radius: 6px; font-size: 1em; box-sizing: border-box; outline: none;">
+                    </div>
+                </div>
+                <div>
+                    <label for="gpsImei" style="display: block; font-size: 0.85em; color: #555; margin-bottom: 8px;">Asignar GPS (Opcional)</label>
+                    <select id="gpsImei" name="imei_gps"
+                            style="width: 100%; padding: 12px 15px; border: 1px solid #ccc; border-radius: 6px; font-size: 1em; box-sizing: border-box; outline: none; background-color: white; cursor: pointer;">
+                        <option value=""> Sin GPS </option>
+                        {{#each gpsDisponibles}}
+                            <option value="{{this.imei}}">{{this.imei}}</option>
+                        {{/each}}
+                    </select>
+                </div>
+                <div style="display: flex; justify-content: flex-end; gap: 15px; margin-top: 15px; padding-top: 25px; border-top: 1px solid #f0f0f0;">
+                    <a href="/camiones" style="padding: 12px 25px; color: #1a1a1a; text-decoration: none; font-weight: bold; border-radius: 6px; transition: background 0.2s;" onmouseover="this.style.backgroundColor='#f0f0f0'" onmouseout="this.style.backgroundColor='transparent'">
+                        Cancelar
+                    </a>
+                    <button type="submit" style="padding: 12px 30px; background-color: #1a1a1a; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: background 0.2s;" onmouseover="this.style.backgroundColor='#333'" onmouseout="this.style.backgroundColor='#1a1a1a'">
+                        Guardar Camión
+                    </button>
+                </div>
+            </form>
+        </section>
+    </div>
+{{/partial}}
+
+{{> partials/layout.hbs}}

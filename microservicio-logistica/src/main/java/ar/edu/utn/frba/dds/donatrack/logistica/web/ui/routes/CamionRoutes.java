@@ -10,7 +10,7 @@ public class CamionRoutes {
   public static void registrar(RoutesConfig ruta, CamionController controller) {
     ruta.get("/camiones", controller::mostrarTodos);
     ruta.get("/camiones/nuevo", controller::mostrarFormularioCreacion);
-    ruta.post("/camiones", controller::guardar);
+    ruta.post("/camiones", controller::crear);
     ruta.get("/camiones/{patente}/edicion", controller::mostrarFormularioEdicion);
     ruta.post("/camiones/{patente}/edicion", controller::actualizar);
     ruta.post("/camiones/{patente}/eliminacion", controller::eliminar);

@@ -17,7 +17,7 @@ public class GpsRepository implements WithLogisticaPersistenceUnit {
   }
 
   public void guardar(Gps gps) {
-    withTransaction(() -> entityManager().persist(gps));
+    entityManager().persist(gps);
   }
 
   public Gps buscarPorId(String imei) {
@@ -30,10 +30,9 @@ public class GpsRepository implements WithLogisticaPersistenceUnit {
   }
 
   public void actualizar(Gps gps) {
-    if (gps.getImei() == null || buscarPorId(gps.getImei()) == null) {
-      throw new RegistroNoEncontradoException(
-          "No se puede actualizar: no existe gps con imei " + gps.getImei());
-    }
-    withTransaction(() -> entityManager().merge(gps));
+    if (gps.getImei() == null || buscarPorId(gps.getImei()) == null)
+      throw new RegistroNoEncontradoException("No se puede actualizar: no existe gps con imei " + gps.getImei());
+
+    entityManager().merge(gps);
   }
 }

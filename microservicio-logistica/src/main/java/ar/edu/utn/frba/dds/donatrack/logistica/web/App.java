@@ -49,9 +49,9 @@ public class App {
     ConfiguracionEntorno config = ConfiguracionEntorno.getInstance();
 
     //Cargo credenciales para la db desde el .env. NO COMMITEAR COMENTADO!!!
-    System.setProperty("hibernate.connection.url", config.getDbUrlLogistica());
-    System.setProperty("hibernate.connection.username", config.getDbUser());
-    System.setProperty("hibernate.connection.password", config.getDbPassword());
+    //System.setProperty("hibernate.connection.url", config.getDbUrlLogistica());
+    //System.setProperty("hibernate.connection.username", config.getDbUser());
+    //System.setProperty("hibernate.connection.password", config.getDbPassword());
 
     AppLogistica resultado = crearApp();
 
@@ -106,13 +106,17 @@ public class App {
     CamionApiController camionApiController = new CamionApiController(camionRepository, gpsRepository);
     //para web (html)
     HomeController homeController = new HomeController();
-    CamionController camionController = new CamionController(camionRepository, gpsRepository);
+    CamionController camionController = new CamionController(camionRepository, gpsRepository, rutaRepository);
     EntregaController entregaController = new EntregaController(entregaRepository);
     RutaController rutaController = new RutaController(rutaRepository);
 
     Javalin app = Javalin.create(config -> {
       config.jsonMapper(GsonConfig.jsonMapper());
       config.http.defaultContentType = "application/json";
+      config.staticFiles.add(staticFiles -> {
+        staticFiles.directory = "/presentacion";
+        staticFiles.location = Location.CLASSPATH;
+      });
       config.staticFiles.add(staticFiles -> {
         staticFiles.hostedPath = "/uploads";
         staticFiles.directory = Path.of("microservicio-logistica", "uploads").toAbsolutePath().toString();

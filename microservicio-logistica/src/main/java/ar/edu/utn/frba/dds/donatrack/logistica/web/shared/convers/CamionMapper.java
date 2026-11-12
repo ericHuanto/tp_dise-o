@@ -24,6 +24,8 @@ public class CamionMapper {
         camion.getCapacidadVolumen(),
         camion.getAltura(),
         camion.getCapacidadCarga(),
+        camion.getUbicacionActual().getLatitud(),
+        camion.getUbicacionActual().getLongitud(),
         camion.getGps()==null ? null : camion.getGps().getImei()
     );
   }

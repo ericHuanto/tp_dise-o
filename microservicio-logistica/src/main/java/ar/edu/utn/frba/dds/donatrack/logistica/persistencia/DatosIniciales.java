@@ -10,16 +10,16 @@ import io.github.flbulgarelli.jpa.extras.simple.WithSimplePersistenceUnit;
 import java.util.List;
 
 public class DatosIniciales implements WithLogisticaPersistenceUnit {
+  private final CamionRepository repoCamiones = CamionRepository.getInstancia();
+  private final EntregaRepository repoEntregas = EntregaRepository.getInstancia();
+  private final BeneficiarioRepository repoBeneficiarios = BeneficiarioRepository.getInstancia();
+  private final GpsRepository repogps = GpsRepository.getInstancia();
+
   public static void init() {
     new DatosIniciales().comenzar();
   }
 
   public void comenzar() {
-    //Repositorios
-    CamionRepository repoCamiones = CamionRepository.getInstancia();
-    EntregaRepository repoEntregas = EntregaRepository.getInstancia();
-    BeneficiarioRepository repoBeneficiarios = BeneficiarioRepository.getInstancia();
-
     //Entidades
     Camion camion = new Camion("ABC-123", 10f, 2.5f, 1500f);
     Gps gps = new Gps("000A");
@@ -36,6 +36,7 @@ public class DatosIniciales implements WithLogisticaPersistenceUnit {
     //Transacción
     try {
       beginTransaction();
+      repogps.guardar(gps);
       repoCamiones.guardar(camion);
       repoBeneficiarios.guardar(beneficiario);
       repoEntregas.guardar(entrega);
