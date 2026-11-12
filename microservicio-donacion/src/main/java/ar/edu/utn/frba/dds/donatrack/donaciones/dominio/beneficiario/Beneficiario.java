@@ -43,11 +43,15 @@ public class Beneficiario {
   private Usuario usuario;
 
   public Beneficiario(String razonSocial, String direccion, List<MedioContacto> contactos) {
+    this(razonSocial, direccion, calcularLatitud(direccion), calcularLongitud(direccion), contactos);
+  }
+
+  public Beneficiario(String razonSocial, String direccion, String latitud, String longitud, List<MedioContacto> contactos) {
     checkDatos(razonSocial, contactos);
     this.razonSocial = razonSocial;
     this.direccion = direccion;
-    this.latitud = calcularLatitud(direccion);
-    this.longitud = calcularLongitud(direccion);
+    this.latitud = latitud;
+    this.longitud = longitud;
     this.contactos = new ArrayList<>(contactos);
     this.necesidades = new ArrayList<>();
     this.donaciones = new ArrayList<>();
@@ -115,13 +119,13 @@ public class Beneficiario {
   }
 
   //=============== FUNCIONES AUXILIARES =================
-  private String calcularLatitud(String direccion) {
+  private static String calcularLatitud(String direccion) {
     //Usar un servicio externo que al pasarle la direccion devuelva la latitud
     Double latitudFalsa = -34.705 + (new Random()).nextDouble() * ((-34.526) - (-34.705));
     return String.valueOf(latitudFalsa);
   }
 
-  public String calcularLongitud(String direccion) {
+  public static String calcularLongitud(String direccion) {
     //Usar un servicio externo que al pasarle la direccion devuelva la longitud
     Double longitudFalsa = -58.531 + (new Random()).nextDouble() * ((-58.335) - (-58.531));
     return String.valueOf(longitudFalsa);

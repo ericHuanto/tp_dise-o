@@ -24,7 +24,6 @@
 
             <div class="form-card">
                 <form action="/perfil/donante-juridica" method="POST">
-                    <!-- Selector Tipo de persona -->
                     <div class="form-group">
                         <label>Tipo de persona</label>
                         <div class="selector-tipo">
@@ -166,7 +165,6 @@
             const contenedor = document.getElementById('contenedor-contactos');
             const nuevaFila = document.createElement('div');
             nuevaFila.className = 'contacto-row';
-
             nuevaFila.innerHTML = `
                 <select name="medios[]" class="col-medio" required>
                     <option value="EMAIL">Email</option>
@@ -178,9 +176,7 @@
                     <option selected value="false">Secundario</option>
                     <option value="true">Es Principal</option>
                 </select>
-                <button type="button" class="btn-peligro" onclick="this.parentElement.remove()">✕</button>
-            `;
-
+                <button type="button" class="btn-peligro" onclick="this.parentElement.remove()">✕</button>`;
             contenedor.appendChild(nuevaFila);
         }
 

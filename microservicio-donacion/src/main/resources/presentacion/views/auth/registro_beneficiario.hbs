@@ -30,9 +30,17 @@
                         <input type="text" id="razon_social" name="razonSocial" placeholder="Comedor Los Pibes" required>
                     </div>
 
-                    <div class="form-group">
-                        <label for="direccion">Dirección física</label>
-                        <input type="text" id="direccion" name="direccion" placeholder="Av. Rivadavia 10000, CABA" required>
+                    <div class="form-group" style="position: relative; margin-bottom: 20px;">
+                        <label for="direccion" style="display: block; font-size: 0.85em; color: #555; margin-bottom: 8px;">Dirección física</label>
+                        <input type="text" id="direccion" name="direccion" autocomplete="off" required
+                               style="width: 100%; padding: 12px 15px; border: 1px solid #ccc; border-radius: 6px; font-size: 1em; box-sizing: border-box; outline: none;">
+                        <div id="sugerencias-direccion" style="position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #ccc; border-radius: 8px; z-index: 1000; display: none; max-height: 200px; overflow-y: auto; box-shadow: 0 4px 12px rgba(0,0,0,0.1);"></div>
+                        <input type="hidden" id="latitud" name="latitud">
+                        <input type="hidden" id="longitud" name="longitud">
+                    </div>
+
+                    <div id="mapa-container" style="width: 100%; height: 250px; border-radius: 8px; overflow: hidden; margin-bottom: 25px; border: 1px solid #ccc;">
+                        <iframe id="mapa-iframe" src="https://www.openstreetmap.org/export/embed.html?bbox=-58.5364,-34.7056,-58.3351,-34.5266&layer=mapnik" width="100%" height="100%" frameborder="0" scrolling="no" marginheight="0" marginwidth="0"></iframe>
                     </div>
 
                     <hr class="divisor-seccion">
@@ -96,7 +104,6 @@
             const contenedor = document.getElementById('contenedor-contactos');
             const nuevaFila = document.createElement('div');
             nuevaFila.className = 'contacto-row';
-
             nuevaFila.innerHTML = `
                 <select name="medios[]" class="col-medio" required>
                     <option value="EMAIL">Email</option>
@@ -108,17 +115,83 @@
                     <option selected value="false">Secundario</option>
                     <option value="true">Es Principal</option>
                 </select>
-                <button type="button" class="btn-peligro" onclick="this.parentElement.remove()">✕</button>
-            `;
-
+                <button type="button" class="btn-peligro" onclick="this.parentElement.remove()">✕</button> `;
             contenedor.appendChild(nuevaFila);
         }
 
-        const params = new URLSearchParams(window.location.search);
-        if (params.has('error')) {
-            const alerta = document.getElementById('alerta-registro');
-            alerta.textContent = params.get('error').replaceAll('_', ' ');
-            alerta.classList.remove('oculto');
+        document.addEventListener("DOMContentLoaded", () => {
+            configurarBuscadorDirecciones();
+        });
+
+        function configurarBuscadorDirecciones() {
+            const inputDireccion = document.getElementById("direccion");
+            const sugerenciasContainer = document.getElementById("sugerencias-direccion");
+            let timeout = null;
+
+            inputDireccion.addEventListener("input", (e) => {
+                clearTimeout(timeout);
+                const busqueda = e.target.value;
+                if (busqueda.length < 6) {
+                    sugerenciasContainer.style.display = "none";
+                    return;
+                }
+                timeout = setTimeout(async () => {
+                    let datos = [];
+                    try {
+                        const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(busqueda)}&countrycodes=ar&limit=5`;
+                        const respuesta = await fetch(url);
+                        datos = await respuesta.json();
+                    } catch (error) {
+                        console.error("Error de red al buscar direcciones:", error);
+                    }
+
+                    sugerenciasContainer.innerHTML = "";
+                    sugerenciasContainer.style.display = "block";
+                    if (datos.length > 0) {
+                        datos.forEach(d => {
+                            const sugerencia = crearSugerencia(d);
+                            sugerenciasContainer.appendChild(sugerencia);
+                        });
+                    } else {
+                        const mensaje = document.createElement("div");
+                        mensaje.textContent = "No se encontraron direcciones";
+                        mensaje.style.padding = "12px 15px";
+                        mensaje.style.fontSize = "0.8rem";
+                        sugerenciasContainer.appendChild(mensaje);
+                    }
+                }, 400);
+            });
+
+            document.addEventListener("click", (e) => {
+                if (e.target !== inputDireccion) {
+                    sugerenciasContainer.style.display = "none";
+                }
+            });
+        }
+
+        function crearSugerencia(dato) {
+            const div = document.createElement("div");
+            div.style.padding = "12px 15px";
+            div.style.cursor = "pointer";
+            div.style.fontSize = "0.8rem";
+            div.innerText = dato.display_name;
+
+            div.addEventListener("mouseenter", () => div.style.backgroundColor = "#f5f5f5");
+            div.addEventListener("mouseleave", () => div.style.backgroundColor = "transparent");
+
+            div.addEventListener("click", () => {
+                document.getElementById("direccion").value = dato.display_name;
+                document.getElementById("latitud").value = dato.lat;
+                document.getElementById("longitud").value = dato.lon;
+                document.getElementById("sugerencias-direccion").style.display = "none";
+
+                const iframeMapa = document.getElementById("mapa-iframe");
+                const zoom = 0.003;
+                const bbox = `${parseFloat(dato.lon) - zoom},${parseFloat(dato.lat) - zoom},${parseFloat(dato.lon) + zoom},${parseFloat(dato.lat) + zoom}`;
+                iframeMapa.src = `https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${dato.lat},${dato.lon}`;
+            });
+
+            return div;
         }
     </script>
 {{/partial}}

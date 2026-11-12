@@ -56,16 +56,19 @@ public class PerfilController implements WithSimplePersistenceUnit {
   }
 
   public void guardarBeneficiario(Context context) {
-    Usuario nuevoUsuario = validarYConstruirUsuario(context, "/perfil/beneficiario");
-    if (nuevoUsuario == null) {
+    if(existeNombreUsuario(context.formParam("name"))) {
+      context.redirect("/perfil/beneficiario?error=ya_existe_un_usuario_con_ese_nombre");
       return;
     }
 
-    String razonSocial = context.formParam("razonSocial");
-    String direccion = context.formParam("direccion");
-    List<MedioContacto> contactos = armarContactos(context);
+    if(!esMismaContraseña(context.formParam("password"), context.formParam("passwordConfirm"))) {
+      context.redirect("/perfil/beneficiario?error=las_contraseñas_no_coinciden");
+      return;
+    }
 
-    Beneficiario nuevoBeneficiario = new Beneficiario(razonSocial, direccion, contactos);
+    Usuario nuevoUsuario = crearUsuario(context.formParam("name"), context.formParam("password"));
+    Beneficiario nuevoBeneficiario = crearBeneficiario(context);
+
     nuevoUsuario.otorgarPermiso(Permiso.SOLICITAR_AYUDA);
     nuevoBeneficiario.vincularUsuario(nuevoUsuario);
 
@@ -86,23 +89,18 @@ public class PerfilController implements WithSimplePersistenceUnit {
   }
 
   public void guardarDonanteHumana(Context context) {
-    Usuario nuevoUsuario = validarYConstruirUsuario(context, "/perfil/donante-humana");
-    if (nuevoUsuario == null) {
+    if(existeNombreUsuario(context.formParam("name"))) {
+      context.redirect("/perfil/donante-humana?error=ya_existe_un_usuario_con_ese_nombre");
       return;
     }
 
-    String nombre = context.formParam("nombre");
-    String apellidos = context.formParam("apellidos");
-    TipoDocumento tipoDoc = TipoDocumento.valueOf(context.formParam("tipoDocumento"));
-    String numDocumento = context.formParam("numeroDocumento");
-    LocalDate fechaNac = LocalDate.parse(context.formParam("fechaNacimiento"));
-    Genero genero = Genero.valueOf(context.formParam("genero"));
-    String direccion = context.formParam("direccion");
-    List<MedioContacto> contactos = armarContactos(context);
+    if(!esMismaContraseña(context.formParam("password"), context.formParam("passwordConfirm"))) {
+      context.redirect("/perfil/donante-humana?error=las_contraseñas_no_coinciden");
+      return;
+    }
 
-    Humana nuevoDonanteHumana = new Humana(
-        nombre, apellidos, new Documento(tipoDoc, numDocumento), fechaNac, genero, direccion, contactos
-    );
+    Usuario nuevoUsuario = crearUsuario(context.formParam("name"), context.formParam("password"));
+    Humana nuevoDonanteHumana = crearDonanteHumana(context);
 
     nuevoUsuario.otorgarPermiso(Permiso.REALIZAR_DONACION);
     nuevoDonanteHumana.vincularUsuario(nuevoUsuario);
@@ -124,49 +122,26 @@ public class PerfilController implements WithSimplePersistenceUnit {
   }
 
   public void guardarDonanteJuridica(Context context) {
-    Usuario nuevoUsuario = validarYConstruirUsuario(context, "/perfil/donante-juridica");
-    if (nuevoUsuario == null) {
+    if(existeNombreUsuario(context.formParam("name"))) {
+      context.redirect("/perfil/donante-juridica?error=ya_existe_un_usuario_con_ese_nombre");
       return;
     }
 
-    // Datos de la persona juridica
-    String razonSocial = context.formParam("razonSocial");
-    TipoDocumento tipoDocJuridica = TipoDocumento.valueOf(context.formParam("tipoDocumento"));
-    String numDocJuridica = context.formParam("numeroDocumento");
-    TipoOrganizacion tipoOrg = TipoOrganizacion.valueOf(context.formParam("tipoOrganizacion"));
-    String rubro = context.formParam("rubro");
+    if(!esMismaContraseña(context.formParam("password"), context.formParam("passwordConfirm"))) {
+      context.redirect("/perfil/donante-juridica?error=las_contraseñas_no_coinciden");
+      return;
+    }
 
-    // Datos del representante
-    String nombreRep = context.formParam("nombreRepresentante");
-    String apellidoRep = context.formParam("apellidoRepresentante");
-    TipoDocumento tipoDocRep = TipoDocumento.valueOf(context.formParam("tipoDocumentoRepresentante"));
-    String numDocRep = context.formParam("numeroDocumentoRepresentante");
-    String direccionRep = context.formParam("direccionRepresentante");
-    List<MedioContacto> contactosRep = armarContactos(context);
-
-    Representante representante = new Representante(
-        nombreRep,
-        apellidoRep,
-        new Documento(tipoDocRep, numDocRep),
-        direccionRep,
-        contactosRep
-    );
-
-    Juridica nuevaJuridica = new Juridica(
-        razonSocial,
-        new Documento(tipoDocJuridica, numDocJuridica),
-        tipoOrg,
-        rubro,
-        List.of(representante)
-    );
+    Usuario nuevoUsuario = crearUsuario(context.formParam("name"), context.formParam("password"));
+    Juridica nuevajuridica = crearDonanteJuridica(context);
 
     nuevoUsuario.otorgarPermiso(Permiso.REALIZAR_DONACION);
-    nuevaJuridica.vincularUsuario(nuevoUsuario);
+    nuevajuridica.vincularUsuario(nuevoUsuario);
 
     try {
       beginTransaction();
       repoUsuarios.guardar(nuevoUsuario);
-      repoDonantes.guardar(nuevaJuridica);
+      repoDonantes.guardar(nuevajuridica);
       commitTransaction();
 
       nuevoUsuario.inicializarPermisos();
@@ -180,22 +155,59 @@ public class PerfilController implements WithSimplePersistenceUnit {
   }
 
   // =================== FUNCIONES AUXILIARES ===================
-  private Usuario validarYConstruirUsuario(Context context, String rutaFormulario) {
-    String nombreUsuario = context.formParam("name");
-    String password = context.formParam("password");
-    String passwordConfirm = context.formParam("passwordConfirm");
+  private boolean esMismaContraseña(String contraseña, String contraseña2) {
+    return contraseña.equals(contraseña2);
+  }
 
-    if (passwordConfirm != null && !password.equals(passwordConfirm)) {
-      context.redirect(rutaFormulario + "?error=Las_contraseñas_no_coinciden");
-      return null;
-    }
+  private boolean existeNombreUsuario(String nombreUsuario) {
+    return repoUsuarios.buscarPorCredenciales(nombreUsuario) != null;
+  }
 
-    if (repoUsuarios.buscarPorCredenciales(nombreUsuario) != null) {
-      context.redirect(rutaFormulario + "?error=El_nombre_de_usuario_ya_esta_en_uso");
-      return null;
-    }
+  private Usuario crearUsuario(String nombreUsuario, String contraseña) {
+    return new Usuario(nombreUsuario, contraseña);
+  }
 
-    return new Usuario(nombreUsuario, password);
+  private Beneficiario crearBeneficiario(Context context) {
+    String razonSocial = context.formParam("razonSocial");
+    String direccion = context.formParam("direccion");
+    List<MedioContacto> contactos = armarContactos(context);
+
+    return new Beneficiario(razonSocial, direccion, contactos);
+  }
+
+  private Humana crearDonanteHumana(Context context) {
+    String nombre = context.formParam("nombre");
+    String apellidos = context.formParam("apellidos");
+    TipoDocumento tipoDocumento = TipoDocumento.valueOf(context.formParam("tipoDocumento"));
+    String numDocumento = context.formParam("numeroDocumento");
+    LocalDate fechaNacimiento = LocalDate.parse(context.formParam("fechaNacimiento"));
+    Genero genero = Genero.valueOf(context.formParam("genero"));
+    String direccion = context.formParam("direccion");
+    List<MedioContacto> contactos = armarContactos(context);
+
+    return new Humana(nombre, apellidos, new Documento(tipoDocumento, numDocumento), fechaNacimiento, genero, direccion, contactos);
+  }
+
+  private Juridica crearDonanteJuridica(Context context) {
+    String razonSocial = context.formParam("razonSocial");
+    TipoDocumento tipoDocJuridica = TipoDocumento.valueOf(context.formParam("tipoDocumento"));
+    String numDocJuridica = context.formParam("numeroDocumento");
+    TipoOrganizacion tipoOrg = TipoOrganizacion.valueOf(context.formParam("tipoOrganizacion"));
+    String rubro = context.formParam("rubro");
+    List<Representante> representantes = List.of(crearRepresentante(context));
+
+    return new Juridica(razonSocial, new Documento(tipoDocJuridica, numDocJuridica), tipoOrg, rubro, representantes);
+  }
+
+  private Representante crearRepresentante(Context context) {
+    String nombre = context.formParam("nombreRepresentante");
+    String apellido = context.formParam("apellidoRepresentante");
+    TipoDocumento tipoDocumento = TipoDocumento.valueOf(context.formParam("tipoDocumentoRepresentante"));
+    String numDocumento = context.formParam("numeroDocumentoRepresentante");
+    String direccion = context.formParam("direccionRepresentante");
+    List<MedioContacto> contactos = armarContactos(context);
+
+    return new Representante(nombre, apellido, new Documento(tipoDocumento, numDocumento), direccion, contactos);
   }
 
   private List<MedioContacto> armarContactos(Context context) {
