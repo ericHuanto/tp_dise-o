@@ -2,6 +2,7 @@ package ar.edu.utn.frba.dds.donatrack.donaciones.web.ui.controllers;
 
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.beneficiario.Beneficiario;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.donacion.Donacion;
+import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.usuario.Usuario;
 import ar.edu.utn.frba.dds.donatrack.donaciones.persistencia.BeneficiarioRepository;
 import ar.edu.utn.frba.dds.donatrack.donaciones.persistencia.DonacionRepository;
 import io.github.flbulgarelli.jpa.extras.simple.WithSimplePersistenceUnit;
@@ -20,23 +21,45 @@ public class DonacionBeneficiarioController implements WithSimplePersistenceUnit
     this.donacionRepository = donacionRepository;
   }
 
+
+
   public void listar(Context context) {
+
+    Usuario usuarioActual = context.sessionAttribute("usuario_actual");
+
+    if (usuarioActual == null) {
+      context.redirect("/login");
+      return;
+    }
+
+    if (!usuarioActual.isBeneficiario()) {
+      context.status(403)
+          .result("No tenés permiso para consultar donaciones");
+      return;
+    }
 
     beginTransaction();
 
     try {
-      Beneficiario beneficiario = beneficiarioRepository.buscarTodos()
-          .stream()
-          .findFirst()
-          .orElse(null);
-      System.out.println("Beneficiaria: " + beneficiario.getRazonSocial());
-      System.out.println("Cantidad de donaciones: " + beneficiario.getDonaciones().size());
+      Beneficiario beneficiario =
+          beneficiarioRepository.buscarPorUsuarioId(
+              usuarioActual.getId()
+          );
+
+      if (beneficiario == null) {
+        rollbackTransaction();
+        context.status(404)
+            .result("No existe un beneficiario asociado a este usuario");
+        return;
+      }
 
       Map<String, Object> modelo = new HashMap<>();
 
-      if (beneficiario != null) {
-        modelo.put("donaciones", beneficiario.getDonaciones());
-      }
+      modelo.put("usuario", usuarioActual);
+      modelo.put("donaciones", beneficiario.getDonaciones());
+
+      // Cargar la colección dentro de la transacción
+      beneficiario.getDonaciones().size();
 
       commitTransaction();
 
@@ -46,29 +69,65 @@ public class DonacionBeneficiarioController implements WithSimplePersistenceUnit
       rollbackTransaction();
       throw e;
     }
-
   }
 
+
+
   public void verDetalle(Context context) {
+
+    Usuario usuarioActual = context.sessionAttribute("usuario_actual");
+
+    if (usuarioActual == null) {
+      context.redirect("/login");
+      return;
+    }
+
+    if (!usuarioActual.isBeneficiario()) {
+      context.status(403)
+          .result("No tenés permiso para consultar donaciones");
+      return;
+    }
+
+    Long idDonacion;
+
+    try {
+      idDonacion = Long.valueOf(context.pathParam("id"));
+    } catch (NumberFormatException e) {
+      context.status(400).result("ID de donación inválido");
+      return;
+    }
+
     beginTransaction();
 
     try {
-      Long idDonacion = Long.valueOf(context.pathParam("id"));
+      Beneficiario beneficiario =
+          beneficiarioRepository.buscarPorUsuarioId(usuarioActual.getId());
 
-      Donacion donacion = donacionRepository.buscarPorId(idDonacion);
+      if (beneficiario == null) {
+        rollbackTransaction();
+        context.status(404)
+            .result("Beneficiario no encontrado");
+        return;
+      }
+
+      Donacion donacion = beneficiario.getDonaciones()
+          .stream()
+          .filter(d -> idDonacion.equals(d.getId()))
+          .findFirst()
+          .orElse(null);
 
       if (donacion == null) {
-        throw new IllegalArgumentException("No se encontró la donación");
+        rollbackTransaction();
+        context.status(404)
+            .result("Donación no encontrada para este beneficiario");
+        return;
       }
 
       Map<String, Object> modelo = new HashMap<>();
+
+      modelo.put("usuario", usuarioActual);
       modelo.put("donacion", donacion);
       modelo.put("fechaAsignacion", donacion.getFechaAsignacion());
-      /*
-      DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-      String fechaFormateada = donacion.getFechaAsignacion().format(formato);
-      modelo.put("fechaAsignacion", fechaFormateada);
-      * para mejorar el formato*/
 
       commitTransaction();
 
