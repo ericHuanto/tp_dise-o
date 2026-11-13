@@ -11,5 +11,7 @@ public class NecesidadRoutes {
     ruta.get("/mis-necesidades", controller::listar);
     ruta.get("/mis-necesidades/nueva", controller::mostrarFormulario);
     ruta.post("/mis-necesidades", controller::guardar);
+    ruta.get("/mis-necesidades/{id}/editar", controller::mostrarFormularioEdicion);
+    ruta.post("/mis-necesidades/{id}/editar", controller::actualizar);
   }
 }

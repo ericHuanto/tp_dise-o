@@ -33,8 +33,11 @@ public class Beneficiario {
   @OneToMany(cascade = CascadeType.ALL)
   @JoinColumn(name = "id_beneficiario")
   private List<MedioContacto> contactos;
-  @ElementCollection
-  @CollectionTable(name = "necesidades", joinColumns = @JoinColumn(name = "id_beneficiario"))
+  //@ElementCollection
+  //@CollectionTable(name = "necesidades", joinColumns = @JoinColumn(name = "id_beneficiario"))
+  @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE ,CascadeType.REMOVE}
+              ,orphanRemoval = true)
+  @JoinColumn(name = "id_beneficiario")
   private List<Necesidad> necesidades;
   @OneToMany(mappedBy = "beneficiario") //Intentar evitar mappedBy. Relaciones bidireccionales son costosas de mantener
   private List<Donacion> donaciones;

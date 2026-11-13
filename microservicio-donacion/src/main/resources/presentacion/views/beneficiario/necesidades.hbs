@@ -1,29 +1,39 @@
-```hbs
+
 {{#partial "nombre_pestaña"}}
-    Mis necesidades
+    Necesidades
 {{/partial}}
 
 {{#partial "breadcrumbs"}}
-    Mis necesidades
+    Necesidades
 {{/partial}}
 
 {{#partial "contenido_propio"}}
     <section class="mis-necesidades">
         <div class="encabezado-seccion">
+
             <div>
-                <h1>Mis necesidades</h1>
-                <p>Administrá las necesidades de tu organización.</p>
+                {{#if esAdmin}}
+                    <h1>Necesidades registradas</h1>
+                    <p>Consultá las necesidades de las organizaciones.</p>
+                {{else}}
+                    <h1>Mis necesidades</h1>
+                    <p>Administrá las necesidades de tu organización.</p>
+                {{/if}}
             </div>
 
-            <a href="/mis-necesidades/nueva" class="boton-principal">
+            <a href="/mis-necesidades/nueva"
+               class="boton-principal">
                 Nueva necesidad
             </a>
+
         </div>
 
         {{#if necesidades}}
             <div class="lista-necesidades">
+
                 {{#each necesidades}}
                     <article class="tarjeta-necesidad">
+
                         <div class="tarjeta-necesidad__encabezado">
                             <h2>{{descripcion}}</h2>
                             <span>{{tipo}}</span>
@@ -32,12 +42,20 @@
                         <p>{{categoria}} / {{subcategoria}}</p>
 
                         {{#if cantidadPorPeriodo}}
-                            <p>{{cantidadPorPeriodo}} {{unidadMedida}} por {{periodo}}</p>
+                            <p>
+                                {{cantidadPorPeriodo}}
+                                {{unidadMedida}} por {{periodo}}
+                            </p>
                         {{else}}
-                            <p>Cantidad requerida: {{cantidadRequerida}} {{unidadMedida}}</p>
+                            <p>
+                                Cantidad requerida:
+                                {{cantidadRequerida}} {{unidadMedida}}
+                            </p>
                         {{/if}}
 
-                        <p>Cantidad recibida: {{cantidadRecibida}}</p>
+                        <p>
+                            Cantidad recibida: {{cantidadRecibida}}
+                        </p>
 
                         {{#if estaSatisfecha}}
                             <span>Necesidad satisfecha</span>
@@ -45,15 +63,44 @@
                             <span>Pendiente de completar</span>
                         {{/if}}
 
+                        {{!-- Acciones del beneficiario --}}
+                        {{#if ../usuario.beneficiario}}
+                            <form
+                                    action="/mis-necesidades/{{id}}/eliminar"
+                                    method="POST">
+
+                                <button
+                                        type="submit"
+                                        class="boton-eliminar"
+                                        onclick="return confirm('¿Seguro que querés eliminar esta necesidad?');">
+                                    Eliminar
+                                </button>
+
+                            </form>
+                        {{/if}}
+
+                        {{!-- Acciones del administrador --}}
+                        {{#if ../esAdmin}}
+                            <div>
+                                <a
+                                        href="/mis-necesidades/{{id}}/editar"
+                                        class="boton-principal">
+                                    Editar
+                                </a>
+                            </div>
+                        {{/if}}
+
                     </article>
                 {{/each}}
+
             </div>
         {{else}}
             <div class="sin-necesidades">
-                <h2>Todavía no registraste necesidades</h2>
-                <p>Podés comenzar registrando los materiales que necesita tu organización.</p>
+                <h2>No hay necesidades registradas</h2>
+                <p>Todavía no hay necesidades para mostrar.</p>
             </div>
         {{/if}}
+
     </section>
 {{/partial}}
 

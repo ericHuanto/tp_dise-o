@@ -60,4 +60,16 @@ public class BeneficiarioRepository implements WithSimplePersistenceUnit {
     entityManager().remove(beneficiario);
   }
 
+  public Beneficiario buscarPorUsuarioId(Long usuarioId) {
+    return entityManager()
+        .createQuery(
+            "SELECT b FROM Beneficiario b WHERE b.usuario.id = :usuarioId",
+            Beneficiario.class
+        )
+        .setParameter("usuarioId", usuarioId)
+        .getResultStream()
+        .findFirst()
+        .orElse(null);
+  }
+
 }

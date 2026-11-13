@@ -50,22 +50,69 @@ public class DatosIniciales implements WithSimplePersistenceUnit {
     Humana juan = new Humana("Juan", "Perez", new Documento(TipoDocumento.DNI, "12345678"), LocalDate.now().minusYears(25), Genero.MASCULINO, "siempre viva 555", List.of(new CorreoDeContacto("correoJuan@gmail.com", true)));
     Humana juana = new Humana("Juana", "Perez", new Documento(TipoDocumento.DNI, "30111222"), LocalDate.of(1990, 5, 10), Genero.FEMENINO, "Calle Falsa 123", List.of(new CorreoDeContacto("juana@gmail.com", true)));
     //Categorias
-    Categoria ropa = new Categoria("ropa");
-    Categoria alimentos = new Categoria("alimentos");
-    //Sub Categorias
-    Subcategoria lacteos = new Subcategoria("lacteos", alimentos);
-    Subcategoria pastas = new Subcategoria("pastas", alimentos);
-    Subcategoria frutas = new Subcategoria("frutas", alimentos);
-    Subcategoria abrigos = new Subcategoria("abrigos", ropa);
-    //Bienes
+    Categoria alimentos = new Categoria("Alimentos");
+    Categoria ropa = new Categoria("Vestimenta");
+    Categoria mobiliario = new Categoria("Mobiliario");
+    Categoria ropaDeCama = new Categoria("Ropa de cama");
+    Categoria higiene = new Categoria("Higiene personal");
+    Categoria limpieza = new Categoria("Limpieza");
+    // Subcategorías de alimentos
+    Subcategoria pastas = new Subcategoria("Fideos secos", alimentos);
+    Subcategoria arroz = new Subcategoria("Arroz", alimentos);
+    Subcategoria legumbres = new Subcategoria("Legumbres secas", alimentos);
+    Subcategoria aceite = new Subcategoria("Aceite vegetal", alimentos);
+    Subcategoria lacteos = new Subcategoria("Leche", alimentos);
+    Subcategoria frutas = new Subcategoria("Frutas", alimentos);
+    Subcategoria verduras = new Subcategoria("Verduras", alimentos);
+    Subcategoria conservas = new Subcategoria("Conservas", alimentos);
+    // Subcategorías de vestimenta
+    Subcategoria abrigos = new Subcategoria("Camperas de abrigo", ropa);
+    Subcategoria remeras = new Subcategoria("Remeras", ropa);
+    Subcategoria pantalones = new Subcategoria("Pantalones", ropa);
+    Subcategoria ropaInfantil = new Subcategoria("Ropa infantil", ropa);
+    Subcategoria calzado = new Subcategoria("Calzado", ropa);
+    // Subcategorías de mobiliario
+    Subcategoria sillas = new Subcategoria("Sillas", mobiliario);
+    Subcategoria mesas = new Subcategoria("Mesas", mobiliario);
+    Subcategoria bancos = new Subcategoria("Bancos escolares", mobiliario);
+    Subcategoria escritorios = new Subcategoria("Escritorios", mobiliario);
+    Subcategoria camas = new Subcategoria("Camas", mobiliario);
+    Subcategoria colchones = new Subcategoria("Colchones", mobiliario);
+    // Subcategorías de ropa de cama
+    Subcategoria frazadas = new Subcategoria("Frazadas", ropaDeCama);
+    Subcategoria sabanas = new Subcategoria("Sábanas", ropaDeCama);
+    Subcategoria almohadas = new Subcategoria("Almohadas", ropaDeCama);
+    // Subcategorías de higiene personal
+    Subcategoria jabon = new Subcategoria("Jabón", higiene);
+    Subcategoria paniales = new Subcategoria("Pañales", higiene);
+    Subcategoria pastaDental = new Subcategoria("Pasta dental", higiene);
+    Subcategoria shampoo = new Subcategoria("Shampoo", higiene);
+
+    // Subcategorías de limpieza
+    Subcategoria lavandina = new Subcategoria("Lavandina", limpieza);
+    Subcategoria detergente = new Subcategoria("Detergente", limpieza);
+    Subcategoria desinfectantes = new Subcategoria("Desinfectantes", limpieza);
+
+
+    // Bienes
     Bien fideo = new Perecedero("Fideos secos", 10f, UnidadMedida.UNIDADES, null, pastas, LocalDate.now().plusMonths(6));
+
     Bien leche = new Perecedero("Leche entera", 10f, UnidadMedida.LITROS, null, lacteos, LocalDate.now().plusDays(20));
-    Bien manzana = new Perecedero("Manzanas", 5f, UnidadMedida.KILOGRAMOS, null, frutas, LocalDate.now().plusDays(7));
-    Bien campera = new NoPerecedero("Camperas", 3f, UnidadMedida.UNIDADES, null, abrigos, true);
-    Bien campera2 = new NoPerecedero("Camperas", 3f, UnidadMedida.UNIDADES, null, abrigos, true);
-    Bien frazada = new NoPerecedero("Frazadas", 8f, UnidadMedida.UNIDADES, null, abrigos, true);
-    Bien frazada2 = new NoPerecedero("Frazadas", 8f, UnidadMedida.UNIDADES, null, abrigos, true);
-    //Necesidades
+
+    Bien manzana = new Perecedero(
+        "Manzanas", 5f, UnidadMedida.KILOGRAMOS, null, frutas, LocalDate.now().plusDays(7));
+
+    Bien campera = new NoPerecedero(
+        "Camperas", 3f, UnidadMedida.UNIDADES, null, abrigos, true);
+
+    Bien campera2 = new NoPerecedero("Camperas", 3f, UnidadMedida.UNIDADES,null, abrigos, true);
+
+    Bien frazada = new NoPerecedero("Frazadas", 8f, UnidadMedida.UNIDADES, null, frazadas, true);
+
+    Bien frazada2 = new NoPerecedero("Frazadas", 8f, UnidadMedida.UNIDADES, null, frazadas, true);
+
+    // Necesidades
+
     Necesidad necesidadLecheRecurrente = Necesidad.crearNecesidadRecurrente("Leche para el comedor", lacteos, UnidadMedida.LITROS, 50, Frecuencia.MENSUAL);
     Necesidad necesidadAbrigo = Necesidad.crearNecesidadExtraordinaria("Abrigos para invierno", abrigos, UnidadMedida.UNIDADES, 20);
     //Donaciones
@@ -116,10 +163,40 @@ public class DatosIniciales implements WithSimplePersistenceUnit {
       repoDonantes.guardar(juana);
       repoCategorias.guardar(ropa);
       repoCategorias.guardar(alimentos);
-      repoSubcategorias.guardar(lacteos);
+      repoCategorias.guardar(ropa);
+      repoCategorias.guardar(mobiliario);
+      repoCategorias.guardar(ropaDeCama);
+      repoCategorias.guardar(higiene);
+      repoCategorias.guardar(limpieza);
       repoSubcategorias.guardar(pastas);
+      repoSubcategorias.guardar(arroz);
+      repoSubcategorias.guardar(legumbres);
+      repoSubcategorias.guardar(aceite);
+      repoSubcategorias.guardar(lacteos);
       repoSubcategorias.guardar(frutas);
+      repoSubcategorias.guardar(verduras);
+      repoSubcategorias.guardar(conservas);
       repoSubcategorias.guardar(abrigos);
+      repoSubcategorias.guardar(remeras);
+      repoSubcategorias.guardar(pantalones);
+      repoSubcategorias.guardar(ropaInfantil);
+      repoSubcategorias.guardar(calzado);
+      repoSubcategorias.guardar(sillas);
+      repoSubcategorias.guardar(mesas);
+      repoSubcategorias.guardar(bancos);
+      repoSubcategorias.guardar(escritorios);
+      repoSubcategorias.guardar(camas);
+      repoSubcategorias.guardar(colchones);
+      repoSubcategorias.guardar(frazadas);
+      repoSubcategorias.guardar(sabanas);
+      repoSubcategorias.guardar(almohadas);
+      repoSubcategorias.guardar(jabon);
+      repoSubcategorias.guardar(paniales);
+      repoSubcategorias.guardar(pastaDental);
+      repoSubcategorias.guardar(shampoo);
+      repoSubcategorias.guardar(lavandina);
+      repoSubcategorias.guardar(detergente);
+      repoSubcategorias.guardar(desinfectantes);
       repoDonaciones.guardar(donacion1);
       repoDonaciones.guardar(donacion2);
       repoDonaciones.guardar(donacion3);

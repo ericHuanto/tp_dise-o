@@ -1,0 +1,154 @@
+
+{{#partial "nombre_pestaña"}}
+    Editar necesidad
+{{/partial}}
+
+{{#partial "breadcrumbs"}}
+    <a href="/mis-necesidades">Mis necesidades</a> / Editar necesidad
+{{/partial}}
+
+{{#partial "contenido_propio"}}
+    <section class="formulario-necesidad">
+
+        <h1>Editar necesidad</h1>
+        <p>Modificá los datos de la necesidad registrada.</p>
+
+        <form action="/mis-necesidades/{{necesidad.id}}/editar" method="post">
+
+            <label for="tipo">Tipo de necesidad</label>
+            <input
+                    type="text"
+                    id="tipo"
+                    value="{{necesidad.tipo}}"
+                    disabled
+            >
+
+            <label for="descripcion">Descripción</label>
+            <input
+                    type="text"
+                    id="descripcion"
+                    name="descripcion"
+                    value="{{necesidad.descripcion}}"
+                    required
+            >
+
+            <label for="categoria">Categoría</label>
+            <select id="categoria" name="categoria" required>
+                {{#each categorias}}
+                    <option value="{{nombre}}">{{nombre}}</option>
+                {{/each}}
+            </select>
+
+            <label for="subcategoria">Subcategoría</label>
+            <select id="subcategoria" name="subcategoria" required>
+                {{#each subcategorias}}
+                    <option
+                            value="{{nombre}}"
+                            data-categoria="{{categoria.nombre}}">
+                        {{nombre}}
+                    </option>
+                {{/each}}
+            </select>
+
+            <label for="unidadMedida">Unidad de medida</label>
+            <select id="unidadMedida" name="unidadMedida" required>
+                <option value="KILOGRAMOS">Kilogramos</option>
+                <option value="GRAMOS">Gramos</option>
+                <option value="LITROS">Litros</option>
+                <option value="MILILITROS">Mililitros</option>
+                <option value="UNIDADES">Unidades</option>
+            </select>
+
+            {{#if esExtraordinaria}}
+                <label for="cantidadRequerida">Cantidad requerida</label>
+                <input
+                        type="number"
+                        id="cantidadRequerida"
+                        name="cantidadRequerida"
+                        value="{{necesidad.cantidadRequerida}}"
+                        min="1"
+                        required
+                >
+            {{/if}}
+
+            {{#if esRecurrente}}
+                <label for="cantidadPorPeriodo">Cantidad por período</label>
+                <input
+                        type="number"
+                        id="cantidadPorPeriodo"
+                        name="cantidadPorPeriodo"
+                        value="{{necesidad.cantidadRequerida}}"
+                        min="1"
+                        required
+                >
+
+                <label for="periodo">Período</label>
+                <select id="periodo" name="periodo" required>
+                    <option value="DIARIO">Diario</option>
+                    <option value="SEMANAL">Semanal</option>
+                    <option value="MENSUAL">Mensual</option>
+                </select>
+            {{/if}}
+
+            <button type="submit">Guardar cambios</button>
+            <a href="/mis-necesidades">Cancelar</a>
+
+        </form>
+    </section>
+{{/partial}}
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const categoria = document.getElementById("categoria");
+        const subcategoria = document.getElementById("subcategoria");
+        const unidadMedida = document.getElementById("unidadMedida");
+        const periodo = document.getElementById("periodo");
+
+        const categoriaActual = "{{necesidad.subcategoria.categoria.nombre}}";
+        const subcategoriaActual = "{{necesidad.subcategoria.nombre}}";
+        const unidadActual = "{{necesidad.unidadMedida}}";
+        const periodoActual = "{{necesidad.frecuencia}}";
+
+        const opcionesSubcategoria = Array.from(subcategoria.options);
+
+        function actualizarSubcategorias() {
+
+            const categoriaSeleccionada = categoria.value;
+
+            subcategoria.innerHTML = "";
+
+            const opcionInicial = document.createElement("option");
+            opcionInicial.value = "";
+            opcionInicial.textContent = "Seleccionar subcategoría";
+            subcategoria.appendChild(opcionInicial);
+
+            opcionesSubcategoria.forEach(opcion => {
+
+                if (
+                        opcion.dataset.categoria?.trim().toLowerCase() ===
+                        categoriaSeleccionada.trim().toLowerCase()
+                ) {
+                    subcategoria.appendChild(opcion.cloneNode(true));
+                }
+            });
+
+            subcategoria.disabled = categoriaSeleccionada === "";
+        }
+
+        categoria.value = categoriaActual;
+        actualizarSubcategorias();
+
+        subcategoria.value = subcategoriaActual;
+        unidadMedida.value = unidadActual;
+
+        if (periodo) {
+            periodo.value = periodoActual;
+        }
+
+        categoria.addEventListener("change", actualizarSubcategorias);
+
+    });
+</script>
+
+{{> partials/layout.hbs}}

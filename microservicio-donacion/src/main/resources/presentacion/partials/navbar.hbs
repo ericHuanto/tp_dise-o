@@ -9,11 +9,13 @@
     {{#if usuario.beneficiario}}
         <a href="/solicitudes/nueva">Solicitar Donación</a>
         <a href="/entregas/pendientes">Confirmar Entregas</a>
+        <a href="/mis-necesidades">Mis Necesidades</a>
     {{/if}}
 
     {{#if usuario.admin}}
         <a href="/donaciones?estado_actual=en_deposito">Depósito</a>
         <a href="/donaciones?estado_actual=asignada">Donaciones Asignadas</a>
+        <a href="/mis-necesidades">Mis Necesidades</a>
     {{/if}}
 
     <a href="/perfil">Mi Perfil</a>
