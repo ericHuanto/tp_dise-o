@@ -1,0 +1,342 @@
+{{#partial "nombre_pestaña"}}
+    Registrar entrega - DonaTrack
+{{/partial}}
+
+{{#partial "css_extra"}}
+    <link rel="stylesheet" href="/css/formularios.css">
+    <link rel="stylesheet" href="/css/admin/donaciones.css">
+    <link rel="stylesheet" href="/css/admin/registro_entrega.css">
+{{/partial}}
+
+{{#partial "contenido_propio"}}
+    <section class="pagina-admin">
+        <nav class="breadcrumb">
+            <a href="/">Inicio</a><span>›</span><a href="/donaciones">Donaciones</a><span>›</span>Registrar entrega
+        </nav>
+
+        <h1>Registrar entrega recibida</h1>
+
+        <p id="errorEntrega" class="aviso-error oculto" role="alert"></p>
+
+        <form id="formEntrega" class="registro-grid">
+            <div class="registro-principal">
+
+                <!-- 01 Donante -->
+                <section class="tarjeta bloque">
+                    <h2><span class="paso-num mono">01</span> Persona donante</h2>
+                    <div class="buscador-donante">
+                        <div class="buscador">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                <circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>
+                            </svg>
+                            <input type="search" id="buscarDonante" autocomplete="off"
+                                   placeholder="Buscar por nombre o documento" aria-label="Buscar persona donante"
+                                   aria-controls="resultadosDonante">
+                        </div>
+                        <ul id="resultadosDonante" class="resultados oculto"></ul>
+                    </div>
+                    <input type="hidden" id="idDonante">
+                </section>
+
+                <!-- 02 Bienes -->
+                <section class="tarjeta bloque">
+                    <h2><span class="paso-num mono">02</span> Bienes recibidos</h2>
+
+                    <div id="filasBienes" class="lista-bienes"></div>
+
+                    <button type="button" id="agregarBien" class="btn-texto-verde">+ Agregar bien</button>
+                    <p class="ayuda">La fecha de vencimiento es obligatoria para los bienes perecederos.</p>
+                </section>
+
+                <!-- 03 Recepción -->
+                <section class="tarjeta bloque">
+                    <h2><span class="paso-num mono">03</span> Recepción</h2>
+                    <div class="form-row">
+                        <div class="form-group col-medio">
+                            <label for="fechaRecepcion">Fecha de recepción</label>
+                            <input type="date" id="fechaRecepcion" value="{{hoy}}" max="{{hoy}}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="observaciones">Observaciones</label>
+                            <input type="text" id="observaciones" maxlength="255" placeholder="Opcional">
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <aside class="tarjeta resumen">
+                <h2>Resumen</h2>
+                <dl class="datos resumen-datos">
+                    <dt>Donante</dt><dd id="resDonante" class="sin-dato">Sin seleccionar</dd>
+                    <dt>Bienes</dt><dd id="resBienes" class="mono">0</dd>
+                    <dt>Cantidad total</dt><dd id="resCantidad" class="mono">0</dd>
+                    <dt>Con vencimiento</dt><dd id="resVenc" class="mono">0</dd>
+                </dl>
+                <p class="nota-estado">
+                    Al registrar, los bienes se agrupan en donaciones por subcategoría y vencimiento.
+                    Quedan en estado <span class="estado estado-pendiente">Pendiente de asignación</span>
+                </p>
+                <button type="submit" id="btnRegistrar" class="btn-primary btn-ancho">Registrar entrega</button>
+                <a href="/donaciones" class="btn-secondary btn-ancho">Cancelar</a>
+            </aside>
+        </form>
+    </section>
+
+    <template id="plantillaBien">
+        <div class="fila-bien bien-card">
+            <button type="button" class="btn-quitar" aria-label="Quitar bien">×</button>
+
+            <div class="renglon renglon-3">
+                <label>Tipo
+                    <select class="f-tipo" required>
+                        <option value="PERECEDERO">Perecedero</option>
+                        <option value="NO_PERECEDERO">No perecedero</option>
+                    </select>
+                </label>
+                <label>Categoría
+                    <select class="f-categoria" required>
+                        <option value="">Elegir</option>
+                        {{#each categorias}}
+                            <option value="{{nombre}}">{{nombre}}</option>
+                        {{/each}}
+                    </select>
+                </label>
+                <label>Subcategoría
+                    <select class="f-subcategoria" required disabled>
+                        <option value="">Elegir</option>
+                        {{#each categorias}}
+                            {{#each subcategorias}}
+                                <option value="{{this}}" data-categoria="{{../nombre}}" hidden disabled>{{this}}</option>
+                            {{/each}}
+                        {{/each}}
+                    </select>
+                </label>
+            </div>
+
+            <div class="renglon renglon-desc">
+                <label>Descripción
+                    <input type="text" class="f-descripcion" maxlength="120" required>
+                </label>
+                <label>Cantidad
+                    <input type="number" class="f-cantidad" min="0.01" step="any" required>
+                </label>
+                <label>Unidad
+                    <select class="f-unidad" required>
+                        {{#each unidades}}
+                            <option value="{{this.valor}}">{{this.texto}}</option>
+                        {{/each}}
+                    </select>
+                </label>
+            </div>
+
+            <div class="renglon renglon-3">
+                <label class="campo-venc">Vencimiento
+                    <input type="date" class="f-venc" required>
+                </label>
+                <label class="campo-usado oculto">Condición
+                    <select class="f-usado">
+                        <option value="false">Nuevo</option>
+                        <option value="true">Usado</option>
+                    </select>
+                </label>
+            </div>
+        </div>
+    </template>
+{{/partial}}
+
+{{#partial "scripts"}}
+    <script>
+        (function () {
+            const cuerpo = document.getElementById('filasBienes');
+            const plantilla = document.getElementById('plantillaBien');
+            const buscar = document.getElementById('buscarDonante');
+            const lista = document.getElementById('resultadosDonante');
+            const idDonante = document.getElementById('idDonante');
+            const errorBox = document.getElementById('errorEntrega');
+            let temporizador;
+
+            function mostrarError(texto) {
+                errorBox.textContent = texto;
+                errorBox.classList.remove('oculto');
+                errorBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+
+            // ---------- Bienes ----------
+            function actualizarVencimiento(fila) {
+                const perecedero = fila.querySelector('.f-tipo').value === 'PERECEDERO';
+                const campoVenc = fila.querySelector('.campo-venc');
+                const campoUsado = fila.querySelector('.campo-usado');
+                const fecha = fila.querySelector('.f-venc');
+                campoVenc.classList.toggle('oculto', !perecedero);
+                campoUsado.classList.toggle('oculto', perecedero);
+                fecha.required = perecedero;
+                if (!perecedero) fecha.value = '';
+            }
+
+            function agregarFila() {
+                const fila = plantilla.content.firstElementChild.cloneNode(true);
+                cuerpo.appendChild(fila);
+                actualizarVencimiento(fila);
+                resumen();
+            }
+
+            function resumen() {
+                const filas = [...cuerpo.querySelectorAll('.fila-bien')];
+                const total = filas.reduce((s, f) => s + (parseFloat(f.querySelector('.f-cantidad').value) || 0), 0);
+                document.getElementById('resBienes').textContent = filas.length;
+                document.getElementById('resCantidad').textContent = Math.round(total * 100) / 100;
+                document.getElementById('resVenc').textContent =
+                    filas.filter(f => f.querySelector('.f-tipo').value === 'PERECEDERO').length;
+            }
+
+            cuerpo.addEventListener('change', e => {
+                const fila = e.target.closest('.fila-bien');
+                if (!fila) return;
+                if (e.target.classList.contains('f-tipo')) actualizarVencimiento(fila);
+                if (e.target.classList.contains('f-categoria')) {
+                    const sub = fila.querySelector('.f-subcategoria');
+                    for (const o of sub.options) {
+                        if (!o.value) continue;
+                        const visible = o.dataset.categoria === e.target.value;
+                        o.hidden = !visible;
+                        o.disabled = !visible;
+                    }
+                    sub.value = '';
+                    sub.disabled = !e.target.value;
+                }
+                resumen();
+            });
+            cuerpo.addEventListener('input', resumen);
+            cuerpo.addEventListener('click', e => {
+                const quitar = e.target.closest('.btn-quitar');
+                if (quitar && cuerpo.children.length > 1) {
+                    quitar.closest('.fila-bien').remove();
+                    resumen();
+                }
+            });
+            document.getElementById('agregarBien').addEventListener('click', agregarFila);
+
+            // ---------- Donante ----------
+            function elegirDonante(d) {
+                idDonante.value = d.id;
+                buscar.value = d.nombre;
+                lista.classList.add('oculto');
+                const res = document.getElementById('resDonante');
+                res.textContent = d.nombre;
+                res.classList.remove('sin-dato');
+            }
+
+            function mostrarResultados(donantes) {
+                lista.innerHTML = '';
+                donantes.forEach(d => {
+                    const li = document.createElement('li');
+                    const b = document.createElement('button');
+                    b.type = 'button';
+                    b.className = 'res-item';
+                    const info = document.createElement('span');
+                    const nombre = document.createElement('strong');
+                    nombre.textContent = d.nombre;
+                    const doc = document.createElement('small');
+                    doc.textContent = d.documento;
+                    info.append(nombre, doc);
+                    const tipo = document.createElement('span');
+                    tipo.className = 'etiqueta';
+                    tipo.textContent = d.tipo_persona === 'JURIDICA' ? 'Jurídica' : 'Humana';
+                    b.append(info, tipo);
+                    b.addEventListener('click', () => elegirDonante(d));
+                    li.appendChild(b);
+                    lista.appendChild(li);
+                });
+                const reg = document.createElement('li');
+                reg.innerHTML = '<a class="res-registrar" href="/donantes/nuevo?volver=/registros-entrega/nueva">+ No está registrada: registrarla</a>';
+                lista.appendChild(reg);
+                lista.classList.remove('oculto');
+            }
+
+            async function buscarDonantes(q) {
+                try {
+                    const r = await fetch('/api/donantes?q=' + encodeURIComponent(q));
+                    if (!r.ok) throw new Error();
+                    mostrarResultados(await r.json());
+                } catch (err) {
+                    lista.innerHTML = '<li class="res-vacio">No se pudo buscar donantes.</li>';
+                    lista.classList.remove('oculto');
+                }
+            }
+
+            buscar.addEventListener('input', () => {
+                idDonante.value = '';
+                const res = document.getElementById('resDonante');
+                res.textContent = 'Sin seleccionar';
+                res.classList.add('sin-dato');
+                clearTimeout(temporizador);
+                const q = buscar.value.trim();
+                if (q.length < 2) { lista.classList.add('oculto'); return; }
+                temporizador = setTimeout(() => buscarDonantes(q), 250);
+            });
+            buscar.addEventListener('keydown', e => {
+                if (e.key === 'Enter') e.preventDefault();
+                if (e.key === 'Escape') lista.classList.add('oculto');
+            });
+            document.addEventListener('click', e => {
+                if (!e.target.closest('.buscador-donante')) lista.classList.add('oculto');
+            });
+
+            // ---------- Envío ----------
+            document.getElementById('formEntrega').addEventListener('submit', async e => {
+                e.preventDefault();
+                errorBox.classList.add('oculto');
+
+                if (!idDonante.value) {
+                    mostrarError('Elegí una persona donante de la lista.');
+                    buscar.focus();
+                    return;
+                }
+
+                const bienes = [...cuerpo.querySelectorAll('.fila-bien')].map(f => {
+                    const perecedero = f.querySelector('.f-tipo').value === 'PERECEDERO';
+                    return {
+                        tipo: f.querySelector('.f-tipo').value,
+                        categoria: f.querySelector('.f-categoria').value,
+                        subcategoria: f.querySelector('.f-subcategoria').value,
+                        descripcion: f.querySelector('.f-descripcion').value.trim(),
+                        cantidad: Number(f.querySelector('.f-cantidad').value),
+                        unidad_medida: f.querySelector('.f-unidad').value,
+                        fecha_vencimiento: perecedero ? f.querySelector('.f-venc').value : null,
+                        usado: perecedero ? null : f.querySelector('.f-usado').value === 'true'
+                    };
+                });
+
+                const payload = {
+                    donante_id: Number(idDonante.value),
+                    fecha_recepcion: document.getElementById('fechaRecepcion').value,
+                    observaciones: document.getElementById('observaciones').value.trim() || null,
+                    bienes: bienes
+                };
+
+                const btn = document.getElementById('btnRegistrar');
+                btn.disabled = true;
+                try {
+                    const r = await fetch('/api/registros-entrega', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    const data = await r.json().catch(() => ({}));
+                    if (r.ok) {
+                        window.location.href = '/donaciones?creadas=' + (data.cantidad_donaciones || '');
+                        return;
+                    }
+                    mostrarError(data.mensaje || data.error || 'No se pudo registrar la entrega.');
+                } catch (err) {
+                    mostrarError('No se pudo conectar con el servidor.');
+                }
+                btn.disabled = false;
+            });
+
+            agregarFila();
+        })();
+    </script>
+{{/partial}}
+
+{{> partials/layout.hbs}}
