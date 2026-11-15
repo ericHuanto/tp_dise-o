@@ -1,0 +1,214 @@
+
+/* PANTALLA MIS NECESIDADES */
+
+.mis-necesidades {
+    width: min(1200px, 100%);
+    margin: 0 auto;
+    padding: 48px 32px 80px;
+}
+
+/* ENCABEZADO */
+
+.encabezado-seccion {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 32px;
+}
+
+.encabezado-seccion h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--accent-dark);
+    margin-bottom: 8px;
+}
+
+.encabezado-seccion p {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+}
+
+/* BOTÓN NUEVA NECESIDAD */
+
+.boton-principal {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 20px;
+    border-radius: 6px;
+    background-color: var(--accent-dark);
+    color: var(--white);
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.boton-principal:hover {
+    opacity: 0.9;
+}
+
+/* CONTENEDOR DE LA TABLA */
+
+.tabla-contenedor {
+    background-color: var(--white);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    overflow-x: auto;
+}
+
+/* TABLA */
+
+.tabla-necesidades {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.tabla-necesidades th {
+    background-color: #F8F8F5;
+    color: var(--text-muted);
+    padding: 18px 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.tabla-necesidades td {
+    padding: 20px;
+    font-size: 0.9rem;
+    color: var(--accent-dark);
+    vertical-align: middle;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.tabla-necesidades tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.tabla-necesidades tbody tr:hover {
+    background-color: #FAFAF8;
+}
+
+/* DATOS SECUNDARIOS */
+
+.subcategoria,
+.dato-secundario {
+    display: block;
+    margin-top: 5px;
+    color: var(--text-muted);
+    font-size: 0.8rem;
+}
+
+/* COBERTURA */
+
+.cobertura {
+    min-width: 130px;
+}
+
+.cobertura__texto,
+.cobertura__porcentaje {
+    display: block;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.barra-progreso {
+    width: 100%;
+    height: 7px;
+    margin: 8px 0;
+    background-color: #E5E7E3;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.barra-progreso__relleno {
+    width: 0;
+    height: 100%;
+    background-color: var(--accent-green);
+    border-radius: 10px;
+    transition: width 0.3s ease;
+}
+
+/* TIPO DE NECESIDAD */
+
+.etiqueta-tipo {
+    display: inline-block;
+    padding: 7px 12px;
+    border-radius: 20px;
+    background-color: #E6EFEA;
+    color: var(--accent-green);
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+/* ACCIONES */
+
+.acciones-necesidad {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.accion-editar {
+    color: var(--accent-green);
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.accion-editar:hover {
+    text-decoration: underline;
+}
+
+.boton-eliminar {
+    border: none;
+    background: transparent;
+    color: #B42318;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.boton-eliminar:hover {
+    text-decoration: underline;
+}
+
+/* SIN NECESIDADES */
+
+.sin-necesidades {
+    padding: 60px 24px;
+    text-align: center;
+    background-color: var(--white);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+}
+
+.sin-necesidades h2 {
+    margin-bottom: 10px;
+    color: var(--accent-dark);
+}
+
+.sin-necesidades p {
+    color: var(--text-muted);
+}
+
+/* PANTALLAS PEQUEÑAS */
+
+@media (max-width: 768px) {
+    .mis-necesidades {
+        padding: 30px 16px 60px;
+    }
+
+    .encabezado-seccion {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .tabla-necesidades {
+        min-width: 850px;
+    }
+}
