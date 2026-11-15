@@ -1,0 +1,103 @@
+
+{{#partial "nombre_pestaña"}}
+    Detalle de donación
+{{/partial}}
+
+{{#partial "breadcrumbs"}}
+    <span>Inicio</span>
+    <span>Donaciones asignadas</span>
+    <span>Detalle de donación</span>
+{{/partial}}
+
+{{#partial "css_extra"}}
+    <link rel="stylesheet" href="/css/beneficiario/detalle_donacion.css">
+{{/partial}}
+
+{{#partial "contenido_propio"}}
+
+    <main class="detalle-donacion">
+
+        <div class="detalle-encabezado">
+            <div>
+                <h1>Detalle de donación</h1>
+
+                <p class="detalle-subtitulo">
+                    Consultá la información y el estado de la donación asignada.
+                </p>
+            </div>
+
+            <a href="/mis-donaciones" class="boton-volver">
+                Volver a mis donaciones
+            </a>
+        </div>
+
+        <section class="detalle-tarjeta">
+
+            <div class="detalle-tarjeta-encabezado">
+                <h2>Información de la donación</h2>
+            </div>
+
+            <div class="detalle-campos">
+
+                <div class="detalle-campo">
+                    <span class="detalle-etiqueta">Código de donación</span>
+                    <span class="detalle-valor">#{{donacion.id}}</span>
+                </div>
+
+                <div class="detalle-campo">
+                    <span class="detalle-etiqueta">Estado actual</span>
+
+                    <span class="detalle-estado"
+                          id="estadoDonacion"
+                          data-estado="{{donacion.estadoActual}}">
+                        {{donacion.estadoActual}}
+                    </span>
+                </div>
+
+                <div class="detalle-campo">
+                    <span class="detalle-etiqueta">Fecha de asignación</span>
+                    <span class="detalle-valor">{{fechaAsignacion}}</span>
+                </div>
+
+                <div class="detalle-campo detalle-campo-completo">
+                    <span class="detalle-etiqueta">Bienes donados</span>
+                    <span class="detalle-valor">{{donacion.descripcion}}</span>
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+{{/partial}}
+
+{{#partial "scripts"}}
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const etiqueta = document.getElementById("estadoDonacion");
+
+            if (!etiqueta) {
+                return;
+            }
+
+            const nombresEstados = {
+                ASIGNACION_REALIZADA: "Asignada",
+                LISTA_PARA_ENTREGAR: "Preparando entrega",
+                EN_TRASLADO: "En traslado",
+                ENTREGADA: "Entregada",
+                ENTREGA_FALLIDA: "Entrega fallida",
+                EN_DEPOSITO: "En depósito",
+                VENCIDA: "Vencida"
+            };
+
+            const estado = etiqueta.dataset.estado;
+
+            etiqueta.textContent = nombresEstados[estado] || estado;
+
+        });
+    </script>
+{{/partial}}
+
+{{> partials/layout.hbs}}

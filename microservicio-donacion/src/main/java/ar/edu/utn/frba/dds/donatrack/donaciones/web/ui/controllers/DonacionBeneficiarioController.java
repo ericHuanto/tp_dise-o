@@ -7,6 +7,7 @@ import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.donacion.TipoEstadoDonac
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.usuario.Usuario;
 import ar.edu.utn.frba.dds.donatrack.donaciones.persistencia.BeneficiarioRepository;
 import ar.edu.utn.frba.dds.donatrack.donaciones.persistencia.DonacionRepository;
+import ar.edu.utn.frba.dds.donatrack.shared.excepciones.DominioException;
 import io.github.flbulgarelli.jpa.extras.simple.WithSimplePersistenceUnit;
 import io.javalin.http.Context;
 import java.util.ArrayList;
@@ -58,24 +59,47 @@ public class DonacionBeneficiarioController implements WithSimplePersistenceUnit
         return;
       }
 
+      List<Map<String, Object>> donacionesVista = new ArrayList<>();
+
+      for (Donacion donacion : beneficiario.getDonaciones()) {
+
+        Map<String, Object> datos = new HashMap<>();
+
+        datos.put("id", donacion.getId());
+        datos.put("descripcion", donacion.getDescripcion());
+        datos.put("estadoActual", donacion.getEstadoActual().name());
+
+        String fechaAsignacion = "—";
+
+        try {
+          fechaAsignacion = donacion.getFechaAsignacion()
+              .format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+        } catch (DominioException e) {
+          // La donación no tiene fecha de asignación.
+        }
+
+        datos.put("fechaAsignacion", fechaAsignacion);
+
+        donacionesVista.add(datos);
+      }
+
       Map<String, Object> modelo = new HashMap<>();
 
       modelo.put("usuario", usuarioActual);
-      modelo.put("donaciones", beneficiario.getDonaciones());
-
-      // Cargar la colección dentro de la transacción
-      beneficiario.getDonaciones().size();
+      modelo.put("donaciones", donacionesVista);
 
       commitTransaction();
 
-      context.render("views/donante/mis_donaciones.hbs", modelo);
+      context.render(
+          "views/beneficiario/donaciones_asignadas.hbs",
+          modelo
+      );
 
     } catch (RuntimeException e) {
       rollbackTransaction();
       throw e;
     }
   }
-
 
 
   public void verDetalle(Context context) {
@@ -136,7 +160,7 @@ public class DonacionBeneficiarioController implements WithSimplePersistenceUnit
 
       commitTransaction();
 
-      context.render("views/donante/detalle_donacion.hbs", modelo);
+      context.render("views/beneficiario/detalle_donacion.hbs", modelo);
 
     } catch (RuntimeException e) {
       rollbackTransaction();

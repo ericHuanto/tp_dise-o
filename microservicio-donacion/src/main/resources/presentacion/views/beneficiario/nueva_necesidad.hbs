@@ -3,165 +3,276 @@
     Nueva necesidad
 {{/partial}}
 
-{{#partial "breadcrumbs"}}
-    <a href="/mis-necesidades">Mis necesidades</a> / Nueva necesidad
+{{#partial "css_extra"}}
+    <link rel="stylesheet" href="/css/beneficiario/nueva_necesidad.css">
 {{/partial}}
 
 {{#partial "contenido_propio"}}
-    <section class="formulario-necesidad">
-        <h1>Registrar una necesidad</h1>
-        <p>Completá los datos de los materiales que necesita tu organización.</p>
+    <div class="necesidad-overlay">
+        <section class="necesidad-modal">
 
-        <form action="/mis-necesidades" method="post">
+            <header class="necesidad-modal__header">
+                <h1>Nueva necesidad</h1>
+                <a href="/mis-necesidades"
+                   class="necesidad-modal__cerrar"
+                   aria-label="Cerrar">×</a>
+            </header>
 
-            <label for="tipo">Tipo de necesidad</label>
-            <select id="tipo" name="tipo" required>
-                <option value="">Seleccionar tipo</option>
-                <option value="EXTRAORDINARIA">Extraordinaria</option>
-                <option value="RECURRENTE">Recurrente</option>
-            </select>
+            <form action="/mis-necesidades" method="post">
 
-            <label for="descripcion">Descripción</label>
-            <input
-                    type="text"
-                    id="descripcion"
-                    name="descripcion"
-                    required
-            >
+                <div class="necesidad-modal__body">
 
-            <label for="categoria">Categoría</label>
-            <select id="categoria" name="categoria" required>
-                <option value="">Seleccionar categoría</option>
-                {{#each categorias}}
-                    <option value="{{nombre}}">{{nombre}}</option>
-                {{/each}}
-            </select>
+                    <div class="formulario-fila">
+                        <div class="campo">
+                            <label for="categoria">Categoría</label>
+                            <select id="categoria" name="categoria" required>
+                                <option value="">Seleccionar categoría</option>
+                                {{#each categorias}}
+                                    <option value="{{nombre}}">{{nombre}}</option>
+                                {{/each}}
+                            </select>
+                        </div>
 
-            <label for="subcategoria">Subcategoría</label>
-            <select id="subcategoria" name="subcategoria" required disabled>
-                <option value="">Primero seleccioná una categoría</option>
+                        <div class="campo">
+                            <label for="subcategoria">Subcategoría</label>
+                            <select id="subcategoria"
+                                    name="subcategoria"
+                                    required
+                                    disabled>
+                                <option value="">Primero seleccioná una categoría</option>
+                                {{#each subcategorias}}
+                                    <option value="{{nombre}}"
+                                            data-categoria="{{categoria.nombre}}">
+                                        {{nombre}}
+                                    </option>
+                                {{/each}}
+                            </select>
+                        </div>
+                    </div>
 
-                {{#each subcategorias}}
-                    <option
-                            value="{{nombre}}"
-                            data-categoria="{{categoria.nombre}}">
-                        {{nombre}}
-                    </option>
-                {{/each}}
-            </select>
+                    <div class="campo">
+                        <label for="descripcion">Descripción</label>
+                        <textarea id="descripcion"
+                                  name="descripcion"
+                                  rows="3"
+                                  required
+                                  placeholder="Describí qué necesita tu organización"></textarea>
+                    </div>
 
-            <label for="unidadMedida">Unidad de medida</label>
-            <select id="unidadMedida" name="unidadMedida" required>
-                <option value="">Seleccionar unidad</option>
-                <option value="KILOGRAMOS">Kilogramos</option>
-                <option value="GRAMOS">Gramos</option>
-                <option value="LITROS">Litros</option>
-                <option value="MILILITROS">Mililitros</option>
-                <option value="UNIDADES">Unidades</option>
-            </select>
+                    <div class="formulario-fila">
+                        <div class="campo">
+                            <label for="cantidadRequerida">Cantidad</label>
 
-            <div id="campos-extraordinaria" hidden>
-                <label for="cantidadRequerida">Cantidad requerida</label>
-                <input
-                        type="number"
-                        id="cantidadRequerida"
-                        name="cantidadRequerida"
-                        min="1"
-                >
-            </div>
+                            <div id="campos-extraordinaria" hidden>
+                                <input type="number"
+                                       id="cantidadRequerida"
+                                       name="cantidadRequerida"
+                                       min="1"
+                                       placeholder="Ej: 40">
+                            </div>
 
-            <div id="campos-recurrente" hidden>
-                <label for="cantidadPorPeriodo">Cantidad por período</label>
-                <input
-                        type="number"
-                        id="cantidadPorPeriodo"
-                        name="cantidadPorPeriodo"
-                        min="1"
-                >
+                            <div id="campos-recurrente" hidden>
+                                <input type="number"
+                                       id="cantidadPorPeriodo"
+                                       name="cantidadPorPeriodo"
+                                       min="1"
+                                       placeholder="Ej: 40">
+                            </div>
 
-                <label for="periodo">Período</label>
-                <select id="periodo" name="periodo">
-                    <option value="">Seleccionar período</option>
-                    <option value="DIARIO">Diario</option>
-                    <option value="SEMANAL">Semanal</option>
-                    <option value="MENSUAL">Mensual</option>
-                </select>
-            </div>
+                            <input type="number"
+                                   id="cantidad-placeholder"
+                                   placeholder="Seleccioná un tipo"
+                                   disabled>
+                        </div>
 
-            <button type="submit">Guardar necesidad</button>
-            <a href="/mis-necesidades">Cancelar</a>
+                        <div class="campo">
+                            <label for="unidadMedida">Unidad</label>
+                            <select id="unidadMedida"
+                                    name="unidadMedida"
+                                    required>
+                                <option value="">Seleccionar unidad</option>
+                                <option value="KILOGRAMOS">Kilogramos</option>
+                                <option value="GRAMOS">Gramos</option>
+                                <option value="LITROS">Litros</option>
+                                <option value="MILILITROS">Mililitros</option>
+                                <option value="UNIDADES">Unidades</option>
+                            </select>
+                        </div>
+                    </div>
 
-        </form>
-    </section>
+                    <div class="campo">
+                        <label>Tipo de necesidad</label>
+
+                        <div class="selector-opciones">
+                            <label class="opcion-segmentada">
+                                <input type="radio"
+                                       name="tipo"
+                                       value="EXTRAORDINARIA"
+                                       required
+                                       checked>
+                                <span>Extraordinaria</span>
+                            </label>
+
+                            <label class="opcion-segmentada">
+                                <input type="radio"
+                                       name="tipo"
+                                       value="RECURRENTE">
+                                <span>Recurrente</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div id="seccion-frecuencia" class="campo" hidden>
+                        <label>Frecuencia</label>
+
+                        <div class="selector-opciones">
+                            <label class="opcion-segmentada">
+                                <input type="radio"
+                                       name="periodo"
+                                       value="DIARIO">
+                                <span>Diario</span>
+                            </label>
+
+                            <label class="opcion-segmentada">
+                                <input type="radio"
+                                       name="periodo"
+                                       value="SEMANAL">
+                                <span>Semanal</span>
+                            </label>
+
+                            <label class="opcion-segmentada">
+                                <input type="radio"
+                                       name="periodo"
+                                       value="MENSUAL">
+                                <span>Mensual</span>
+                            </label>
+                        </div>
+
+                        <p class="ayuda-campo">
+                            La cantidad se vuelve a pedir con esta frecuencia.
+                        </p>
+                    </div>
+
+                </div>
+
+                <footer class="necesidad-modal__footer">
+                    <a href="/mis-necesidades"
+                       class="boton-cancelar">
+                        Cancelar
+                    </a>
+
+                    <button type="submit" class="boton-guardar">
+                        Guardar necesidad
+                    </button>
+                </footer>
+
+            </form>
+        </section>
+    </div>
 {{/partial}}
 
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
+{{#partial "scripts"}}
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
 
-        // Elementos del formulario
-        const tipo = document.getElementById("tipo");
-        const camposExtraordinaria = document.getElementById("campos-extraordinaria");
-        const camposRecurrente = document.getElementById("campos-recurrente");
-        const cantidadRequerida = document.getElementById("cantidadRequerida");
-        const cantidadPorPeriodo = document.getElementById("cantidadPorPeriodo");
-        const periodo = document.getElementById("periodo");
+            const categoria = document.getElementById("categoria");
+            const subcategoria = document.getElementById("subcategoria");
 
-        const categoria = document.getElementById("categoria");
-        const subcategoria = document.getElementById("subcategoria");
+            const opcionesSubcategoria = Array.from(subcategoria.options)
+                    .filter(opcion => opcion.value !== "");
 
-        // Guardamos las subcategorías originales
-        const opcionesSubcategoria = Array.from(subcategoria.options)
-                .filter(opcion => opcion.value !== "");
+            function actualizarSubcategorias() {
+                const seleccionada = categoria.value;
 
-        // Filtrar subcategorías según la categoría seleccionada
-        function actualizarSubcategorias() {
+                subcategoria.innerHTML = "";
 
-            const categoriaSeleccionada = categoria.value;
+                const opcionInicial = document.createElement("option");
+                opcionInicial.value = "";
+                opcionInicial.textContent = "Seleccionar subcategoría";
+                subcategoria.appendChild(opcionInicial);
 
-            subcategoria.innerHTML = "";
+                opcionesSubcategoria.forEach(opcion => {
+                    if (
+                            opcion.dataset.categoria?.trim().toLowerCase() ===
+                            seleccionada.trim().toLowerCase()
+                    ) {
+                        subcategoria.appendChild(opcion.cloneNode(true));
+                    }
+                });
 
-            const opcionInicial = document.createElement("option");
-            opcionInicial.value = "";
-            opcionInicial.textContent = "Seleccionar subcategoría";
+                subcategoria.disabled = seleccionada === "";
+            }
 
-            subcategoria.appendChild(opcionInicial);
+            categoria.addEventListener("change", actualizarSubcategorias);
 
-            opcionesSubcategoria.forEach(opcion => {
+            const tipos = document.querySelectorAll('input[name="tipo"]');
+            const frecuencias = document.querySelectorAll('input[name="periodo"]');
 
-                if (
-                        opcion.dataset.categoria?.trim().toLowerCase() ===
-                        categoriaSeleccionada.trim().toLowerCase()
-                ) {
-                    subcategoria.appendChild(opcion.cloneNode(true));
+            const camposExtraordinaria =
+                    document.getElementById("campos-extraordinaria");
+
+            const camposRecurrente =
+                    document.getElementById("campos-recurrente");
+
+            const cantidadRequerida =
+                    document.getElementById("cantidadRequerida");
+
+            const cantidadPorPeriodo =
+                    document.getElementById("cantidadPorPeriodo");
+
+            const placeholder =
+                    document.getElementById("cantidad-placeholder");
+
+            const seccionFrecuencia =
+                    document.getElementById("seccion-frecuencia");
+
+
+            function actualizarCampos() {
+                const tipoSeleccionado =
+                        document.querySelector('input[name="tipo"]:checked')?.value;
+
+                const esExtraordinaria = tipoSeleccionado === "EXTRAORDINARIA";
+                const esRecurrente = tipoSeleccionado === "RECURRENTE";
+
+                // Copiar la cantidad al campo del tipo seleccionado
+                if (esExtraordinaria && cantidadPorPeriodo.value !== "") {
+                    cantidadRequerida.value = cantidadPorPeriodo.value;
                 }
 
+                if (esRecurrente && cantidadRequerida.value !== "") {
+                    cantidadPorPeriodo.value = cantidadRequerida.value;
+                }
+
+                // Mostrar solamente el campo correspondiente
+                camposExtraordinaria.hidden = !esExtraordinaria;
+                camposRecurrente.hidden = !esRecurrente;
+                placeholder.hidden = esExtraordinaria || esRecurrente;
+
+                // Habilitar el campo correspondiente
+                cantidadRequerida.required = esExtraordinaria;
+                cantidadRequerida.disabled = !esExtraordinaria;
+
+                cantidadPorPeriodo.required = esRecurrente;
+                cantidadPorPeriodo.disabled = !esRecurrente;
+
+                // Mostrar frecuencia solamente para recurrentes
+                seccionFrecuencia.hidden = !esRecurrente;
+
+                frecuencias.forEach(frecuencia => {
+                    frecuencia.required = esRecurrente;
+                    frecuencia.disabled = !esRecurrente;
+                });
+            }
+
+
+            tipos.forEach(tipo => {
+                tipo.addEventListener("change", actualizarCampos);
             });
 
-            subcategoria.disabled = categoriaSeleccionada === "";
-        }
-
-        categoria.addEventListener("change", actualizarSubcategorias);
-
-        // Mostrar campos según el tipo de necesidad
-        function actualizarCampos() {
-
-            const esExtraordinaria = tipo.value === "EXTRAORDINARIA";
-            const esRecurrente = tipo.value === "RECURRENTE";
-
-            camposExtraordinaria.hidden = !esExtraordinaria;
-            camposRecurrente.hidden = !esRecurrente;
-
-            cantidadRequerida.required = esExtraordinaria;
-            cantidadPorPeriodo.required = esRecurrente;
-            periodo.required = esRecurrente;
-        }
-
-        tipo.addEventListener("change", actualizarCampos);
-
-        // Estado inicial
-        actualizarCampos();
-
-    });
-</script>
+            actualizarSubcategorias();
+            actualizarCampos();
+        });
+    </script>
+{{/partial}}
 
 {{> partials/layout.hbs}}

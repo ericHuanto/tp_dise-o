@@ -3,14 +3,14 @@
     Necesidades
 {{/partial}}
 
-{{#partial "breadcrumbs"}}
-    Necesidades
+{{#partial "css_extra"}}
+    <link rel="stylesheet" href="/css/beneficiario/necesidades.css">
 {{/partial}}
 
 {{#partial "contenido_propio"}}
     <section class="mis-necesidades">
-        <div class="encabezado-seccion">
 
+        <div class="encabezado-seccion">
             <div>
                 {{#if esAdmin}}
                     <h1>Necesidades registradas</h1>
@@ -21,79 +21,93 @@
                 {{/if}}
             </div>
 
-            <a href="/mis-necesidades/nueva"
-               class="boton-principal">
-                Nueva necesidad
+            <a href="/mis-necesidades/nueva" class="boton-principal">
+                + Nueva necesidad
             </a>
-
         </div>
 
         {{#if necesidades}}
-            <div class="lista-necesidades">
+            <div class="tabla-contenedor">
+                <table class="tabla-necesidades">
+                    <thead>
+                    <tr>
+                        <th>Categoría</th>
+                        <th>Descripción</th>
+                        <th>Cantidad</th>
+                        <th>Cubierto</th>
+                        <th>Tipo</th>
 
-                {{#each necesidades}}
-                    <article class="tarjeta-necesidad">
-
-                        <div class="tarjeta-necesidad__encabezado">
-                            <h2>{{descripcion}}</h2>
-                            <span>{{tipo}}</span>
-                        </div>
-
-                        <p>{{categoria}} / {{subcategoria}}</p>
-
-                        {{#if cantidadPorPeriodo}}
-                            <p>
-                                {{cantidadPorPeriodo}}
-                                {{unidadMedida}} por {{periodo}}
-                            </p>
-                        {{else}}
-                            <p>
-                                Cantidad requerida:
-                                {{cantidadRequerida}} {{unidadMedida}}
-                            </p>
+                        {{#if esAdmin}}
+                            <th>Acciones</th>
                         {{/if}}
+                    </tr>
+                    </thead>
 
-                        <p>
-                            Cantidad recibida: {{cantidadRecibida}}
-                        </p>
+                    <tbody>
+                    {{#each necesidades}}
+                        <tr>
+                            <td>
+                                <strong>{{categoria}}</strong>
+                                <span class="subcategoria">
+                                    {{subcategoria}}
+                                </span>
+                            </td>
 
-                        {{#if estaSatisfecha}}
-                            <span>Necesidad satisfecha</span>
-                        {{else}}
-                            <span>Pendiente de completar</span>
-                        {{/if}}
+                            <td>
+                                {{descripcion}}
+                            </td>
 
-                        {{!-- Acciones del beneficiario --}}
-                        {{#if ../usuario.beneficiario}}
-                            <form
-                                    action="/mis-necesidades/{{id}}/eliminar"
-                                    method="POST">
+                            <td>
+                                {{#if cantidadPorPeriodo}}
+                                    {{cantidadPorPeriodo}} {{unidadMedida}}
+                                    <span class="dato-secundario">
+                                        por {{periodo}}
+                                    </span>
+                                {{else}}
+                                    {{cantidadRequerida}} {{unidadMedida}}
+                                {{/if}}
+                            </td>
 
-                                <button
-                                        type="submit"
-                                        class="boton-eliminar"
-                                        onclick="return confirm('¿Seguro que querés eliminar esta necesidad?');">
-                                    Eliminar
-                                </button>
+                            <td>
+                                <div class="cobertura"
+                                     data-recibida="{{cantidadRecibida}}"
+                                     data-requerida="{{#if cantidadPorPeriodo}}{{cantidadPorPeriodo}}{{else}}{{cantidadRequerida}}{{/if}}">
 
-                            </form>
-                        {{/if}}
+                                    <span class="cobertura__texto">
+                                        {{cantidadRecibida}} recibidas
+                                    </span>
 
-                        {{!-- Acciones del administrador --}}
-                        {{#if ../esAdmin}}
-                            <div>
-                                <a
-                                        href="/mis-necesidades/{{id}}/editar"
-                                        class="boton-principal">
-                                    Editar
-                                </a>
-                            </div>
-                        {{/if}}
+                                    <div class="barra-progreso">
+                                        <div class="barra-progreso__relleno"></div>
+                                    </div>
 
-                    </article>
-                {{/each}}
+                                    <span class="cobertura__porcentaje"></span>
+                                </div>
+                            </td>
 
+                            <td>
+                                <span class="etiqueta-tipo">
+                                    {{tipo}}
+                                </span>
+                            </td>
+
+                            {{#if ../esAdmin}}
+                                <td>
+                                    <div class="acciones-necesidad">
+                                        <a href="/mis-necesidades/{{id}}/editar"
+                                           class="accion-editar">
+                                            Editar
+                                        </a>
+                                    </div>
+                                </td>
+                            {{/if}}
+
+                        </tr>
+                    {{/each}}
+                    </tbody>
+                </table>
             </div>
+
         {{else}}
             <div class="sin-necesidades">
                 <h2>No hay necesidades registradas</h2>
@@ -102,6 +116,26 @@
         {{/if}}
 
     </section>
+{{/partial}}
+
+{{#partial "scripts"}}
+    <script>
+        document.querySelectorAll(".cobertura").forEach(contenedor => {
+
+            const recibida = Number(contenedor.dataset.recibida);
+            const requerida = Number(contenedor.dataset.requerida);
+
+            const porcentaje = requerida > 0
+                    ? Math.min(100, Math.max(0, recibida / requerida * 100))
+                    : 0;
+
+            contenedor.querySelector(".barra-progreso__relleno")
+                    .style.width = porcentaje + "%";
+
+            contenedor.querySelector(".cobertura__porcentaje")
+                    .textContent = Math.round(porcentaje) + "%";
+        });
+    </script>
 {{/partial}}
 
 {{> partials/layout.hbs}}
