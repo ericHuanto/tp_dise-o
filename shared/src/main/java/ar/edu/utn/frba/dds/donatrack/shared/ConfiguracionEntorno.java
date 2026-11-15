@@ -97,6 +97,20 @@ public class ConfiguracionEntorno {
     return obtenerObligatorio("DB_DIALECT");
   }
 
+  public String adminUsuario(String porDefecto) {
+    String v = dotenv.get("ADMIN_USUARIO");
+    return (v == null || v.isBlank()) ? porDefecto : v;
+  }
+
+  public String adminPassword(String porDefecto) {
+    String v = dotenv.get("ADMIN_PASSWORD");
+    if (v == null || v.isBlank()) {
+      System.out.println("Falta 'ADMIN_PASSWORD': se usa la clave por defecto (solo para pruebas locales)");
+      return porDefecto;
+    }
+    return v;
+  }
+
   //=================== FUNCIONES AUXILIARES =====================
   private String obtenerObligatorio(String nombre) {
     String clave = dotenv.get(nombre);
