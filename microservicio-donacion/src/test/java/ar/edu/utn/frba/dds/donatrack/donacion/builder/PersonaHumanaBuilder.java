@@ -1,4 +1,4 @@
-package ar.edu.utn.frba.dds.donatrack.builder;
+package ar.edu.utn.frba.dds.donatrack.donacion.builder;
 
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.donante.documento.Documento;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.donante.Donante;

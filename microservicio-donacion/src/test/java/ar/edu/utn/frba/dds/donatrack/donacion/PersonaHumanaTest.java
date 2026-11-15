@@ -1,7 +1,7 @@
 package ar.edu.utn.frba.dds.donatrack.donacion;
 
 import static org.junit.jupiter.api.Assertions.*;
-import ar.edu.utn.frba.dds.donatrack.builder.PersonaHumanaBuilder;
+import ar.edu.utn.frba.dds.donatrack.donacion.builder.PersonaHumanaBuilder;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.donante.documento.Documento;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.donante.Donante;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.donante.tipodonantes.persona.Humana;

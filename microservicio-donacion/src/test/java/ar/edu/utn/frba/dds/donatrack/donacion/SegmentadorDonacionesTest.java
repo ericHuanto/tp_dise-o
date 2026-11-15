@@ -1,10 +1,10 @@
 package ar.edu.utn.frba.dds.donatrack.donacion;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import ar.edu.utn.frba.dds.donatrack.builder.BienBuilder;
-import ar.edu.utn.frba.dds.donatrack.builder.CategoriaBuilder;
-import ar.edu.utn.frba.dds.donatrack.builder.RegistroEntregaBuilder;
-import ar.edu.utn.frba.dds.donatrack.builder.SubcategoriaBuilder;
+import ar.edu.utn.frba.dds.donatrack.donacion.builder.BienBuilder;
+import ar.edu.utn.frba.dds.donatrack.donacion.builder.CategoriaBuilder;
+import ar.edu.utn.frba.dds.donatrack.donacion.builder.RegistroEntregaBuilder;
+import ar.edu.utn.frba.dds.donatrack.donacion.builder.SubcategoriaBuilder;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.bien.Bien;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.bien.Categoria;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.segmentador.SegmentadorDonaciones;
@@ -73,7 +73,7 @@ public class SegmentadorDonacionesTest {
     Bien tomate = builtomate.conSubcategoria(SubcategoriaTomate).buildPerecedero();
     Bien fideo = buildFideo.conSubcategoria(SubcategoriaFideos).buildPerecedero();
 
-    RegistroEntrega registro = buildRegistro.conDescripcion("Donación planta de pastas")
+    RegistroEntrega registro = buildRegistro.conObservaciones("Donación planta de pastas")
         .conBien(tomate).conBien(fideo).build();
 
     List<Donacion> donaciones = segmentador.segmentar(List.of(registro));
@@ -87,7 +87,7 @@ public class SegmentadorDonacionesTest {
     Bien fideos2027 = buildFideo.conFechaVencimiento(LocalDate.of(2027, 1, 1)).buildPerecedero();
     Bien fideos2026 = buildFideo.conFechaVencimiento(LocalDate.of(2026, 6, 1)).buildPerecedero();
 
-    RegistroEntrega registro = buildRegistro.conDescripcion("Fideos con distintas fechas")
+    RegistroEntrega registro = buildRegistro.conObservaciones("Fideos con distintas fechas")
         .conBien(fideos2027).conBien(fideos2026).build();
 
     List<Donacion> donaciones = segmentador.segmentar(List.of(registro));
@@ -106,7 +106,7 @@ public class SegmentadorDonacionesTest {
         .conFechaVencimiento(LocalDate.of(2027, 1, 1))
         .buildPerecedero();
 
-    RegistroEntrega registro = buildRegistro.conDescripcion("Fideos misma fecha")
+    RegistroEntrega registro = buildRegistro.conObservaciones("Fideos misma fecha")
         .conBien(fideos1).conBien(fideos2).build();
 
     List<Donacion> donaciones = segmentador.segmentar(List.of(registro));
@@ -120,7 +120,7 @@ public class SegmentadorDonacionesTest {
     Bien sillaUsada = buildSilla.conUsado(true).buildNoPerecedero();
     Bien sillaNueva = buildSilla.conUsado(false).buildNoPerecedero();
 
-    RegistroEntrega registro = buildRegistro.conDescripcion("Sillas nuevas y usadas")
+    RegistroEntrega registro = buildRegistro.conObservaciones("Sillas nuevas y usadas")
         .conBien(sillaUsada).conBien(sillaNueva).build();
 
     List<Donacion> donaciones = segmentador.segmentar(List.of(registro));
@@ -134,7 +134,7 @@ public class SegmentadorDonacionesTest {
     Bien sillaUsada = buildSilla.buildNoPerecedero();
     Bien mesaUsada = buildMesa.buildNoPerecedero();
 
-    RegistroEntrega registro = buildRegistro.conDescripcion("Mudanza Arcos Plateados")
+    RegistroEntrega registro = buildRegistro.conObservaciones("Mudanza Arcos Plateados")
         .conBien(sillaUsada).conBien(mesaUsada).build();
 
     List<Donacion> donaciones = segmentador.segmentar(List.of(registro));

@@ -1,9 +1,9 @@
 package ar.edu.utn.frba.dds.donatrack.donacion;
 
-import ar.edu.utn.frba.dds.donatrack.builder.BienBuilder;
-import ar.edu.utn.frba.dds.donatrack.builder.CategoriaBuilder;
-import ar.edu.utn.frba.dds.donatrack.builder.PersonaHumanaBuilder;
-import ar.edu.utn.frba.dds.donatrack.builder.SubcategoriaBuilder;
+import ar.edu.utn.frba.dds.donatrack.donacion.builder.BienBuilder;
+import ar.edu.utn.frba.dds.donatrack.donacion.builder.CategoriaBuilder;
+import ar.edu.utn.frba.dds.donatrack.donacion.builder.PersonaHumanaBuilder;
+import ar.edu.utn.frba.dds.donatrack.donacion.builder.SubcategoriaBuilder;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.beneficiario.Beneficiario;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.bien.Bien;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.bien.Categoria;
