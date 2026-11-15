@@ -35,4 +35,20 @@ public class SubcategoriaRepository implements WithSimplePersistenceUnit {
         .getResultList();
   }
 
+  public List<Subcategoria> buscarTodas() {
+    return entityManager()
+        .createQuery("SELECT s FROM Subcategoria s JOIN FETCH s.categoria", Subcategoria.class)
+        .getResultList();
+  }
+
+  public Subcategoria buscarPorNombre(String categoria, String subcategoria) {
+    return entityManager()
+        .createQuery("SELECT s FROM Subcategoria s WHERE s.nombre = :sub AND s.categoria.nombre = :cat",
+            Subcategoria.class)
+        .setParameter("sub", subcategoria.toLowerCase())
+        .setParameter("cat", categoria.toLowerCase())
+        .getResultStream()
+        .findFirst()
+        .orElse(null);
+  }
 }

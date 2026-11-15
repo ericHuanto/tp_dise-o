@@ -60,4 +60,13 @@ public abstract class Bien {
     return this.unidadMedida.convertirAMenorMedida(cantidad);
   }
 
+  public boolean esMismoProductoQue(Bien otro) {
+    return descripcion.trim().equalsIgnoreCase(otro.descripcion.trim())
+        && unidadMedida == otro.unidadMedida;
+  }
+
+  public void sumarCantidad(float extra) {
+    this.cantidad += extra;
+  }
+
 }
