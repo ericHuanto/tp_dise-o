@@ -31,6 +31,10 @@ public class ConfiguracionEntorno {
     return elegirPuerto("PUERTO_LOGISTICA", puertoPorDefecto);
   }
 
+  public Integer puertoBff(int puertoPorDefecto) {
+    return elegirPuerto("PUERTO_BFF", puertoPorDefecto);
+  }
+
   public String getTwilioAccountSid() {
     return obtenerObligatorio("TWILIO_ACCOUNT_SID");
   }
@@ -64,6 +68,7 @@ public class ConfiguracionEntorno {
     return valor;
   }
 
+  // Métodos para la DB
   public String getDbUrlDonaciones() {
     return obtenerObligatorio("DB_URL_DONACIONES");
   }
@@ -72,10 +77,13 @@ public class ConfiguracionEntorno {
     return obtenerObligatorio("DB_URL_LOGISTICA");
   }
 
+  public String getDbUrlBff() {
+    return obtenerObligatorio("DB_URL_BFF");
+  }
+
   public String getDbUser() {
     return obtenerObligatorio("DB_USER");
   }
-
 
   public String getDbPassword() {
     String password = dotenv.get("DB_PASSWORD");
@@ -96,6 +104,21 @@ public class ConfiguracionEntorno {
   public String getDbDialect() {
     return obtenerObligatorio("DB_DIALECT");
   }
+
+  // Métodos para gRPC
+  public Integer puertoGrpcLogistica(int puertoPorDefecto) {
+    return elegirPuerto("PUERTO_GRPC_LOGISTICA", puertoPorDefecto);
+  }
+
+  public String hostGrpcLogistica(String hostPorDefecto) {
+    String valor = dotenv.get("HOST_GRPC_LOGISTICA");
+    if (valor == null || valor.isBlank()) {
+      System.out.println("Falta la variable de entorno: 'HOST_GRPC_LOGISTICA' Se va a usar el host por default: " + hostPorDefecto);
+      return hostPorDefecto;
+    }
+    return valor;
+  }
+
 
   //=================== FUNCIONES AUXILIARES =====================
   private String obtenerObligatorio(String nombre) {

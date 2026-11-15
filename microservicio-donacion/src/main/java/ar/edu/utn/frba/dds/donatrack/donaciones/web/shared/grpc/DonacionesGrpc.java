@@ -1,38 +1,97 @@
 package ar.edu.utn.frba.dds.donatrack.donaciones.web.shared.grpc;
 
+import static ar.edu.utn.frba.dds.donatrack.donaciones.web.shared.convers.ContactoMapper.aDominio;
+
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.beneficiario.Beneficiario;
+import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.bien.Subcategoria;
+import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.bien.UnidadMedida;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.comunicaciones.DispatcherEventos;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.comunicaciones.eventos.EventoEntregaExitosa;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.comunicaciones.eventos.EventoEntregaFallida;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.comunicaciones.eventos.EventoInicioDeRuta;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.donacion.Donacion;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.donacion.TipoEstadoDonacion;
+import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.donante.Donante;
+import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.donante.documento.Documento;
+import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.donante.documento.TipoDocumento;
+import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.donante.tipodonantes.Genero;
+import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.donante.tipodonantes.juridica.Juridica;
+import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.donante.tipodonantes.juridica.Representante;
+import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.donante.tipodonantes.juridica.TipoOrganizacion;
+import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.donante.tipodonantes.persona.Humana;
+import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.generadordonantes.FilaError;
+import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.generadordonantes.importadorcsv.ImportadorCsv;
+import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.generadordonantes.importadorcsv.ResultadoImportacion;
+import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.generadorrankings.Ranking;
+import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.mediocontacto.MedioContacto;
+import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.necesidades.Frecuencia;
+import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.necesidades.Necesidad;
+import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.necesidades.TipoNecesidad;
+import ar.edu.utn.frba.dds.donatrack.donaciones.persistencia.BeneficiarioRepository;
+import ar.edu.utn.frba.dds.donatrack.donaciones.persistencia.CategoriaRepository;
 import ar.edu.utn.frba.dds.donatrack.donaciones.persistencia.DonacionRepository;
-import ar.edu.utn.frba.dds.donatrack.grpc.BeneficiarioMsg;
-import ar.edu.utn.frba.dds.donatrack.grpc.DonacionId;
-import ar.edu.utn.frba.dds.donatrack.grpc.DonacionMsg;
-import ar.edu.utn.frba.dds.donatrack.grpc.DonacionesServiceGrpc;
-import ar.edu.utn.frba.dds.donatrack.grpc.EnCaminoRequest;
-import ar.edu.utn.frba.dds.donatrack.grpc.EntregadaRequest;
-import ar.edu.utn.frba.dds.donatrack.grpc.ErrorEntregaRequest;
-import ar.edu.utn.frba.dds.donatrack.grpc.ListaDonaciones;
-import ar.edu.utn.frba.dds.donatrack.grpc.Resultado;
-import ar.edu.utn.frba.dds.donatrack.grpc.Vacio;
+import ar.edu.utn.frba.dds.donatrack.donaciones.persistencia.DonanteRepository;
+import ar.edu.utn.frba.dds.donatrack.donaciones.persistencia.RankingRepository;
+import ar.edu.utn.frba.dds.donatrack.donaciones.persistencia.SubcategoriaRepository;
+import ar.edu.utn.frba.dds.donatrack.donaciones.web.shared.convers.BeneficiarioMapper;
+import ar.edu.utn.frba.dds.donatrack.donaciones.web.shared.convers.ContactoMapper;
+import ar.edu.utn.frba.dds.donatrack.donaciones.web.shared.convers.DonacionMapper;
+import ar.edu.utn.frba.dds.donatrack.donaciones.web.shared.convers.NecesidadMapper;
+import ar.edu.utn.frba.dds.donatrack.donaciones.web.shared.convers.RankingMapper;
+import ar.edu.utn.frba.dds.donatrack.donaciones.web.shared.dto.beneficiario.BeneficiarioMapaResponse;
+import ar.edu.utn.frba.dds.donatrack.donaciones.web.shared.dto.contacto.ContactoDto;
+import ar.edu.utn.frba.dds.donatrack.donaciones.web.shared.dto.necesidad.NecesidadRequest;
+import ar.edu.utn.frba.dds.donatrack.donaciones.web.shared.dto.necesidad.NecesidadResponse;
+import ar.edu.utn.frba.dds.donatrack.grpc.*;
 import ar.edu.utn.frba.dds.donatrack.shared.excepciones.BodyException;
 import ar.edu.utn.frba.dds.donatrack.shared.excepciones.CambioDeEstadoNoPermitidoException;
 import ar.edu.utn.frba.dds.donatrack.shared.excepciones.DominioException;
 import ar.edu.utn.frba.dds.donatrack.shared.excepciones.RecursoNoEncontradoException;
+import com.google.gson.Gson;
 import io.github.flbulgarelli.jpa.extras.simple.WithSimplePersistenceUnit;
 import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.security.SecureRandom;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.UUID;
 import java.util.function.Supplier;
 
 public class DonacionesGrpc extends DonacionesServiceGrpc.DonacionesServiceImplBase
     implements WithSimplePersistenceUnit {
   private final DonacionRepository repoDonaciones;
+  private final DonanteRepository repoDonantes;
+  private final BeneficiarioRepository repoBeneficiarios;
+  private final CategoriaRepository repoCategorias;
+  private final SubcategoriaRepository repoSubcategorias;
+  private final RankingRepository repoRankings;
 
   public DonacionesGrpc(DonacionRepository repoDonaciones) {
     this.repoDonaciones = repoDonaciones;
+    this.repoDonantes = DonanteRepository.getInstancia();
+    this.repoBeneficiarios = BeneficiarioRepository.getInstancia();
+    this.repoCategorias = CategoriaRepository.getInstancia();
+    this.repoSubcategorias = SubcategoriaRepository.getInstancia();
+    this.repoRankings = RankingRepository.getInstancia();
+
+  }
+
+  public DonacionesGrpc(DonacionRepository repoDonaciones,
+                        DonanteRepository repoDonantes,
+                        BeneficiarioRepository repoBeneficiarios,
+                        CategoriaRepository repoCategorias,
+                        SubcategoriaRepository repoSubcategorias,
+                        RankingRepository repoRankings) {
+    this.repoDonaciones = repoDonaciones;
+    this.repoDonantes = repoDonantes;
+    this.repoBeneficiarios = repoBeneficiarios;
+    this.repoCategorias = repoCategorias;
+    this.repoSubcategorias = repoSubcategorias;
+    this.repoRankings = repoRankings;
   }
 
   @Override
@@ -121,6 +180,648 @@ public class DonacionesGrpc extends DonacionesServiceGrpc.DonacionesServiceImplB
     });
   }
 
+  //Registro Persona Humana
+  @Override
+  public void registrarDonanteHumana(RegistrarHumanaRequest req, StreamObserver<RegistroActorResponse> out) {
+    responder(out, () -> withTransaction(() -> {
+      Documento doc = new Documento(TipoDocumento.valueOf(req.getTipoDocumento()), req.getNumeroDocumento());
+      LocalDate fechaNac = LocalDate.parse(req.getFechaNacimiento());
+      Genero genero = Genero.valueOf(req.getGenero());
+      List<MedioContacto> contactos = aDominioContactos(req.getContactosList());
+
+      Humana nuevaHumana = new Humana(
+          req.getNombre(),
+          req.getApellido(),
+          doc,
+          fechaNac,
+          genero,
+          req.getDireccion(),
+          contactos
+      );
+      repoDonantes.guardar(nuevaHumana);
+
+      return RegistroActorResponse.newBuilder()
+          .setIdCreado(nuevaHumana.getId())
+          .build();
+    }));
+  }
+
+  //Registro Persona jurídica
+  @Override
+  public void registrarDonanteJuridica(RegistrarJuridicaRequest req, StreamObserver<RegistroActorResponse> out) {
+    responder(out, () -> withTransaction(() -> {
+      Documento docJuridica = new Documento(TipoDocumento.valueOf(req.getTipoDocumento()), req.getNumeroDocumento());
+      TipoOrganizacion tipoOrg = TipoOrganizacion.valueOf(req.getTipoOrganizacion());
+
+      Documento docRep = new Documento(
+          TipoDocumento.valueOf(req.getTipoDocumentoRepresentante()),
+          req.getNumeroDocumentoRepresentante()
+      );
+      List<MedioContacto> contactosRep = aDominioContactos(req.getContactosList());
+
+      Representante representante = new Representante(
+          req.getNombreRepresentante(),
+          req.getApellidoRepresentante(),
+          docRep,
+          req.getDireccionRepresentante(),
+          contactosRep
+      );
+
+      Juridica nuevaJuridica = new Juridica(
+          req.getRazonSocial(),
+          docJuridica,
+          tipoOrg,
+          req.getRubro(),
+          List.of(representante)
+      );
+      repoDonantes.guardar(nuevaJuridica);
+
+      return RegistroActorResponse.newBuilder()
+          .setIdCreado(nuevaJuridica.getId())
+          .build();
+    }));
+  }
+
+  //Registro Beneficiario
+  @Override
+  public void registrarBeneficiario(RegistrarBeneficiarioRequest req, StreamObserver<RegistroActorResponse> out) {
+    responder(out, () -> withTransaction(() -> {
+      List<MedioContacto> contactos = aDominioContactos(req.getContactosList());
+      Beneficiario nuevoBeneficiario = new Beneficiario(
+          req.getRazonSocial(),
+          req.getDireccion(),
+          contactos
+      );
+      repoBeneficiarios.guardar(nuevoBeneficiario);
+
+      return RegistroActorResponse.newBuilder()
+          .setIdCreado(nuevoBeneficiario.getId())
+          .build();
+    }));
+  }
+
+  //Mapa de Beneficiarios
+  @Override
+  public void obtenerDatosMapaDonacionesRecibidas(Vacio req, StreamObserver<DatosMapaResponse> out) {
+    responder(out, () -> withTransaction(() -> {
+      List<Beneficiario> beneficiarios = repoBeneficiarios.buscarBeneficiariosConDonacionesRecibidas();
+      List<BeneficiarioMapaResponse> beneficiariosDto = BeneficiarioMapper.aDtoMapa(beneficiarios);
+      String beneficiariosJson = new Gson().toJson(beneficiariosDto);
+
+      List<CategoriaMsg> categoriasProto = repoCategorias.buscarTodos().stream()
+          .map(c -> CategoriaMsg.newBuilder()
+              .setId(c.getId())
+              .setNombre(c.getNombre())
+              .build())
+          .toList();
+
+      return DatosMapaResponse.newBuilder()
+          .setMarcadoresJson(beneficiariosJson)
+          .addAllCategorias(categoriasProto)
+          .build();
+    }));
+  }
+
+  //
+  @Override
+  public void obtenerVistaDonacionesDonante(FiltroDonacionesDonanteRequest req,
+                                            StreamObserver<VistaDonacionesDonanteResponse> out) {
+    responder(out, () -> withTransaction(() -> {
+      Donante donante = repoDonantes.buscarPorId(req.getIdDonante());
+      if (donante == null) {
+        throw new RecursoNoEncontradoException("No existe el donante con id: " + req.getIdDonante());
+      }
+
+      TipoEstadoDonacion estado = req.getEstado().isBlank()
+          ? null
+          : TipoEstadoDonacion.valueOf(req.getEstado());
+      Long idCategoria = req.getIdCategoria() == 0 ? null : req.getIdCategoria();
+      List<Long> idsSubcategorias = req.getIdsSubcategoriasList();
+
+      List<Donacion> donaciones = repoDonaciones.buscarPorDonante(
+          donante, estado, idCategoria, idsSubcategorias
+      );
+
+      VistaDonacionesDonanteResponse.Builder builder = VistaDonacionesDonanteResponse.newBuilder();
+
+      for (Donacion d : donaciones) {
+        DonacionVistaMsg.Builder dMsg = DonacionVistaMsg.newBuilder()
+            .setId(d.getId())
+            .setDescripcion(d.getDescripcion() != null ? d.getDescripcion() : "")
+            .setEstadoActual(d.getEstadoActual() != null ? d.getEstadoActual().name() : "");
+        if(d.getSubcategoria() != null) {
+          dMsg.setSubcategoria(aSubcategoriaMsg(d.getSubcategoria()));
+        }
+        builder.addDonaciones(dMsg.build());
+      }
+
+      Arrays.stream(TipoEstadoDonacion.values())
+          .forEach(e -> builder.addEstados(e.name()));
+
+      repoCategorias.buscarTodos().forEach(c ->
+          builder.addCategorias(CategoriaMsg.newBuilder()
+              .setId(c.getId())
+              .setNombre(c.getNombre())
+              .build())
+      );
+
+      repoSubcategorias.buscarTodos().forEach(s ->
+          builder.addSubcategorias(aSubcategoriaMsg(s))
+      );
+
+      return builder.build();
+    }));
+  }
+
+  @Override
+  public void listarBeneficiariosParaDonante(Vacio req,
+                                             StreamObserver<ListaBeneficiariosParaDonanteResponse> out) {
+    responder(out, () -> withTransaction(() -> {
+      ListaBeneficiariosParaDonanteResponse.Builder builder = ListaBeneficiariosParaDonanteResponse.newBuilder();
+      repoBeneficiarios.buscarTodos().forEach(b -> builder.addBeneficiarios(aBeneficiarioDetalleMsg(b)));
+      return builder.build();
+    }));
+  }
+
+  @Override
+  public void obtenerDetalleBeneficiario(BeneficiarioIdRequest req,
+                                         StreamObserver<DetalleBeneficiarioResponse> out) {
+    responder(out, () -> withTransaction(() -> {
+      Beneficiario b = repoBeneficiarios.buscarPorId(req.getId());
+      if (b == null) {
+        return DetalleBeneficiarioResponse.newBuilder().setEncontrado(false).build();
+      }
+      return DetalleBeneficiarioResponse.newBuilder()
+          .setEncontrado(true)
+          .setBeneficiario(aBeneficiarioDetalleMsg(b))
+          .build();
+    }));
+  }
+
+  //Donacion
+  @Override
+  public void listarDonacionesAdmin(FiltroEstadoDonacionRequest req,
+                                    StreamObserver<ListaDonacionesAdminResponse> out) {
+    responder(out, () -> withTransaction(() -> {
+      List<Donacion> donaciones;
+      if (!req.getEstadoActual().isBlank()) {
+        TipoEstadoDonacion estadoFiltro;
+        try {
+          estadoFiltro = TipoEstadoDonacion.valueOf(req.getEstadoActual().toUpperCase());
+        } catch (IllegalArgumentException e) {
+          throw new DominioException("El estado de donación: " + req.getEstadoActual()
+              + " no existe, debe ser: " + Arrays.toString(TipoEstadoDonacion.values()));
+        }
+        donaciones = repoDonaciones.buscarPorEstadoActualCoincidenteCon(estadoFiltro);
+      } else {
+        donaciones = repoDonaciones.buscarTodos();
+      }
+
+      ListaDonacionesAdminResponse.Builder builder = ListaDonacionesAdminResponse.newBuilder();
+      for(Donacion d : donaciones) {
+        DonacionAdminDtoMsg.Builder msg = DonacionAdminDtoMsg.newBuilder()
+            .setId(d.getId())
+            .setDescripcion(d.getDescripcion() != null ? d.getDescripcion() : "")
+            .setEstadoActual(d.getEstadoActual().name());
+
+        if (d.getBeneficiario() != null) {
+          Beneficiario b = d.getBeneficiario();
+          msg.setBeneficiario(BeneficiarioMsg.newBuilder()
+              .setId(b.getId())
+              .setRazonSocial(b.getRazonSocial() != null ? b.getRazonSocial() : "")
+              .setDireccion(b.getDireccion() != null ? b.getDireccion() : "")
+              .build());
+        }
+        builder.addDonaciones(msg.build());
+      }
+      return builder.build();
+    }));
+  }
+
+  @Override
+  public void marcarDonacionComoVencida(DonacionId req, StreamObserver<Resultado> out) {
+    responder(out, () -> {
+      withTransaction(() -> {
+        Donacion donacion = buscarDonacionPorId(req.getId());
+        donacion.vencida();
+        repoDonaciones.actualizar(donacion);
+      });
+      return ok("La donación fue marcada como vencida");
+    });
+  }
+
+  //Necesidad
+  @Override
+  public void listarNecesidades(ListarNecesidadesRequest req,
+                                StreamObserver<ListarNecesidadesResponse> out) {
+    responder(out, () -> withTransaction(() -> {
+      List<Necesidad> necesidades = new ArrayList<>();
+
+      if (req.getEsAdmin()) {
+        for (Beneficiario beneficiario : repoBeneficiarios.buscarTodos()) {
+          necesidades.addAll(beneficiario.getNecesidades());
+        }
+      } else {
+        Beneficiario beneficiario = repoBeneficiarios.buscarPorId(req.getIdBeneficiario());
+        if (beneficiario == null) {
+          throw new RecursoNoEncontradoException("No existe un beneficiario asociado a este usuario");
+        }
+        necesidades.addAll(beneficiario.getNecesidades());
+      }
+
+      List<NecesidadResponse> dtos = NecesidadMapper.aDto(necesidades);
+      ListarNecesidadesResponse.Builder builder = ListarNecesidadesResponse.newBuilder();
+
+      for (NecesidadResponse dto : dtos) {
+        builder.addNecesidades(NecesidadResponseMsg.newBuilder()
+            .setId(dto.id())
+            .setTipo(dto.tipo() != null ? dto.tipo() : "")
+            .setDescripcion(dto.descripcion() != null ? dto.descripcion() : "")
+            .setUnidadMedida(dto.unidadMedida() != null ? dto.unidadMedida() : "")
+            .setCategoria(dto.categoria() != null ? dto.categoria() : "")
+            .setSubcategoria(dto.subcategoria() != null ? dto.subcategoria() : "")
+            .setCantidadRecibida(dto.cantidadRecibida() != null ? dto.cantidadRecibida() : 0)
+            .setEstaSatisfecha(Boolean.TRUE.equals(dto.estaSatisfecha()))
+            .setCantidadPorPeriodo(dto.cantidadPorPeriodo() != null ? dto.cantidadPorPeriodo() : 0)
+            .setPeriodo(dto.periodo() != null ? dto.periodo() : "")
+            .setCantidadRequerida(dto.cantidadRequerida() != null ? dto.cantidadRequerida() : 0)
+            .build());
+      }
+
+      return builder.build();
+    }));
+  }
+
+  @Override
+  public void obtenerDatosFormularioNecesidad(Vacio req,
+                                              StreamObserver<DatosFormularioNecesidadResponse> out) {
+    responder(out, () -> withTransaction(() -> {
+      DatosFormularioNecesidadResponse.Builder builder = DatosFormularioNecesidadResponse.newBuilder();
+
+      repoCategorias.buscarTodos().forEach(c ->
+          builder.addCategorias(CategoriaMsg.newBuilder()
+              .setId(c.getId())
+              .setNombre(c.getNombre())
+              .build())
+      );
+
+      repoSubcategorias.buscarTodos().forEach(s ->
+          builder.addSubcategorias(aSubcategoriaMsg(s))
+      );
+
+      return builder.build();
+    }));
+  }
+
+  @Override
+  public void guardarNecesidad(GuardarNecesidadRequest req, StreamObserver<Resultado> out) {
+    responder(out, () -> {
+      withTransaction(() -> {
+        Beneficiario beneficiario = repoBeneficiarios.buscarPorId(req.getIdBeneficiario());
+        if (beneficiario == null) {
+          throw new RecursoNoEncontradoException("No existe un beneficiario asociado a este usuario");
+        }
+
+        NecesidadRequest requestDto = new NecesidadRequest(
+            req.getTipo(),
+            req.getDescripcion(),
+            req.getUnidadMedida(),
+            req.getCategoria(),
+            req.getSubcategoria(),
+            req.getCantidadPorPeriodo() == 0 ? null : req.getCantidadPorPeriodo(),
+            req.getPeriodo().isBlank() ? null : req.getPeriodo(),
+            req.getCantidadRequerida() == 0 ? null : req.getCantidadRequerida()
+        );
+
+        Subcategoria subcategoria = repoSubcategorias.buscarTodos()
+            .stream()
+            .filter(s -> s.getNombre().equalsIgnoreCase(requestDto.subcategoria()))
+            .filter(s -> s.getCategoria().getNombre().equalsIgnoreCase(requestDto.categoria()))
+            .findFirst()
+            .orElseThrow(() -> new DominioException(
+                "La subcategoría no pertenece a la categoría seleccionada"
+            ));
+
+        Necesidad necesidad = NecesidadMapper.aDominio(requestDto, subcategoria);
+        beneficiario.agregarNecesidad(necesidad);
+        repoBeneficiarios.actualizar(beneficiario);
+      });
+      return ok("Necesidad registrada correctamente");
+    });
+  }
+
+  @Override
+  public void obtenerDatosEdicionNecesidad(NecesidadIdRequest req,
+                                           StreamObserver<DatosEdicionNecesidadResponse> out) {
+    responder(out, () -> withTransaction(() -> {
+      Long necesidadId = req.getIdNecesidad();
+      Necesidad necesidadEncontrada = null;
+      Beneficiario beneficiarioEncontrado = null;
+
+      for (Beneficiario beneficiario : repoBeneficiarios.buscarTodos()) {
+        for (Necesidad necesidad : beneficiario.getNecesidades()) {
+          if (necesidad.getId().equals(necesidadId)) {
+            necesidadEncontrada = necesidad;
+            beneficiarioEncontrado = beneficiario;
+            break;
+          }
+        }
+        if (necesidadEncontrada != null) {
+          break;
+        }
+      }
+
+      if (necesidadEncontrada == null) {
+        return DatosEdicionNecesidadResponse.newBuilder().setEncontrada(false).build();
+      }
+
+      NecesidadEdicionMsg necesidadMsg = NecesidadEdicionMsg.newBuilder()
+          .setId(necesidadEncontrada.getId())
+          .setTipo(necesidadEncontrada.getTipo().name())
+          .setDescripcion(necesidadEncontrada.getDescripcion() != null ? necesidadEncontrada.getDescripcion() : "")
+          .setSubcategoria(aSubcategoriaMsg(necesidadEncontrada.getSubcategoria()))
+          .setUnidadMedida(necesidadEncontrada.getUnidadMedida().name())
+          .setFrecuencia(necesidadEncontrada.getFrecuencia() != null ? necesidadEncontrada.getFrecuencia().name() : "")
+          .setCantidadRequerida(necesidadEncontrada.getCantidadRequerida() != null ? necesidadEncontrada.getCantidadRequerida() : 0)
+          .build();
+
+      DatosEdicionNecesidadResponse.Builder builder = DatosEdicionNecesidadResponse.newBuilder()
+          .setEncontrada(true)
+          .setNecesidad(necesidadMsg)
+          .setEsExtraordinaria(necesidadEncontrada.getTipo() == TipoNecesidad.EXTRAORDINARIA)
+          .setEsRecurrente(necesidadEncontrada.getTipo() == TipoNecesidad.RECURRENTE)
+          .setBeneficiario(BeneficiarioMsg.newBuilder()
+              .setId(beneficiarioEncontrado.getId())
+              .setRazonSocial(beneficiarioEncontrado.getRazonSocial())
+              .setDireccion(beneficiarioEncontrado.getDireccion())
+              .build());
+
+      repoCategorias.buscarTodos().forEach(c ->
+          builder.addCategorias(CategoriaMsg.newBuilder()
+              .setId(c.getId())
+              .setNombre(c.getNombre())
+              .build())
+      );
+
+      repoSubcategorias.buscarTodos().forEach(s ->
+          builder.addSubcategorias(aSubcategoriaMsg(s))
+      );
+
+      return builder.build();
+    }));
+  }
+
+  @Override
+  public void actualizarNecesidad(ActualizarNecesidadRequest req, StreamObserver<Resultado> out) {
+    responder(out, () -> {
+      withTransaction(() -> {
+        Long necesidadId = req.getIdNecesidad();
+        Necesidad necesidadEncontrada = null;
+        Beneficiario beneficiarioEncontrado = null;
+
+        for (Beneficiario beneficiario : repoBeneficiarios.buscarTodos()) {
+          for (Necesidad necesidad : beneficiario.getNecesidades()) {
+            if (necesidadId.equals(necesidad.getId())) {
+              necesidadEncontrada = necesidad;
+              beneficiarioEncontrado = beneficiario;
+              break;
+            }
+          }
+          if (necesidadEncontrada != null) {
+            break;
+          }
+        }
+
+        if (necesidadEncontrada == null) {
+          throw new RecursoNoEncontradoException("Necesidad no encontrada");
+        }
+
+        Integer cantidadRequerida = (necesidadEncontrada.getTipo() == TipoNecesidad.RECURRENTE)
+            ? req.getCantidadPorPeriodo()
+            : req.getCantidadRequerida();
+
+        UnidadMedida unidadMedida = UnidadMedida.valueOf(req.getUnidadMedida());
+
+        Subcategoria subcategoria = repoSubcategorias.buscarTodos()
+            .stream()
+            .filter(s -> s.getNombre().equalsIgnoreCase(req.getSubcategoria()))
+            .filter(s -> s.getCategoria().getNombre().equalsIgnoreCase(req.getCategoria()))
+            .findFirst()
+            .orElseThrow(() -> new DominioException(
+                "La subcategoría no pertenece a la categoría seleccionada"
+            ));
+
+        if (necesidadEncontrada.getTipo() == TipoNecesidad.EXTRAORDINARIA) {
+          necesidadEncontrada.actualizarDatosExtraordinaria(
+              req.getDescripcion(),
+              subcategoria,
+              unidadMedida,
+              cantidadRequerida
+          );
+        } else if (necesidadEncontrada.getTipo() == TipoNecesidad.RECURRENTE) {
+          Frecuencia frecuencia = Frecuencia.valueOf(req.getPeriodo());
+          necesidadEncontrada.actualizarDatosRecurrente(
+              req.getDescripcion(),
+              subcategoria,
+              unidadMedida,
+              cantidadRequerida,
+              frecuencia
+          );
+        }
+
+        repoBeneficiarios.actualizar(beneficiarioEncontrado);
+      });
+      return ok("Necesidad actualizada correctamente");
+    });
+  }
+
+  //DonacionBeneficiario
+  @Override
+  public void listarDonacionesPorBeneficiario(BeneficiarioIdRequest req,
+                                              StreamObserver<ListaDonacionesBeneficiarioResponse> out) {
+    responder(out, () -> withTransaction(() -> {
+      Beneficiario beneficiario = repoBeneficiarios.buscarPorId(req.getId());
+      if (beneficiario == null) {
+        throw new RecursoNoEncontradoException("No existe un beneficiario asociado a este usuario");
+      }
+
+      ListaDonacionesBeneficiarioResponse.Builder builder = ListaDonacionesBeneficiarioResponse.newBuilder();
+      for (Donacion d : beneficiario.getDonaciones()) {
+        builder.addDonaciones(aDonacionBeneficiarioMsg(d));
+      }
+      return builder.build();
+    }));
+  }
+
+  @Override
+  public void obtenerDetalleDonacionBeneficiario(DetalleDonacionBeneficiarioRequest req,
+                                                 StreamObserver<DetalleDonacionBeneficiarioResponse> out) {
+    responder(out, () -> withTransaction(() -> {
+      Beneficiario beneficiario = repoBeneficiarios.buscarPorId(req.getIdBeneficiario());
+      if (beneficiario == null) {
+        throw new RecursoNoEncontradoException("Beneficiario no encontrado");
+      }
+
+      Donacion donacion = beneficiario.getDonaciones()
+          .stream()
+          .filter(d -> Long.valueOf(req.getIdDonacion()).equals(d.getId()))
+          .findFirst()
+          .orElse(null);
+
+      if (donacion == null) {
+        throw new RecursoNoEncontradoException("Donación no encontrada para este beneficiario");
+      }
+
+      String fechaAsignacionStr = donacion.getFechaAsignacion() != null
+          ? donacion.getFechaAsignacion().toString()
+          : "";
+
+      return DetalleDonacionBeneficiarioResponse.newBuilder()
+          .setDonacion(aDonacionBeneficiarioMsg(donacion))
+          .setFechaAsignacion(fechaAsignacionStr)
+          .build();
+    }));
+  }
+
+  //Asignacion
+  @Override
+  public void listarRankingsVigentes(Vacio req, StreamObserver<ListaRankingsResponse> out) {
+    responder(out, () -> withTransaction(() -> {
+      List<Ranking> rankingsVigentes = repoRankings.buscarTodos();
+      ListaRankingsResponse.Builder builder = ListaRankingsResponse.newBuilder();
+
+      RankingMapper.aDto(rankingsVigentes).forEach(rDto -> {
+        DonacionRankingMsg.Builder donacionMsg = DonacionRankingMsg.newBuilder()
+            .setId(rDto.donacion().id())
+            .setDescripcion(rDto.donacion().descripcion() != null ? rDto.donacion().descripcion() : "")
+            .setEstado(rDto.donacion().estado() != null ? rDto.donacion().estado() : "");
+
+        if (rDto.donacion().donantes() != null) {
+          rDto.donacion().donantes().forEach(donanteDto ->
+              donacionMsg.addDonantes(DonanteNombreMsg.newBuilder()
+                  .setNombre(donanteDto.nombre() != null ? donanteDto.nombre() : "")
+                  .build())
+          );
+        }
+
+        RankingVistaMsg.Builder rankingMsg = RankingVistaMsg.newBuilder()
+            .setId(rDto.id())
+            .setFechaGeneracion(rDto.fechaGeneracion() != null ? rDto.fechaGeneracion().toString() : "")
+            .setDonacion(donacionMsg.build());
+
+        if (rDto.candidatos() != null) {
+          rDto.candidatos().forEach(cDto ->
+              rankingMsg.addCandidatos(CandidatoRankingMsg.newBuilder()
+                  .setPosicion(cDto.posicion())
+                  .setBeneficiario(BeneficiarioMsg.newBuilder()
+                      .setId(cDto.beneficiario().id())
+                      .setRazonSocial(cDto.beneficiario().razonSocial() != null ? cDto.beneficiario().razonSocial() : "")
+                      .setDireccion(cDto.beneficiario().direccion() != null ? cDto.beneficiario().direccion() : "")
+                      .build())
+                  .build())
+          );
+        }
+
+        builder.addRankings(rankingMsg.build());
+      });
+
+      return builder.build();
+    }));
+  }
+
+  @Override
+  public void confirmarAsignacion(ConfirmarAsignacionRequest req, StreamObserver<Resultado> out) {
+    responder(out, () -> {
+      withTransaction(() -> {
+        Ranking ranking = repoRankings.buscarPorId(req.getIdRanking());
+        if (ranking == null) {
+          throw new RecursoNoEncontradoException("No existe el ranking: " + req.getIdRanking());
+        }
+        Beneficiario beneficiarioSeleccionado = repoBeneficiarios.buscarPorId(req.getIdBeneficiario());
+        if (beneficiarioSeleccionado == null) {
+          throw new RecursoNoEncontradoException("No existe el beneficiario: " + req.getIdBeneficiario());
+        }
+
+        Donacion donacion = ranking.getDonacion();
+        donacion.asignarA(beneficiarioSeleccionado);
+        ranking.invalidar();
+
+        repoDonaciones.actualizar(donacion);
+        repoBeneficiarios.actualizar(beneficiarioSeleccionado);
+        repoRankings.actualizar(ranking);
+      });
+      return ok("Asignación confirmada correctamente");
+    });
+  }
+
+  // Importador CSV
+  @Override
+  public void importarDonantesCsv(ImportarCsvRequest req, StreamObserver<ImportarCsvResponse> out) {
+    responder(out, () -> {
+      //Guardamos el archivo recibido por gRPC en la carpeta local de uploads del microservicio
+      Path directorioCsv = Path.of("microservicio-donacion", "uploads", "ex-donantes");
+      Path rutaDestino;
+      try {
+        if (!Files.exists(directorioCsv)) {
+          Files.createDirectories(directorioCsv);
+        }
+        String nombreUnico = UUID.randomUUID().toString().substring(0, 8) + "-" + req.getNombreArchivo();
+        rutaDestino = directorioCsv.resolve(nombreUnico);
+        Files.write(rutaDestino, req.getContenidoCsv().toByteArray());
+      } catch (Exception e) {
+        throw new RuntimeException("Error al guardar el archivo CSV en disco", e);
+      }
+
+      ImportadorCsv importador = new ImportadorCsv();
+      ResultadoImportacion resultado = importador.importarDesdeArchivo(rutaDestino.toString());
+
+      ImportarCsvResponse.Builder responseBuilder = ImportarCsvResponse.newBuilder();
+
+      //Persistimos los donantes
+      withTransaction(() -> {
+        for (Donante donante : resultado.getDonantes()) {
+          repoDonantes.guardar(donante);
+
+          String username = donante.getNombreCompleto().substring(0, 3) + donante.getDocumento().getDetalle();
+          String password = generarContraseniaTemporal(); //revisar
+
+          donante.recibirNotificacion(String.format(
+              "Bienvenido al nuevo sistema de DonaTrack %s. Tu cuenta ha sido creada. \n Usuario: %s \n Contraseña temporal: %s \n ",
+              donante.getNombreCompleto(), username, password
+          ));
+
+          //Armamos la respuesta para que el BFF persista a los donantes en tabla de Usuarios
+          responseBuilder.addUsuariosGenerados(DonanteImportadoUsuarioMsg.newBuilder()
+              .setIdDonante(donante.getId())
+              .setUsername(username)
+              .setPassword(password)
+              .build());
+        }
+      });
+
+      responseBuilder.setCantExitosa(resultado.getDonantes().size());
+
+      for (FilaError error : resultado.getRegistroFallas()) {
+        responseBuilder.addErroresEncontrados(FilaErrorMsg.newBuilder()
+            .setNumeroFila(error.getNumeroFila())
+            .setMotivoError(error.getMotivoError())
+            .build());
+      }
+
+      return responseBuilder.build();
+    });
+  }
+
+  private String generarContraseniaTemporal() {
+    String caracteres = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    SecureRandom random = new SecureRandom();
+    StringBuilder codigo = new StringBuilder();
+    for (int i = 0; i < 8; i++) {
+      codigo.append(caracteres.charAt(random.nextInt(caracteres.length())));
+    }
+    return codigo.toString();
+  }
+
   //================ FUNCIONES AUXILIARES ===============
   private <T> void responder(StreamObserver<T> out, Supplier<T> accion) {
     try {
@@ -170,5 +871,61 @@ public class DonacionesGrpc extends DonacionesServiceGrpc.DonacionesServiceImplB
     Donacion donacion = repoDonaciones.buscarPorId(id);
     if (donacion == null) throw new RecursoNoEncontradoException("No existe donación: " + id);
     return donacion;
+  }
+
+  private List<MedioContacto> aDominioContactos(List<ContactoMsg> contactosProto) {
+    List<ContactoDto> dtos = contactosProto.stream()
+        .map(c -> new ContactoDto(c.getTipoContacto(), c.getValor(), c.getEsPrincipal()))
+        .toList();
+    return ContactoMapper.aDominio(dtos);
+  }
+
+  private BeneficiarioDetalleMsg aBeneficiarioDetalleMsg(Beneficiario b) {
+    BeneficiarioDetalleMsg.Builder builder = BeneficiarioDetalleMsg.newBuilder()
+        .setId(b.getId())
+        .setRazonSocial(b.getRazonSocial() != null ? b.getRazonSocial() : "")
+        .setDireccion(b.getDireccion() != null ? b.getDireccion() : "");
+
+    // Mapeamos las necesidades que lee detalle_beneficiario.hbs
+    if (b.getNecesidades() != null) {
+      b.getNecesidades().forEach(n -> {
+        NecesidadVistaMsg.Builder nMsg = NecesidadVistaMsg.newBuilder()
+            .setDescripcion(n.getDescripcion() != null ? n.getDescripcion() : "")
+            .setTipo(n.getTipo() != null ? n.getTipo().toString() : "")
+            .setFrecuencia(n.getFrecuencia() != null ? n.getFrecuencia().toString() : "")
+            .setCantidadRequerida(n.getCantidadRequerida() != null ? String.valueOf(n.getCantidadRequerida()) : "0")
+            .setCantidadRecibida(n.getCantidadRecibida() != null ? String.valueOf(n.getCantidadRecibida()) : "0")
+            .setUnidadMedida(n.getUnidadMedida() != null ? n.getUnidadMedida().toString() : "");
+
+        if (n.getSubcategoria() != null) {
+          nMsg.setSubcategoria(aSubcategoriaMsg(n.getSubcategoria()));
+        }
+        builder.addNecesidades(nMsg.build());
+      });
+    }
+    return builder.build();
+  }
+
+  private SubcategoriaMsg aSubcategoriaMsg(Subcategoria s) {
+    SubcategoriaMsg.Builder builder = SubcategoriaMsg.newBuilder()
+        .setId(s.getId())
+        .setNombre(s.getNombre() != null ? s.getNombre() : "");
+    if (s.getCategoria() != null) {
+      builder.setCategoria(CategoriaMsg.newBuilder()
+          .setId(s.getCategoria().getId())
+          .setNombre(s.getCategoria().getNombre() != null ? s.getCategoria().getNombre() : "")
+          .build());
+    }
+    return builder.build();
+  }
+
+  private DonacionBeneficiarioMsg aDonacionBeneficiarioMsg(Donacion d) {
+    DonacionBeneficiarioMsg.Builder builder = DonacionBeneficiarioMsg.newBuilder()
+        .setId(d.getId())
+        .setDescripcion(d.getDescripcion() != null ? d.getDescripcion() : "")
+        .setEstadoActual(d.getEstadoActual() != null ? d.getEstadoActual().name() : "")
+        .setFechaAsignacion(d.getFechaAsignacion() != null ? d.getFechaAsignacion().toString() : "");
+
+    return builder.build();
   }
 }

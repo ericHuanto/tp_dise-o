@@ -16,8 +16,6 @@ import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.generadorrankings.Rankin
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.mediocontacto.CorreoDeContacto;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.necesidades.Frecuencia;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.necesidades.Necesidad;
-import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.usuario.Permiso;
-import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.usuario.Usuario;
 import io.github.flbulgarelli.jpa.extras.simple.WithSimplePersistenceUnit;
 
 import java.time.LocalDate;
@@ -29,7 +27,6 @@ public class DatosIniciales implements WithSimplePersistenceUnit {
   private CategoriaRepository repoCategorias = CategoriaRepository.getInstancia();
   private SubcategoriaRepository repoSubcategorias = SubcategoriaRepository.getInstancia();
   private DonacionRepository repoDonaciones = DonacionRepository.getInstancia();
-  private UsuarioRepository repoUsuarios = UsuarioRepository.getInstancia();
   private RankingRepository repoRankings = RankingRepository.getInstancia();
 
   public static void init() {
@@ -37,12 +34,9 @@ public class DatosIniciales implements WithSimplePersistenceUnit {
   }
 
   public void comenzar() {
-    //Usuarios
-    Usuario usuarioBeneficiario = new Usuario("comedorA", "beneficiario");
-    Usuario usuarioBeneficiario2 = new Usuario("comedorP", "beneficiario");
-    Usuario usuarioDonante = new Usuario("juan", "donante");
-    Usuario usuarioDonante2 = new Usuario("juana", "donante");
-    Usuario admin = new Usuario("admin", "admin");
+    //Si la db no está vacía, no los inserta nuevamente
+    if (!repoCategorias.buscarTodos().isEmpty()) return;
+
     //Beneficiarios
     Beneficiario comedorAmerica = new Beneficiario("Comedor america", "Av. Rivadavia 10000", List.of(new CorreoDeContacto("comedorAmerica@gmail.com", true)));
     Beneficiario comedorPibes = new Beneficiario("Comedor Los Pibes", "Av. Rivadavia 1000", List.of(new CorreoDeContacto("comedor@gmail.com", true)));
@@ -139,24 +133,10 @@ public class DatosIniciales implements WithSimplePersistenceUnit {
     donacion4.entregada();
     comedorAmerica.agregarNecesidad(necesidadLecheRecurrente);
     comedorAmerica.agregarNecesidad(necesidadAbrigo);
-    usuarioBeneficiario.otorgarPermiso(Permiso.SOLICITAR_AYUDA);
-    usuarioBeneficiario2.otorgarPermiso(Permiso.SOLICITAR_AYUDA);
-    usuarioDonante.otorgarPermiso(Permiso.REALIZAR_DONACION);
-    usuarioDonante.otorgarPermiso(Permiso.REALIZAR_DONACION);
-    comedorAmerica.vincularUsuario(usuarioBeneficiario);
-    comedorPibes.vincularUsuario(usuarioBeneficiario2);
-    juan.vincularUsuario(usuarioDonante);
-    juana.vincularUsuario(usuarioDonante2);
-    admin.otorgarPermiso(Permiso.ADMINISTRADOR);
 
     //Transacción
     try {
       beginTransaction();
-      repoUsuarios.guardar(admin);
-      repoUsuarios.guardar(usuarioDonante);
-      repoUsuarios.guardar(usuarioDonante2);
-      repoUsuarios.guardar(usuarioBeneficiario);
-      repoUsuarios.guardar(usuarioBeneficiario2);
       repoBeneficiarios.guardar(comedorAmerica);
       repoBeneficiarios.guardar(comedorPibes);
       repoDonantes.guardar(juan);

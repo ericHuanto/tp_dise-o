@@ -1,0 +1,18 @@
+package ar.edu.utn.frba.dds.donatrack.usuario.web.routes;
+
+import ar.edu.utn.frba.dds.donatrack.usuario.web.controllers.PerfilController;
+import io.javalin.config.RoutesConfig;
+
+public class PerfilRoutes {
+
+  private PerfilRoutes() { }
+
+  public static void registrar(RoutesConfig ruta, PerfilController controller) {
+    ruta.get("/perfil/beneficiario", controller::mostrarFormularioRegistroBeneficiario);
+    ruta.post("/perfil/beneficiario", controller::guardarBeneficiario);
+    ruta.get("/perfil/donante-humana", controller::mostrarFormularioRegistroDonanteHumano);
+    ruta.post("/perfil/donante-humana", controller::guardarDonanteHumana);
+    ruta.get("/perfil/donante-juridica", controller::mostrarFormularioRegistroDonanteJuridica);
+    ruta.post("/perfil/donante-juridica", controller::guardarDonanteJuridica);
+  }
+}

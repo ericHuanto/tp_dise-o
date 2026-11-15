@@ -16,6 +16,7 @@
         <module>microservicio-donacion</module>
         <module>microservicio-logistica</module>
         <module>shared</module>
+        <module>bff-usuario</module>
     </modules>
 
     <properties>

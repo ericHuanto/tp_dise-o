@@ -2,7 +2,6 @@ package ar.edu.utn.frba.dds.donatrack.donaciones.dominio.beneficiario;
 
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.donacion.Donacion;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.donacion.TipoEstadoDonacion;
-import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.usuario.Usuario;
 import ar.edu.utn.frba.dds.donatrack.shared.excepciones.DominioException;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.mediocontacto.MedioContacto;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.necesidades.Necesidad;
@@ -41,9 +40,6 @@ public class Beneficiario {
   private List<Necesidad> necesidades;
   @OneToMany(mappedBy = "beneficiario") //Intentar evitar mappedBy. Relaciones bidireccionales son costosas de mantener
   private List<Donacion> donaciones;
-  @OneToOne
-  @JoinColumn(name = "id_usuario")
-  private Usuario usuario;
 
   public Beneficiario(String razonSocial, String direccion, List<MedioContacto> contactos) {
     this(razonSocial, direccion, calcularLatitud(direccion), calcularLongitud(direccion), contactos);
@@ -58,7 +54,6 @@ public class Beneficiario {
     this.contactos = new ArrayList<>(contactos);
     this.necesidades = new ArrayList<>();
     this.donaciones = new ArrayList<>();
-    this.usuario = null;
   }
 
   private void checkDatos(String razonSocial, List<MedioContacto> contactos) {
@@ -104,10 +99,6 @@ public class Beneficiario {
   public void recibirNotificacionImportante(String mensaje) {
     List<MedioContacto> contactos = getContactos();
     contactos.forEach(c -> c.enviarMensaje(mensaje));
-  }
-
-  public void vincularUsuario(Usuario usuario) {
-    this.usuario = usuario;
   }
 
   public Boolean esIgual(Beneficiario otroBeneficiario) {

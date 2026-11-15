@@ -2,7 +2,6 @@ package ar.edu.utn.frba.dds.donatrack.donaciones.dominio.donante;
 
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.donante.documento.Documento;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.donante.entrega.RegistroEntrega;
-import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.usuario.Usuario;
 import ar.edu.utn.frba.dds.donatrack.shared.excepciones.DominioException;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.mediocontacto.MedioContacto;
 import java.time.LocalDateTime;
@@ -28,16 +27,12 @@ public abstract class Donante {
   private String tipo;
   @OneToMany(mappedBy = "donante")
   private List<RegistroEntrega> entregas;
-  @OneToOne
-  @JoinColumn(name = "id_usuario")
-  private Usuario usuario;
 
   protected Donante(Documento documento, String tipo) {
     checkDatos(documento);
     this.documento = documento;
     this.tipo = tipo;
     this.entregas = new ArrayList<>();
-    this.usuario = null;
   }
 
   private void checkDatos(Documento documento) {
@@ -76,10 +71,6 @@ public abstract class Donante {
   protected abstract List<MedioContacto> getContactosPrincipales();
 
   protected abstract List<MedioContacto> getContactos();
-
-  public void vincularUsuario(Usuario usuario) {
-    this.usuario = usuario;
-  }
 
   protected void actualizarDatosBase(Documento documento) {
     checkDatos(documento);
