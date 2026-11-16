@@ -56,7 +56,7 @@ public class NecesidadController {
       modelo.put("esAdmin", usuarioActual.isAdmin());
       modelo.put("necesidades", response.getNecesidadesList());
 
-      context.render("views/beneficiario/necesidades.hbs", modelo);
+      context.render("donaciones/views/beneficiario/necesidades.hbs", modelo);
     } catch (StatusRuntimeException e) {
       if (e.getStatus().getCode() == Status.Code.NOT_FOUND) {
         context.status(404).result(e.getStatus().getDescription());
@@ -88,7 +88,7 @@ public class NecesidadController {
     modelo.put("categorias", response.getCategoriasList());
     modelo.put("subcategorias", response.getSubcategoriasList());
 
-    context.render("views/beneficiario/nueva_necesidad.hbs", modelo);
+    context.render("donaciones/views/beneficiario/nueva_necesidad.hbs", modelo);
   }
 
   public void mostrarFormularioEdicion(Context context) {
@@ -124,7 +124,7 @@ public class NecesidadController {
     modelo.put("categorias", response.getCategoriasList());
     modelo.put("subcategorias", response.getSubcategoriasList());
 
-    context.render("views/beneficiario/editar_necesidad.hbs", modelo);
+    context.render("donaciones/views/beneficiario/editar_necesidad.hbs", modelo);
   }
 
   public void guardar(Context context) {

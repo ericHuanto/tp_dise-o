@@ -30,6 +30,6 @@ public class MapaController {
     modelo.put("marcadoresJson", response.getMarcadoresJson());
     modelo.put("categorias", categorias);
 
-    context.render("views/general/mapa_beneficiarios.hbs", modelo);
+    context.render("donaciones/views/general/mapa_beneficiarios.hbs", modelo);
   }
 }

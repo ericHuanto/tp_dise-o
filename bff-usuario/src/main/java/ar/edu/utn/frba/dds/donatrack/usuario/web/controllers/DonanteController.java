@@ -64,7 +64,7 @@ public class DonanteController {
       modelo.put("categoriaElegida", idCategoria);
       modelo.put("subcategoriasElegidas", idsSubcategorias);
 
-      context.render("views/donante/donaciones_donante.hbs", modelo);
+      context.render("donaciones/views/donante/donaciones_donante.hbs", modelo);
     } catch (StatusRuntimeException e) {
       context.redirect("/donante/donaciones");
     }
@@ -83,7 +83,7 @@ public class DonanteController {
     modelo.put("usuario", context.sessionAttribute("usuario_actual"));
     modelo.put("beneficiarios", response.getBeneficiariosList());
 
-    context.render("views/donante/beneficiarios.hbs", modelo);
+    context.render("donaciones/views/donante/beneficiarios.hbs", modelo);
   }
 
   public void detalleBeneficiario(Context context) {
@@ -120,7 +120,7 @@ public class DonanteController {
     modelo.put("usuario", context.sessionAttribute("usuario_actual"));
     modelo.put("beneficiario", beneficiarioVista);
 
-    context.render("views/donante/detalle_beneficiario.hbs", modelo);
+    context.render("donaciones/views/donante/detalle_beneficiario.hbs", modelo);
   }
 
   //================== FUNCIONES AUXILIARES ========================

@@ -7,24 +7,30 @@ import ar.edu.utn.frba.dds.donatrack.usuario.persistencia.DatosIniciales;
 import ar.edu.utn.frba.dds.donatrack.usuario.persistencia.UsuarioRepository;
 import ar.edu.utn.frba.dds.donatrack.usuario.web.config.GrpcClientsConfig;
 import ar.edu.utn.frba.dds.donatrack.usuario.web.controllers.AsignacionController;
+import ar.edu.utn.frba.dds.donatrack.usuario.web.controllers.CamionController;
 import ar.edu.utn.frba.dds.donatrack.usuario.web.controllers.CsvController;
 import ar.edu.utn.frba.dds.donatrack.usuario.web.controllers.DonacionBeneficiarioController;
 import ar.edu.utn.frba.dds.donatrack.usuario.web.controllers.DonacionController;
 import ar.edu.utn.frba.dds.donatrack.usuario.web.controllers.DonanteController;
+import ar.edu.utn.frba.dds.donatrack.usuario.web.controllers.EntregaController;
 import ar.edu.utn.frba.dds.donatrack.usuario.web.controllers.HomeController;
 import ar.edu.utn.frba.dds.donatrack.usuario.web.controllers.MapaController;
 import ar.edu.utn.frba.dds.donatrack.usuario.web.controllers.NecesidadController;
 import ar.edu.utn.frba.dds.donatrack.usuario.web.controllers.PerfilController;
+import ar.edu.utn.frba.dds.donatrack.usuario.web.controllers.RutaController;
 import ar.edu.utn.frba.dds.donatrack.usuario.web.controllers.SesionController;
 import ar.edu.utn.frba.dds.donatrack.usuario.web.routes.AsignacionRoutes;
+import ar.edu.utn.frba.dds.donatrack.usuario.web.routes.CamionRoutes;
 import ar.edu.utn.frba.dds.donatrack.usuario.web.routes.CsvRoutes;
 import ar.edu.utn.frba.dds.donatrack.usuario.web.routes.DonacionBeneficiarioRoutes;
 import ar.edu.utn.frba.dds.donatrack.usuario.web.routes.DonacionRoutes;
 import ar.edu.utn.frba.dds.donatrack.usuario.web.routes.DonanteRoutes;
+import ar.edu.utn.frba.dds.donatrack.usuario.web.routes.EntregaRoutes;
 import ar.edu.utn.frba.dds.donatrack.usuario.web.routes.HomeRoutes;
 import ar.edu.utn.frba.dds.donatrack.usuario.web.routes.MapaRoutes;
 import ar.edu.utn.frba.dds.donatrack.usuario.web.routes.NecesidadRoutes;
 import ar.edu.utn.frba.dds.donatrack.usuario.web.routes.PerfilRoutes;
+import ar.edu.utn.frba.dds.donatrack.usuario.web.routes.RutaRoutes;
 import ar.edu.utn.frba.dds.donatrack.usuario.web.routes.SesionRoutes;
 import com.github.jknack.handlebars.Handlebars;
 import com.github.jknack.handlebars.helper.ConditionalHelpers;
@@ -56,6 +62,7 @@ public class App {
   public static Javalin crearApp(GrpcClientsConfig grpcClients) {
     UsuarioRepository usuarioRepository = UsuarioRepository.getInstancia();
 
+    //DONACIONES
     HomeController homeController = new HomeController();
     SesionController sesionController = new SesionController(usuarioRepository);
     PerfilController perfilController = new PerfilController(grpcClients.getDonacionesStub(), usuarioRepository);
@@ -66,6 +73,11 @@ public class App {
     DonacionBeneficiarioController donacionBeneficiarioController = new DonacionBeneficiarioController(grpcClients.getDonacionesStub());
     AsignacionController asignacionController = new AsignacionController(grpcClients.getDonacionesStub());
     CsvController csvController = new CsvController(grpcClients.getDonacionesStub(), usuarioRepository);
+
+    //LOGISTICA
+    CamionController camionController = new CamionController(grpcClients.getLogisticaStub());
+    EntregaController entregaController = new EntregaController(grpcClients.getLogisticaStub());
+    RutaController rutaController = new RutaController(grpcClients.getLogisticaStub());
 
     return Javalin.create(config -> {
       config.jsonMapper(GsonConfig.jsonMapper());
@@ -90,6 +102,10 @@ public class App {
       DonacionBeneficiarioRoutes.registrar(config.routes, donacionBeneficiarioController);
       AsignacionRoutes.registrar(config.routes, asignacionController);
       CsvRoutes.registrar(config.routes, csvController);
+
+      CamionRoutes.registrar(config.routes, camionController);
+      EntregaRoutes.registrar(config.routes, entregaController);
+      RutaRoutes.registrar(config.routes, rutaController);
 
       ExceptionHandlers.registrar(config.routes);
 

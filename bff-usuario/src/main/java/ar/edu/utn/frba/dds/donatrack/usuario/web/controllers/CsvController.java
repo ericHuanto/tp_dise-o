@@ -28,7 +28,7 @@ public class CsvController implements WithSimplePersistenceUnit {
   public void mostrarFormularioCreacion(Context context) {
     Map<String, Object> modelo = new HashMap<>();
     modelo.put("usuario", context.sessionAttribute("usuario_actual"));
-    context.render("views/admin/importar_donantes.hbs", modelo);
+    context.render("donaciones/views/admin/importar_donantes.hbs", modelo);
   }
 
   public void procesarDonantesAntiguos(Context context) {
@@ -98,7 +98,7 @@ public class CsvController implements WithSimplePersistenceUnit {
     Map<String, Object> modelo = new HashMap<>();
     modelo.put("usuario", context.sessionAttribute("usuario_actual"));
     modelo.put("idTarea", idTarea);
-    context.render("views/admin/importar_donantes_espera.hbs", modelo);
+    context.render("donaciones/views/admin/importar_donantes_espera.hbs", modelo);
   }
 
   public void consultarEstadoProceso(Context context) {
@@ -123,7 +123,7 @@ public class CsvController implements WithSimplePersistenceUnit {
     modelo.put("usuario", context.sessionAttribute("usuario_actual"));
     modelo.put("resultado", resultado);
 
-    context.render("views/admin/importar_donantes_resultado.hbs", modelo);
+    context.render("donaciones/views/admin/importar_donantes_resultado.hbs", modelo);
   }
 
   //================== FUNCIONES AUXILIARES ====================

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>{{#block "nombre_pestaña"}}DonaTrack{{/block}}</title>
+    <link rel="stylesheet" href="/donaciones/css/global.css">
+    <link rel="stylesheet" href="/donaciones/css/layout.css">
+    <!--Espacio para que cada pantalla implemente su propio css-->
+    {{#block "css_extra"}}{{/block}}
+</head>
+<body>
+    <!-- HEADER -->
+    {{> donaciones/partials/header.hbs}}
+    <!-- MAIN -->
+    <main>
+        {{#block "contenido_propio"}} {{/block}}
+    </main>
+    <!-- FOOTER -->
+    {{> donaciones/partials/footer.hbs}}
+    <!-- Extra Scripts -->
+    {{#block "scripts"}}{{/block}}
+</body>
+</html>

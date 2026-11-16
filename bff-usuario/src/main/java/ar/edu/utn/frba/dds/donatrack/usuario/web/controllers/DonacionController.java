@@ -30,7 +30,7 @@ public class DonacionController {
     modelo.put("usuario", usuarioActual);
     modelo.put("donaciones", response.getDonacionesList());
 
-    context.render("views/admin/donaciones_en_deposito.hbs", modelo);
+    context.render("donaciones/views/admin/donaciones_en_deposito.hbs", modelo);
   }
 
   public void marcarComoVencida(Context context) {

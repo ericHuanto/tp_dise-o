@@ -49,7 +49,7 @@ public class DonacionBeneficiarioController {
       modelo.put("usuario", usuarioActual);
       modelo.put("donaciones", response.getDonacionesList());
 
-      context.render("views/donante/mis_donaciones.hbs", modelo);
+      context.render("donaciones/views/donante/mis_donaciones.hbs", modelo);
 
     } catch (StatusRuntimeException e) {
       if (e.getStatus().getCode() == Status.Code.NOT_FOUND) {
@@ -99,7 +99,7 @@ public class DonacionBeneficiarioController {
       modelo.put("donacion", response.getDonacion());
       modelo.put("fechaAsignacion", response.getFechaAsignacion());
 
-      context.render("views/donante/detalle_donacion.hbs", modelo);
+      context.render("donaciones/views/donante/detalle_donacion.hbs", modelo);
 
     } catch (StatusRuntimeException e) {
       if (e.getStatus().getCode() == Status.Code.NOT_FOUND) {

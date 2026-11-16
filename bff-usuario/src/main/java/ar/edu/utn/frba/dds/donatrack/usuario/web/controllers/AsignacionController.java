@@ -38,7 +38,7 @@ public class AsignacionController {
     modelo.put("usuario", context.sessionAttribute("usuario_actual"));
     modelo.put("rankings", rankingsVista);
 
-    context.render("views/admin/asignar_beneficiaria.hbs", modelo);
+    context.render("donaciones/views/admin/asignar_beneficiaria.hbs", modelo);
   }
 
   public void confirmarAsignacion(Context context) {

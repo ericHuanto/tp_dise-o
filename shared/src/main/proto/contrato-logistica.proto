@@ -1,0 +1,110 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "ar.edu.utn.frba.dds.donatrack.grpc";
+
+service LogisticaService {
+  //Camiones
+  rpc ObtenerVistaCamiones      (VacioLogistica)              returns (VistaCamionesResponse);
+  rpc ListarGpsDisponibles      (VacioLogistica)              returns (ListaGpsResponse);
+  rpc CrearCamion               (GuardarCamionRequest)        returns (CrearCamionResponse);
+  rpc ObtenerDatosEdicionCamion (PatenteCamionRequest)        returns (DatosEdicionCamionResponse);
+  rpc ActualizarCamion          (GuardarCamionRequest)        returns (ResultadoLogistica);
+  rpc EliminarCamion            (PatenteCamionRequest)        returns (ResultadoLogistica);
+
+  //Entregas
+  rpc ListarEntregasEnTraslado (VacioLogistica)            returns (ListaEntregasResponse);
+  rpc ObtenerEntregaPorId      (EntregaIdRequest)          returns (EntregaVistaMsg);
+  rpc ConfirmarRecepcion       (ConfirmarRecepcionRequest) returns (ResultadoLogistica);
+
+  //Rutas
+  //verSeguimiento
+  rpc ObtenerSeguimientoEntregas (VacioLogistica) returns (ListaMarcadoresCamionResponse);
+}
+
+message VacioLogistica {}
+message ResultadoLogistica { string mensaje = 1; }
+
+//CAMIONES
+message CamionVistaMsg {
+  string patente = 1;
+  float capacidad_carga = 2;
+  float capacidad_volumen = 3;
+  float altura = 4;
+  string imei_gps = 5;
+  string ultima_latitud = 6;
+  string ultima_longitud = 7;
+}
+
+message VistaCamionesResponse {
+  repeated CamionVistaMsg camiones = 1;
+  int64 total_camiones = 2;
+  int64 camiones_sin_gps = 3;
+  int64 camiones_en_ruta = 4;
+}
+
+message GpsMsg {
+  string imei = 1;
+}
+
+message ListaGpsResponse {
+  repeated GpsMsg gps_disponibles = 1;
+}
+
+message GuardarCamionRequest {
+  string patente = 1;
+  float capacidad_volumen = 2;
+  float altura = 3;
+  float capacidad_carga = 4;
+  string imei_gps = 5;
+}
+
+// Respuesta de crear(): indica si la patente ya estaba repetida para redirigir con ?error=la_patente_ya_existe
+message CrearCamionResponse {
+  bool patente_duplicada = 1;
+}
+
+message PatenteCamionRequest {
+  string patente = 1;
+}
+
+message DatosEdicionCamionResponse {
+  CamionVistaMsg camion = 1;
+  repeated GpsMsg gps_disponibles = 2;
+}
+
+//ENTREGAS
+message EntregaVistaMsg {
+  int64 id = 1;
+  string estado_actual = 2;
+}
+
+message ListaEntregasResponse {
+  repeated EntregaVistaMsg entregas = 1;
+}
+
+message EntregaIdRequest {
+  int64 id = 1;
+}
+
+message FotoRecepcionMsg {
+  string nombre_archivo = 1;
+  bytes contenido = 2;
+}
+
+message ConfirmarRecepcionRequest {
+  int64 id_entrega = 1;
+  repeated FotoRecepcionMsg fotos = 2;
+}
+
+//RUTA
+message MarcadorCamionMsg {
+  string patente = 1;
+  string latitud = 2;
+  string longitud = 3;
+  string ultima_actualizacion = 4;
+}
+
+message ListaMarcadoresCamionResponse {
+  repeated MarcadorCamionMsg marcadores = 1;
+}

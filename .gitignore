@@ -13,3 +13,4 @@ Estacion-dds-*/
 
 # Excepción: NO ignorar los archivos .gitkeep
 !**/uploads/**/.gitkeep
+/microservicio-logistica/uploads/
