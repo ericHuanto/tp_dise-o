@@ -1,0 +1,342 @@
+/* =========================================
+   CONTENEDOR PRINCIPAL Y TIPOGRAFÍA
+   ========================================= */
+.importacion-wrapper {
+    background-color: #f7f6f2;
+    min-height: 100vh;
+    padding: 40px 20px;
+}
+
+.importacion-container {
+    max-width: 800px;
+    margin: 0 auto;
+    font-family: Arial, sans-serif;
+}
+
+.importacion-titulo {
+    font-size: 2em;
+    color: #1a1a1a;
+    margin-bottom: 25px;
+    letter-spacing: -0.5px;
+}
+
+/* =========================================
+   PASOS (STEPPER)
+   ========================================= */
+.pasos-container {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 30px;
+    font-size: 0.9em;
+}
+
+.paso-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.paso-actual {
+    font-weight: bold;
+    color: #1a1a1a;
+}
+
+.paso-inactivo {
+    color: #aaa;
+}
+
+.paso-completado {
+    color: #555;
+}
+
+.paso-final-activo {
+    font-weight: bold;
+    color: #2e7d32;
+}
+
+.paso-circulo {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 24px;
+    height: 24px;
+    color: white;
+    border-radius: 50%;
+}
+
+.circulo-actual {
+    background-color: #1a1a1a;
+    font-size: 12px;
+}
+
+.circulo-inactivo {
+    background-color: #e0e0e0;
+    font-size: 12px;
+}
+
+.circulo-exito {
+    background-color: #2e7d32;
+    font-size: 14px;
+}
+
+.paso-separador {
+    height: 1px;
+    width: 40px;
+    background-color: #ccc;
+}
+
+/* =========================================
+   TARJETA DE SUBIDA DE ARCHIVO
+   ========================================= */
+.tarjeta-subida {
+    background-color: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid #eaeaea;
+}
+
+.archivo-info {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.icono-csv {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+    width: 60px;
+    height: 60px;
+    border-radius: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    font-size: 0.9em;
+    letter-spacing: 1px;
+}
+
+.nombre-archivo {
+    margin: 0 0 5px 0;
+    font-size: 1.1em;
+    color: #1a1a1a;
+}
+
+.detalles-archivo {
+    margin: 0;
+    color: #777;
+    font-size: 0.85em;
+}
+
+.archivo-acciones {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+}
+
+.label-buscar {
+    color: #2e7d32;
+    font-weight: bold;
+    font-size: 0.85em;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.input-oculto {
+    display: none;
+}
+
+.btn-importar {
+    background-color: #1a1a1a;
+    color: white;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    opacity: 1;
+    transition: 0.2s;
+}
+
+.btn-importar:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+/* =========================================
+   TARJETA DE PROCESAMIENTO (ESPERA)
+   ========================================= */
+.tarjeta-procesando {
+    text-align: center;
+}
+
+.procesando-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.procesando-titulo {
+    margin: 0;
+    font-size: 1.2em;
+}
+
+.badge-procesando {
+    background-color: #e0f2f1;
+    color: #00695c;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 0.8em;
+    font-weight: bold;
+}
+
+.barra-contenedor {
+    height: 8px;
+    background-color: #e0e0e0;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 10px;
+    position: relative;
+}
+
+.barra-progreso {
+    height: 100%;
+    background-color: #2e7d32;
+    width: 30%;
+    border-radius: 4px;
+    position: absolute;
+    left: 0;
+    transition: left 1s linear;
+}
+
+.texto-indicador {
+    color: #555;
+    margin: 0;
+    font-size: 0.9em;
+}
+
+.texto-secundario {
+    color: #888;
+    font-size: 0.8em;
+    margin-top: 20px;
+}
+
+/* =========================================
+   TARJETA DE RESULTADOS Y TABLA DE ERRORES
+   ========================================= */
+.tarjeta-resultados {
+    background-color: white;
+    border-radius: 12px;
+    padding: 30px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border: 1px solid #eaeaea;
+}
+
+.alerta-exito {
+    background-color: #e6f4ea;
+    border: 1px solid #ceead6;
+    padding: 15px;
+    border-radius: 5px;
+    color: #137333;
+    font-weight: bold;
+    margin-bottom: 30px;
+}
+
+.titulo-errores {
+    color: #d93025;
+    font-size: 1.2em;
+    margin-bottom: 15px;
+}
+
+.tabla-errores {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    background-color: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.tabla-errores thead {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+.tabla-errores th {
+    padding: 12px 15px;
+    border-bottom: 1px solid #f5c6cb;
+}
+
+.tabla-errores tbody tr {
+    border-bottom: 1px solid #eee;
+}
+
+.celda-fila {
+    padding: 12px 15px;
+    font-weight: bold;
+}
+
+.celda-motivo {
+    padding: 12px 15px;
+    color: #555;
+}
+
+.acciones-errores {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 30px;
+}
+
+.btn-otra-importacion,
+.btn-otra-importacion:visited {
+    display: inline-block;
+    background-color: #1a1a1a;
+    color: white;
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: bold;
+}
+
+.btn-descargar-csv {
+    background-color: white;
+    color: #1a1a1a;
+    border: 1px solid #ccc;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 0.9em;
+    transition: background-color 0.2s;
+}
+
+.btn-descargar-csv:hover {
+    background-color: #f0f0f0;
+}
+
+.mensaje-sin-errores {
+    padding: 30px;
+    text-align: center;
+    background-color: #f8f9fa;
+    border: 1px dashed #ccc;
+    border-radius: 5px;
+    color: #555;
+}
+
+.mensaje-sin-errores p {
+    margin: 0;
+    font-size: 1.1em;
+}
+
+.acciones-centradas {
+    margin-top: 30px;
+    text-align: center;
+}

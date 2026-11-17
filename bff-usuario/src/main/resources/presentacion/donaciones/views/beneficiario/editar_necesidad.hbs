@@ -1,0 +1,245 @@
+
+{{#partial "nombre_pestaña"}}
+    Editar necesidad
+{{/partial}}
+
+{{#partial "css_extra"}}
+    <link rel="stylesheet" href="/donaciones/css/beneficiario/nueva_necesidad.css">
+{{/partial}}
+
+{{#partial "contenido_propio"}}
+    <div class="necesidad-overlay">
+        <section class="necesidad-modal">
+
+            <header class="necesidad-modal__header">
+                <h1>Editar necesidad</h1>
+
+                <a href="/mis-necesidades"
+                   class="necesidad-modal__cerrar"
+                   aria-label="Cerrar">×</a>
+            </header>
+
+            <form action="/mis-necesidades/{{necesidad.id}}/editar"
+                  method="post">
+
+                <div class="necesidad-modal__body">
+
+                    <div class="formulario-fila">
+                        <div class="campo">
+                            <label for="categoria">Categoría</label>
+
+                            <select id="categoria"
+                                    name="categoria"
+                                    required>
+                                {{#each categorias}}
+                                    <option value="{{nombre}}">
+                                        {{nombre}}
+                                    </option>
+                                {{/each}}
+                            </select>
+                        </div>
+
+                        <div class="campo">
+                            <label for="subcategoria">Subcategoría</label>
+
+                            <select id="subcategoria"
+                                    name="subcategoria"
+                                    required>
+                                {{#each subcategorias}}
+                                    <option value="{{nombre}}"
+                                            data-categoria="{{categoria.nombre}}">
+                                        {{nombre}}
+                                    </option>
+                                {{/each}}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="campo">
+                        <label for="descripcion">Descripción</label>
+
+                        <textarea id="descripcion"
+                                  name="descripcion"
+                                  rows="3"
+                                  required>{{necesidad.descripcion}}</textarea>
+                    </div>
+
+                    <div class="formulario-fila">
+                        <div class="campo">
+                            <label for="cantidad">
+                                {{#if esRecurrente}}
+                                    Cantidad por período
+                                {{else}}
+                                    Cantidad requerida
+                                {{/if}}
+                            </label>
+
+                            {{#if esExtraordinaria}}
+                                <input type="number"
+                                       id="cantidad"
+                                       name="cantidadRequerida"
+                                       value="{{necesidad.cantidadRequerida}}"
+                                       min="1"
+                                       required>
+                            {{/if}}
+
+                            {{#if esRecurrente}}
+                                <input type="number"
+                                       id="cantidad"
+                                       name="cantidadPorPeriodo"
+                                       value="{{necesidad.cantidadRequerida}}"
+                                       min="1"
+                                       required>
+                            {{/if}}
+                        </div>
+
+                        <div class="campo">
+                            <label for="unidadMedida">Unidad</label>
+
+                            <select id="unidadMedida"
+                                    name="unidadMedida"
+                                    required>
+                                <option value="KILOGRAMOS">Kilogramos</option>
+                                <option value="GRAMOS">Gramos</option>
+                                <option value="LITROS">Litros</option>
+                                <option value="MILILITROS">Mililitros</option>
+                                <option value="UNIDADES">Unidades</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="campo">
+                        <label>Tipo de necesidad</label>
+
+                        <div class="selector-opciones">
+                            <label class="opcion-segmentada">
+                                <input type="radio"
+                                       name="tipoVisual"
+                                       value="EXTRAORDINARIA"
+                                       {{#if esExtraordinaria}}checked{{/if}}
+                                       disabled>
+                                <span>Extraordinaria</span>
+                            </label>
+
+                            <label class="opcion-segmentada">
+                                <input type="radio"
+                                       name="tipoVisual"
+                                       value="RECURRENTE"
+                                       {{#if esRecurrente}}checked{{/if}}
+                                       disabled>
+                                <span>Recurrente</span>
+                            </label>
+                        </div>
+
+                        <p class="ayuda-campo">
+                            El tipo de necesidad no puede modificarse.
+                        </p>
+                    </div>
+
+                    {{#if esRecurrente}}
+                        <div class="campo">
+                            <label>Frecuencia</label>
+
+                            <div class="selector-opciones">
+                                <label class="opcion-segmentada">
+                                    <input type="radio"
+                                           name="periodo"
+                                           value="DIARIO"
+                                           required>
+                                    <span>Diario</span>
+                                </label>
+
+                                <label class="opcion-segmentada">
+                                    <input type="radio"
+                                           name="periodo"
+                                           value="SEMANAL">
+                                    <span>Semanal</span>
+                                </label>
+
+                                <label class="opcion-segmentada">
+                                    <input type="radio"
+                                           name="periodo"
+                                           value="MENSUAL">
+                                    <span>Mensual</span>
+                                </label>
+                            </div>
+                        </div>
+                    {{/if}}
+
+                </div>
+
+                <footer class="necesidad-modal__footer">
+                    <a href="/mis-necesidades"
+                       class="boton-cancelar">
+                        Cancelar
+                    </a>
+
+                    <button type="submit"
+                            class="boton-guardar">
+                        Guardar cambios
+                    </button>
+                </footer>
+
+            </form>
+        </section>
+    </div>
+{{/partial}}
+
+{{#partial "scripts"}}
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const categoria = document.getElementById("categoria");
+            const subcategoria = document.getElementById("subcategoria");
+            const unidadMedida = document.getElementById("unidadMedida");
+
+            const categoriaActual = "{{necesidad.subcategoria.categoria.nombre}}";
+            const subcategoriaActual = "{{necesidad.subcategoria.nombre}}";
+            const unidadActual = "{{necesidad.unidadMedida}}";
+            const periodoActual = "{{necesidad.frecuencia}}";
+
+            const opcionesSubcategoria = Array.from(subcategoria.options);
+
+            function actualizarSubcategorias() {
+                const seleccionada = categoria.value;
+
+                subcategoria.innerHTML = "";
+
+                const opcionInicial = document.createElement("option");
+                opcionInicial.value = "";
+                opcionInicial.textContent = "Seleccionar subcategoría";
+                subcategoria.appendChild(opcionInicial);
+
+                opcionesSubcategoria.forEach(opcion => {
+                    if (
+                            opcion.dataset.categoria?.trim().toLowerCase() ===
+                            seleccionada.trim().toLowerCase()
+                    ) {
+                        subcategoria.appendChild(opcion.cloneNode(true));
+                    }
+                });
+
+                subcategoria.disabled = seleccionada === "";
+            }
+
+            categoria.value = categoriaActual;
+            actualizarSubcategorias();
+
+            subcategoria.value = subcategoriaActual;
+            unidadMedida.value = unidadActual;
+
+            const frecuenciaActual = document.querySelector(
+                    'input[name="periodo"][value="' + periodoActual + '"]'
+            );
+
+            if (frecuenciaActual) {
+                frecuenciaActual.checked = true;
+            }
+
+            categoria.addEventListener("change", actualizarSubcategorias);
+
+        });
+    </script>
+{{/partial}}
+
+{{> donaciones/partials/layout.hbs}}

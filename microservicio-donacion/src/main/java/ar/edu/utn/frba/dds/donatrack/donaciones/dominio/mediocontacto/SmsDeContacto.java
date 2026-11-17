@@ -31,7 +31,7 @@ public class SmsDeContacto extends MedioContacto {
 
   private void checkDatos(String telefono, Boolean estado) {
     if (telefono == null || telefono.isBlank()) {
-      throw new DominioException("Cada sms necesita un 'valor' valido");
+      throw new DominioException("Cada sms necesita un 'valor' con datos");
     }
     if (!telefono.matches("^[+0-9 -]*$")) {
       throw new DominioException("Teléfono invalido, verifique por favor");

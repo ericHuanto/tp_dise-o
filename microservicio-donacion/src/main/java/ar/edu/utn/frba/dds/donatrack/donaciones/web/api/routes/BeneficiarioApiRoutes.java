@@ -8,11 +8,11 @@ public class BeneficiarioApiRoutes {
   private BeneficiarioApiRoutes() {}
 
   public static void registrar(RoutesConfig ruta, BeneficiarioApiController controller) {
-    ruta.post("/beneficiarios", controller::crear);
-    ruta.get("/beneficiarios", controller::obtenerTodos);
-    ruta.get("/beneficiarios/{id}", controller::obtener);
-    ruta.patch("/beneficiarios/{id}", controller::actualizar);
-    ruta.delete("/beneficiarios/{id}", controller::eliminar);
+    ruta.post("/api/beneficiarios", controller::crear);
+    ruta.get("/api/beneficiarios", controller::obtenerTodos);
+    ruta.get("/api/beneficiarios/{id}", controller::obtener);
+    ruta.patch("/api/beneficiarios/{id}", controller::actualizar);
+    ruta.delete("/api/beneficiarios/{id}", controller::eliminar);
   }
 
 }

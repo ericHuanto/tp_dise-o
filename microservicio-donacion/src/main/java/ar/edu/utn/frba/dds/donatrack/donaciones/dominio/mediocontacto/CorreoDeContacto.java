@@ -31,9 +31,9 @@ public class CorreoDeContacto extends MedioContacto {
 
   private void checkDatos(String correo, Boolean estado) {
     if (correo == null || correo.isBlank()) {
-      throw new DominioException("Cada correo necesita un 'valor' valido");
+      throw new DominioException("Cada correo necesita un 'valor' con datos");
     }
-    if (!correo.matches("^.*@.*$")) {
+    if (!correo.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$")) {
       throw new DominioException("Correo invalido, verifique por favor");
     }
     if (estado == null) {

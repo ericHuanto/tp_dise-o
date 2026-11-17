@@ -21,7 +21,7 @@ public class RutaRepository implements WithLogisticaPersistenceUnit {
     if (ruta.getId() != null) {
       throw new BaseDatoException("Constraint Violations: La ruta ya tiene un ID asignado: " + ruta.getId());
     }
-    withTransaction(() -> entityManager().persist(ruta));
+    entityManager().persist(ruta);
   }
 
   public Ruta buscarPorId(Long id) {
@@ -35,10 +35,9 @@ public class RutaRepository implements WithLogisticaPersistenceUnit {
 
   public void actualizar(Ruta ruta) {
     if (ruta.getId() == null || buscarPorId(ruta.getId()) == null) {
-      throw new RegistroNoEncontradoException(
-          "No se puede actualizar: no existe en la base de datos la ruta: " + ruta.getId());
+      throw new RegistroNoEncontradoException("No se puede actualizar: no existe en la base de datos la ruta: " + ruta.getId());
     }
-    withTransaction(() -> entityManager().merge(ruta));
+    entityManager().merge(ruta);
   }
 
   public void eliminar(Long id) {
@@ -46,6 +45,15 @@ public class RutaRepository implements WithLogisticaPersistenceUnit {
     if (ruta == null) {
       throw new RegistroNoEncontradoException("No existe ruta con id " + id);
     }
-    withTransaction(() -> entityManager().remove(ruta));
+    entityManager().remove(ruta);
   }
+
+  public long camionesEnRutaAhora() {
+    return entityManager()
+        .createQuery("SELECT COUNT(DISTINCT r.camion) " +
+                "FROM Ruta r " +
+                "WHERE r.estaIniciada = true", Long.class)
+        .getSingleResult();
+  }
+
 }

@@ -9,10 +9,9 @@ import ar.edu.utn.frba.dds.donatrack.shared.excepciones.RecursoNoEncontradoExcep
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.*;
-
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import java.util.Random;
 
 @Getter
 @NoArgsConstructor
@@ -26,19 +25,32 @@ public class Beneficiario {
   private String razonSocial;
   @Column(name = "direccion")
   private String direccion;
+  @Column(name = "latitud_direccion")
+  private String latitud;
+  @Column(name = "longitud_direccion")
+  private String longitud;
   @OneToMany(cascade = CascadeType.ALL)
   @JoinColumn(name = "id_beneficiario")
   private List<MedioContacto> contactos;
-  @ElementCollection
-  @CollectionTable(name = "necesidades", joinColumns = @JoinColumn(name = "id_beneficiario"))
+  //@ElementCollection
+  //@CollectionTable(name = "necesidades", joinColumns = @JoinColumn(name = "id_beneficiario"))
+  @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE ,CascadeType.REMOVE}
+              ,orphanRemoval = true)
+  @JoinColumn(name = "id_beneficiario")
   private List<Necesidad> necesidades;
   @OneToMany(mappedBy = "beneficiario") //Intentar evitar mappedBy. Relaciones bidireccionales son costosas de mantener
   private List<Donacion> donaciones;
 
   public Beneficiario(String razonSocial, String direccion, List<MedioContacto> contactos) {
+    this(razonSocial, direccion, calcularLatitud(direccion), calcularLongitud(direccion), contactos);
+  }
+
+  public Beneficiario(String razonSocial, String direccion, String latitud, String longitud, List<MedioContacto> contactos) {
     checkDatos(razonSocial, contactos);
     this.razonSocial = razonSocial;
     this.direccion = direccion;
+    this.latitud = latitud;
+    this.longitud = longitud;
     this.contactos = new ArrayList<>(contactos);
     this.necesidades = new ArrayList<>();
     this.donaciones = new ArrayList<>();
@@ -100,9 +112,16 @@ public class Beneficiario {
     this.contactos = new ArrayList<>(contactos);
   }
 
-  public void addContacto(MedioContacto contacto) {
-    if (contacto != null) {
-      this.contactos.add(contacto);
-    }
+  //=============== FUNCIONES AUXILIARES =================
+  private static String calcularLatitud(String direccion) {
+    //Usar un servicio externo que al pasarle la direccion devuelva la latitud
+    Double latitudFalsa = -34.705 + (new Random()).nextDouble() * ((-34.526) - (-34.705));
+    return String.valueOf(latitudFalsa);
+  }
+
+  public static String calcularLongitud(String direccion) {
+    //Usar un servicio externo que al pasarle la direccion devuelva la longitud
+    Double longitudFalsa = -58.531 + (new Random()).nextDouble() * ((-58.335) - (-58.531));
+    return String.valueOf(longitudFalsa);
   }
 }

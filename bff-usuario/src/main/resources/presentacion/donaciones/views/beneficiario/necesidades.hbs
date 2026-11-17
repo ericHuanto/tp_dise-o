@@ -1,0 +1,141 @@
+
+{{#partial "nombre_pestaña"}}
+    Necesidades
+{{/partial}}
+
+{{#partial "css_extra"}}
+    <link rel="stylesheet" href="/donaciones/css/beneficiario/necesidades.css">
+{{/partial}}
+
+{{#partial "contenido_propio"}}
+    <section class="mis-necesidades">
+
+        <div class="encabezado-seccion">
+            <div>
+                {{#if esAdmin}}
+                    <h1>Necesidades registradas</h1>
+                    <p>Consultá las necesidades de las organizaciones.</p>
+                {{else}}
+                    <h1>Mis necesidades</h1>
+                    <p>Administrá las necesidades de tu organización.</p>
+                {{/if}}
+            </div>
+
+            <a href="/mis-necesidades/nueva" class="boton-principal">
+                + Nueva necesidad
+            </a>
+        </div>
+
+        {{#if necesidades}}
+            <div class="tabla-contenedor">
+                <table class="tabla-necesidades">
+                    <thead>
+                    <tr>
+                        <th>Categoría</th>
+                        <th>Descripción</th>
+                        <th>Cantidad</th>
+                        <th>Cubierto</th>
+                        <th>Tipo</th>
+
+                        {{#if esAdmin}}
+                            <th>Acciones</th>
+                        {{/if}}
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                    {{#each necesidades}}
+                        <tr>
+                            <td>
+                                <strong>{{categoria}}</strong>
+                                <span class="subcategoria">
+                                    {{subcategoria}}
+                                </span>
+                            </td>
+
+                            <td>
+                                {{descripcion}}
+                            </td>
+
+                            <td>
+                                {{#if cantidadPorPeriodo}}
+                                    {{cantidadPorPeriodo}} {{unidadMedida}}
+                                    <span class="dato-secundario">
+                                        por {{periodo}}
+                                    </span>
+                                {{else}}
+                                    {{cantidadRequerida}} {{unidadMedida}}
+                                {{/if}}
+                            </td>
+
+                            <td>
+                                <div class="cobertura"
+                                     data-recibida="{{cantidadRecibida}}"
+                                     data-requerida="{{#if cantidadPorPeriodo}}{{cantidadPorPeriodo}}{{else}}{{cantidadRequerida}}{{/if}}">
+
+                                    <span class="cobertura__texto">
+                                        {{cantidadRecibida}} recibidas
+                                    </span>
+
+                                    <div class="barra-progreso">
+                                        <div class="barra-progreso__relleno"></div>
+                                    </div>
+
+                                    <span class="cobertura__porcentaje"></span>
+                                </div>
+                            </td>
+
+                            <td>
+                                <span class="etiqueta-tipo">
+                                    {{tipo}}
+                                </span>
+                            </td>
+
+                            {{#if ../esAdmin}}
+                                <td>
+                                    <div class="acciones-necesidad">
+                                        <a href="/mis-necesidades/{{id}}/editar"
+                                           class="accion-editar">
+                                            Editar
+                                        </a>
+                                    </div>
+                                </td>
+                            {{/if}}
+
+                        </tr>
+                    {{/each}}
+                    </tbody>
+                </table>
+            </div>
+
+        {{else}}
+            <div class="sin-necesidades">
+                <h2>No hay necesidades registradas</h2>
+                <p>Todavía no hay necesidades para mostrar.</p>
+            </div>
+        {{/if}}
+
+    </section>
+{{/partial}}
+
+{{#partial "scripts"}}
+    <script>
+        document.querySelectorAll(".cobertura").forEach(contenedor => {
+
+            const recibida = Number(contenedor.dataset.recibida);
+            const requerida = Number(contenedor.dataset.requerida);
+
+            const porcentaje = requerida > 0
+                    ? Math.min(100, Math.max(0, recibida / requerida * 100))
+                    : 0;
+
+            contenedor.querySelector(".barra-progreso__relleno")
+                    .style.width = porcentaje + "%";
+
+            contenedor.querySelector(".cobertura__porcentaje")
+                    .textContent = Math.round(porcentaje) + "%";
+        });
+    </script>
+{{/partial}}
+
+{{> donaciones/partials/layout.hbs}}

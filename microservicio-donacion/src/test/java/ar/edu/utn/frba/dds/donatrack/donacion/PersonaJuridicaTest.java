@@ -1,7 +1,7 @@
 package ar.edu.utn.frba.dds.donatrack.donacion;
 
-import ar.edu.utn.frba.dds.donatrack.builder.PersonaJuridicaBuilder;
-import ar.edu.utn.frba.dds.donatrack.builder.RepresentanteBuilder;
+import ar.edu.utn.frba.dds.donatrack.donacion.builder.PersonaJuridicaBuilder;
+import ar.edu.utn.frba.dds.donatrack.donacion.builder.RepresentanteBuilder;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.donante.documento.Documento;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.donante.tipodonantes.juridica.Juridica;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.donante.tipodonantes.juridica.Representante;

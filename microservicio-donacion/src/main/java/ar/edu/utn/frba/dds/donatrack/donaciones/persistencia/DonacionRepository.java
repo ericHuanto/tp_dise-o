@@ -2,13 +2,10 @@ package ar.edu.utn.frba.dds.donatrack.donaciones.persistencia;
 
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.donacion.Donacion;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.donacion.TipoEstadoDonacion;
-import ar.edu.utn.frba.dds.donatrack.shared.excepciones.BaseDatoException;
+import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.donante.Donante;
 import ar.edu.utn.frba.dds.donatrack.shared.excepciones.RegistroNoEncontradoException;
 import io.github.flbulgarelli.jpa.extras.simple.WithSimplePersistenceUnit;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 
 public class DonacionRepository implements WithSimplePersistenceUnit {
   private static final DonacionRepository INSTANCE = new DonacionRepository();
@@ -22,6 +19,16 @@ public class DonacionRepository implements WithSimplePersistenceUnit {
   }
   public static DonacionRepository getInstancia() {
     return INSTANCE;
+  }
+
+  public List<Donacion> buscarPorEstadoActualCoincidenteCon(TipoEstadoDonacion estado) {
+    return entityManager()
+        .createQuery("SELECT d FROM Donacion d " +
+            "JOIN d.historialEstados e " +
+            "WHERE INDEX(e) = (SELECT MAX(INDEX(e2)) FROM Donacion d2 JOIN d2.historialEstados e2 WHERE d2 = d) " +
+            "AND e.tipoEstado = :estado", Donacion.class)
+        .setParameter("estado", estado)
+        .getResultList();
   }
 
   public List<Donacion> buscarTodoPorEstado(TipoEstadoDonacion estado) {
@@ -43,6 +50,29 @@ public class DonacionRepository implements WithSimplePersistenceUnit {
 
   public void eliminar(Donacion donacion) {
    entityManager().remove(donacion);
+  }
+
+  public List<Donacion> buscarPorDonante(Donante donante, TipoEstadoDonacion estado,
+                                         Long idCategoria, List<Long> idsSubcategorias) {
+    return entityManager()
+        .createQuery("SELECT d FROM Donacion d JOIN d.donantes dn WHERE dn.id = :idDonante", Donacion.class)
+        .setParameter("idDonante", donante.getId())
+        .getResultList()
+        .stream()
+        .filter(d -> estado == null || d.getEstadoActual() == estado)
+        .filter(d -> idCategoria == null || d.getSubcategoria().getCategoria().getId().equals(idCategoria))
+        .filter(d -> idsSubcategorias.isEmpty() || idsSubcategorias.contains(d.getSubcategoria().getId()))
+        .toList();
+  }
+  public List<Donacion> buscarPorBeneficiario(Long idBeneficiario) {
+    return entityManager()
+        .createQuery(
+            "SELECT d FROM Donacion d " +
+                "WHERE d.beneficiario.id = :idBeneficiario",
+            Donacion.class
+        )
+        .setParameter("idBeneficiario", idBeneficiario)
+        .getResultList();
   }
 
 }

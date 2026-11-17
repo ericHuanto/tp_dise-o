@@ -1,0 +1,215 @@
+
+/* FONDO OSCURO */
+
+.necesidad-overlay {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 16px;
+    background-color: var(--accent-dark);
+}
+
+/* MODAL */
+
+.necesidad-modal {
+    width: 100%;
+    max-width: 570px;
+    background-color: var(--white);
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.18);
+}
+
+.necesidad-modal__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 24px 28px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.necesidad-modal__header h1 {
+    margin: 0;
+    font-size: 1.4rem;
+    color: var(--accent-dark);
+}
+
+.necesidad-modal__cerrar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    text-decoration: none;
+    color: var(--accent-dark);
+    font-size: 1.4rem;
+}
+
+/* CUERPO DEL FORMULARIO */
+
+.necesidad-modal__body {
+    padding: 28px;
+}
+
+.formulario-fila {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.campo {
+    margin-bottom: 20px;
+}
+
+.campo > label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--accent-dark);
+}
+
+.campo select,
+.campo textarea,
+.campo input[type="number"] {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background-color: var(--white);
+    color: var(--accent-dark);
+    font: inherit;
+}
+
+.campo textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.campo select:focus,
+.campo textarea:focus,
+.campo input[type="number"]:focus {
+    outline: 2px solid var(--accent-green);
+    outline-offset: 1px;
+}
+
+/* SELECTORES SEGMENTADOS */
+
+.selector-opciones {
+    display: flex;
+    padding: 4px;
+    gap: 4px;
+    border-radius: 9px;
+    background-color: #EAE8E2;
+}
+
+.opcion-segmentada {
+    flex: 1;
+    position: relative;
+    cursor: pointer;
+}
+
+.opcion-segmentada input {
+    position: absolute;
+    opacity: 0;
+    width: 1px;
+    height: 1px;
+}
+
+.opcion-segmentada span {
+    display: block;
+    padding: 11px 8px;
+    text-align: center;
+    border-radius: 7px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--accent-dark);
+}
+
+.opcion-segmentada input:checked + span {
+    background-color: var(--white);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+.opcion-segmentada input:focus-visible + span {
+    outline: 2px solid var(--accent-green);
+    outline-offset: 1px;
+}
+
+.ayuda-campo {
+    margin-top: 10px;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+/* PIE DEL FORMULARIO */
+
+.necesidad-modal__footer {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 10px;
+    padding: 20px 28px;
+    background-color: #FAF9F6;
+    border-top: 1px solid var(--border-color);
+}
+
+.boton-cancelar,
+.boton-guardar {
+    padding: 12px 18px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.boton-cancelar {
+    background-color: var(--white);
+    color: var(--accent-dark);
+    border: 1px solid var(--border-color);
+}
+
+.boton-guardar {
+    background-color: var(--accent-dark);
+    color: var(--white);
+    border: 1px solid var(--accent-dark);
+}
+
+/* RESPETAR EL ATRIBUTO HIDDEN */
+
+.necesidad-modal [hidden] {
+    display: none !important;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 600px) {
+    .formulario-fila {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+
+    .necesidad-modal__header,
+    .necesidad-modal__body,
+    .necesidad-modal__footer {
+        padding-left: 18px;
+        padding-right: 18px;
+    }
+
+    .necesidad-modal__footer {
+        flex-wrap: wrap;
+    }
+
+    .opcion-segmentada input:disabled + span {
+        cursor: not-allowed;
+    }
+
+    .opcion-segmentada input:checked:disabled + span {
+        background-color: var(--white);
+        color: var(--accent-dark);
+    }
+}

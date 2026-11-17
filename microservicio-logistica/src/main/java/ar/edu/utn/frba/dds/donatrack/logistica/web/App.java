@@ -3,35 +3,57 @@ package ar.edu.utn.frba.dds.donatrack.logistica.web;
 import ar.edu.utn.frba.dds.donatrack.logistica.persistencia.BeneficiarioRepository;
 import ar.edu.utn.frba.dds.donatrack.logistica.persistencia.DatosIniciales;
 import ar.edu.utn.frba.dds.donatrack.logistica.persistencia.GpsRepository;
-import ar.edu.utn.frba.dds.donatrack.logistica.web.controllers.CamionController;
-import ar.edu.utn.frba.dds.donatrack.logistica.web.controllers.PlanificacionController;
+import ar.edu.utn.frba.dds.donatrack.logistica.persistencia.WithLogisticaPersistenceUnit;
+import ar.edu.utn.frba.dds.donatrack.logistica.web.api.controllers.*;
+import ar.edu.utn.frba.dds.donatrack.logistica.web.api.routes.*;
 import ar.edu.utn.frba.dds.donatrack.logistica.web.coordinadores.CoordinadorRuta;
 import ar.edu.utn.frba.dds.donatrack.logistica.cron.ProcesoLogistica;
-import ar.edu.utn.frba.dds.donatrack.logistica.web.integracion.planificadorexterno.ClientePlanificadorExterno;
-import ar.edu.utn.frba.dds.donatrack.logistica.web.integracion.planificadorexterno.ClientePlanificadorExternoMock;
-import ar.edu.utn.frba.dds.donatrack.logistica.web.integracion.microserviciosdonaciones.ConectorDonacionesApi;
-import ar.edu.utn.frba.dds.donatrack.logistica.web.controllers.RutaController;
-import ar.edu.utn.frba.dds.donatrack.logistica.web.controllers.EntregaController;
+import ar.edu.utn.frba.dds.donatrack.logistica.dominio.planificadorexterno.ClientePlanificadorExterno;
+import ar.edu.utn.frba.dds.donatrack.logistica.dominio.planificadorexterno.ClientePlanificadorExternoMock;
+import ar.edu.utn.frba.dds.donatrack.logistica.web.shared.grpc.LogisticaGrpc;
+import ar.edu.utn.frba.dds.donatrack.logistica.web.shared.integracion.microserviciosdonaciones.ConectorDonacionesGrpc;
+import ar.edu.utn.frba.dds.donatrack.logistica.web.shared.integracion.microserviciosdonaciones.ConectorDonaciones;
 import ar.edu.utn.frba.dds.donatrack.logistica.persistencia.CamionRepository;
 import ar.edu.utn.frba.dds.donatrack.logistica.persistencia.RutaRepository;
-import ar.edu.utn.frba.dds.donatrack.logistica.web.routes.EntregaRoutes;
-import ar.edu.utn.frba.dds.donatrack.logistica.web.routes.PlanificacionRoutes;
-import ar.edu.utn.frba.dds.donatrack.logistica.web.routes.RutaRoutes;
 import ar.edu.utn.frba.dds.donatrack.logistica.persistencia.EntregaRepository;
-import ar.edu.utn.frba.dds.donatrack.logistica.web.routes.CamionRoutes;
+import ar.edu.utn.frba.dds.donatrack.shared.ConfiguracionEntorno;
 import ar.edu.utn.frba.dds.donatrack.shared.ExceptionHandlers;
 import ar.edu.utn.frba.dds.donatrack.shared.GsonConfig;
+import io.grpc.Server;
+import io.grpc.ServerBuilder;
 import io.javalin.Javalin;
+
+import java.io.IOException;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import io.javalin.http.staticfiles.Location;
+import java.nio.file.Path;
+
 public class App {
   public static final int PUERTO = 7071;
+  public static final int PUERTO_GRPC = 7073;
 
-  public static void main(String[] args) {
+  public static void main(String[] args) throws IOException {
+    ConfiguracionEntorno config = ConfiguracionEntorno.getInstance();
+
+    //Cargo credenciales para la db desde el .env. NO COMMITEAR COMENTADO!!!
+    System.setProperty("hibernate.connection.url", config.getDbUrlLogistica());
+    System.setProperty("hibernate.connection.username", config.getDbUser());
+    System.setProperty("hibernate.connection.password", config.getDbPassword());
+
+    //Servidor gRPC
+    Server grpc = ServerBuilder
+        .forPort(config.puertoGrpcLogistica(PUERTO_GRPC))
+        .addService(new LogisticaGrpc())
+        .build()
+        .start();
+    System.out.println("[gRPC] Servidor de logistica escuchando en el puerto " + grpc.getPort());
+    Runtime.getRuntime().addShutdownHook(new Thread(grpc::shutdown));
+
     AppLogistica resultado = crearApp();
 
     ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
@@ -52,14 +74,15 @@ public class App {
 
     System.out.println("[Cron] Planificación programada en " + minutosHasta + " minutos");
     DatosIniciales.init();
-    resultado.app().start(PUERTO);
+    resultado.app().start(config.puertoLogistica(PUERTO));
   }
 
   public record AppLogistica(Javalin app, ProcesoLogistica procesoLogistica) {}
 
   public static AppLogistica crearApp() {
     //Servicios Externos
-    ConectorDonacionesApi donacionesClient = new ConectorDonacionesApi();
+    //ConectorDonacionesApi donacionesClient = new ConectorDonacionesApi();
+    ConectorDonaciones donacionesClient = new ConectorDonacionesGrpc();
     ClientePlanificadorExterno clienteExterno = new ClientePlanificadorExternoMock();
 
     //Repositorios
@@ -76,25 +99,38 @@ public class App {
     );
     ProcesoLogistica procesoLogistica = new ProcesoLogistica(coordinadorRuta);
 
-    //Controllers
-    PlanificacionController planificacionController = new PlanificacionController(coordinadorRuta, procesoLogistica);
-    RutaController rutaController = new RutaController(rutaRepository, donacionesClient);
-    EntregaController entregaController = new EntregaController(entregaRepository, donacionesClient);
-    CamionController camionController = new CamionController(camionRepository, gpsRepository);
+    //Controllers para api (json)
+    PlanificacionApiController planificacionApiController = new PlanificacionApiController(coordinadorRuta, procesoLogistica);
+    RutaApiController rutaApiController = new RutaApiController(rutaRepository, donacionesClient);
+    EntregaApiController entregaApiController = new EntregaApiController(entregaRepository, donacionesClient);
+    CamionApiController camionApiController = new CamionApiController(camionRepository, gpsRepository);
 
     Javalin app = Javalin.create(config -> {
       config.jsonMapper(GsonConfig.jsonMapper());
       config.http.defaultContentType = "application/json";
+      config.staticFiles.add(staticFiles -> {
+        staticFiles.hostedPath = "/uploads";
+        staticFiles.directory = Path.of("microservicio-logistica", "uploads").toAbsolutePath().toString();
+        staticFiles.location = Location.EXTERNAL;
+      });
 
-      // Registramos las Rutas usando config.routes
+      //Rutas de la api
       config.routes.get("/health", ctx -> ctx.json("Micro servicio de logística funcionando"));
-      CamionRoutes.registrar(config.routes, camionController);
-      RutaRoutes.registrar(config.routes, rutaController);
-      EntregaRoutes.registrar(config.routes, entregaController);
-      PlanificacionRoutes.registrar(config.routes, planificacionController);
+      CamionApiRoutes.registrar(config.routes, camionApiController);
+      RutaApiRoutes.registrar(config.routes, rutaApiController);
+      EntregaApiRoutes.registrar(config.routes, entregaApiController);
+      PlanificacionApiRoutes.registrar(config.routes, planificacionApiController);
 
       // Registramos las excepciones usando config.routes
       ExceptionHandlers.registrar(config.routes);
+
+      config.routes.after(ctx -> {
+        var acceso = WithLogisticaPersistenceUnit.PER_THREAD_ENTITY_MANAGER_ACCESS;
+        if (acceso.isAttached() && acceso.get().getTransaction().isActive()) {
+          acceso.get().getTransaction().rollback();
+        }
+        WithLogisticaPersistenceUnit.dispose();
+      });
     });
 
     return new AppLogistica(app, procesoLogistica);

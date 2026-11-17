@@ -2,6 +2,7 @@ package ar.edu.utn.frba.dds.donatrack.donaciones.persistencia;
 
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.bien.Subcategoria;
 import io.github.flbulgarelli.jpa.extras.simple.WithSimplePersistenceUnit;
+import java.util.List;
 
 public class SubcategoriaRepository implements WithSimplePersistenceUnit {
   private static final SubcategoriaRepository INSTANCE = new SubcategoriaRepository();
@@ -25,4 +26,29 @@ public class SubcategoriaRepository implements WithSimplePersistenceUnit {
         .orElse(null);
   }
 
+  public List<Subcategoria> buscarTodos() {
+    return entityManager()
+        .createQuery(
+            "SELECT s FROM Subcategoria s ORDER BY s.categoria.nombre, s.nombre",
+            Subcategoria.class
+        )
+        .getResultList();
+  }
+
+  public List<Subcategoria> buscarTodas() {
+    return entityManager()
+        .createQuery("SELECT s FROM Subcategoria s JOIN FETCH s.categoria", Subcategoria.class)
+        .getResultList();
+  }
+
+  public Subcategoria buscarPorNombre(String categoria, String subcategoria) {
+    return entityManager()
+        .createQuery("SELECT s FROM Subcategoria s WHERE s.nombre = :sub AND s.categoria.nombre = :cat",
+            Subcategoria.class)
+        .setParameter("sub", subcategoria.toLowerCase())
+        .setParameter("cat", categoria.toLowerCase())
+        .getResultStream()
+        .findFirst()
+        .orElse(null);
+  }
 }

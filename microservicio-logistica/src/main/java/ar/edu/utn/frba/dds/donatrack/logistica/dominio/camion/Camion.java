@@ -35,9 +35,11 @@ public class Camion {
   @CollectionTable(name = "camion_coordenadas", joinColumns = @JoinColumn(name = "camion_patente"))
   @OrderColumn(name = "orden")
   private List<Coordenada> coordenadas;
-  @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-  @JoinColumn(name = "gps_imei")
+  @OneToOne
+  @JoinColumn(name = "imei_gps")
   private Gps gps;
+  @Column(name = "estaActivo")
+  private Boolean activo;
 
   public Camion(String patente, Float capacidadVolumen, Float altura, Float capacidadCarga) {
     validar(patente, capacidadVolumen, altura, capacidadCarga);
@@ -47,6 +49,9 @@ public class Camion {
     this.capacidadCarga = capacidadCarga;
     this.coordenadas = new ArrayList<>();
     this.gps = null;
+    this.activo = true;
+
+    this.coordenadas.add(new Coordenada("-34.647812", "-58.452710")); //direccion de nuestro déposito
   }
 
   private void validar(String patente, Float capacidadVolumen, Float altura, Float capacidadCarga) {
@@ -58,8 +63,24 @@ public class Camion {
     this.gps = gps;
   }
 
+  public void quitarGps() {
+    this.gps = null;
+  }
+
   public boolean posee(String idGps) {
     return this.gps != null && this.gps.getImei().equalsIgnoreCase(idGps);
+  }
+
+  public boolean tieneGps() {
+    return this.gps != null;
+  }
+
+  public void darDeBaja() {
+    this.activo = false;
+  }
+
+  public Boolean estaActivo() {
+    return this.activo;
   }
 
   public void agregarCoordenada(Coordenada coordenada) {

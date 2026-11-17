@@ -1,0 +1,374 @@
+/* =========================================
+   PÁGINA Y ENCABEZADOS DE REGISTRO
+   ========================================= */
+.registro-page {
+    width: 100%;
+    max-width: 1320px;
+    margin: 0 auto;
+    padding: 32px 40px 80px 40px;
+}
+
+.breadcrumb {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-bottom: 24px;
+}
+
+.breadcrumb a,
+.breadcrumb a:visited {
+    color: var(--accent-green);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.breadcrumb span {
+    margin: 0 6px;
+}
+
+.registro-container {
+    max-width: 680px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+.registro-container h1 {
+    font-size: 2.2rem;
+    color: var(--accent-dark);
+    margin-bottom: 6px;
+    font-weight: 700;
+}
+
+.registro-container p.subtitulo {
+    color: var(--text-muted);
+    font-size: 0.98rem;
+    margin-bottom: 26px;
+}
+
+/* =========================================
+   TABS DE SELECCIÓN DE PERFIL
+   ========================================= */
+.tabs-perfil {
+    display: flex;
+    background-color: #EBE9DF;
+    border-radius: 10px;
+    margin-bottom: 24px;
+    padding: 4px;
+}
+
+.tab-btn,
+.tab-btn:visited {
+    flex: 1;
+    padding: 11px;
+    text-align: center;
+    text-decoration: none;
+    color: var(--text-muted);
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+    border-radius: 7px;
+}
+
+.tab-btn.active {
+    background-color: var(--white);
+    color: var(--accent-dark);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+/* =========================================
+   TARJETA PRINCIPAL DEL FORMULARIO
+   ========================================= */
+.form-card {
+    background-color: var(--white);
+    padding: 36px 40px;
+    border-radius: 14px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+}
+
+.form-card h3 {
+    font-size: 1.05rem;
+    margin-top: 8px;
+    margin-bottom: 18px;
+    color: var(--accent-dark);
+    font-weight: 700;
+}
+
+.divisor-seccion {
+    border: none;
+    border-top: 1px solid #EFECE6;
+    margin: 26px 0 22px 0;
+}
+
+/* =========================================
+   CHIPS (Persona humana / Persona jurídica)
+   ========================================= */
+.selector-tipo {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+
+.chip,
+.chip:visited {
+    padding: 8px 16px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 0.85rem;
+    text-decoration: none;
+    color: var(--accent-dark);
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.chip.active {
+    background-color: #E3EFEA;
+    border-color: var(--accent-green);
+    color: var(--accent-green);
+    font-weight: 600;
+}
+
+/* =========================================
+   GRILLA DE FILAS, COLUMNAS E INPUTS
+   ========================================= */
+.form-row {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 18px;
+}
+
+.form-group {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 18px;
+}
+
+.form-row .form-group {
+    margin-bottom: 0;
+}
+
+.col-medio {
+    flex: 0 0 30%;
+}
+
+.col-valor {
+    flex: 1;
+}
+
+.col-tipo {
+    flex: 0 0 25%;
+}
+
+label {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+    font-weight: 500;
+}
+
+input[type="text"],
+input[type="password"],
+input[type="email"],
+input[type="number"],
+input[type="date"],
+select,
+textarea {
+    width: 100%;
+    padding: 11px 14px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background-color: var(--white);
+    font-size: 0.92rem;
+    color: var(--accent-dark);
+    transition: all 0.2s;
+}
+
+.input-mono {
+    font-family: monospace;
+    font-size: 0.95rem;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    outline: none;
+    border-color: var(--accent-green);
+    box-shadow: 0 0 0 3px rgba(59, 107, 91, 0.1);
+}
+
+.ayuda-input {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    margin-top: -8px;
+    margin-bottom: 20px;
+}
+
+/* =========================================
+   CONTACTOS ADICIONALES Y PIE DE REGISTRO
+   ========================================= */
+.contacto-row {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 12px;
+    align-items: center;
+}
+
+.btn-texto-verde {
+    background: none;
+    border: none;
+    color: var(--accent-green);
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 4px 0;
+}
+
+.btn-texto-verde:hover {
+    text-decoration: underline;
+}
+
+.btn-peligro {
+    background-color: #FFEBEE;
+    color: #C62828;
+    border: 1px solid #FFCDD2;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.registro-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 28px;
+    padding-top: 22px;
+    border-top: 1px solid #EFECE6;
+    font-size: 0.88rem;
+    color: var(--text-muted);
+}
+
+.registro-footer a,
+.registro-footer a:visited {
+    color: var(--accent-green);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.btn-crear-cuenta {
+    background-color: var(--accent-dark);
+    color: var(--white);
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 0.92rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.btn-crear-cuenta:hover {
+    opacity: 0.9;
+}
+
+/* =========================================
+   PANTALLA DE INICIO DE SESIÓN (login.hbs)
+   ========================================= */
+.login-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - 140px);
+    padding: 40px 20px;
+}
+
+.login-card {
+    width: 100%;
+    max-width: 440px;
+    padding: 40px 36px 32px 36px;
+}
+
+.login-logo {
+    width: 42px;
+    height: 42px;
+    font-size: 1.25rem;
+    font-weight: 700;
+    border-radius: 10px;
+    margin-bottom: 22px;
+}
+
+.login-card h2 {
+    font-size: 1.85rem;
+    font-weight: 700;
+    color: var(--accent-dark);
+    margin-bottom: 8px;
+}
+
+.login-card .subtitulo {
+    color: var(--text-muted);
+    font-size: 0.92rem;
+    line-height: 1.45;
+    margin-bottom: 28px;
+}
+
+.label-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+}
+
+.label-row label {
+    margin-bottom: 0;
+}
+
+.link-olvido,
+.link-olvido:visited {
+    font-size: 0.82rem;
+    color: var(--accent-green);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.alerta-error-login {
+    background-color: #F9E6DF;
+    color: #9E3F24;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    margin-bottom: 18px;
+}
+
+.btn-submit {
+    width: 100%;
+    background-color: var(--accent-dark);
+    color: var(--white);
+    padding: 13px;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 6px;
+}
+
+.login-footer {
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid #EFECE6;
+    text-align: center;
+    font-size: 0.88rem;
+    color: var(--text-muted);
+}
+
+.login-footer a,
+.login-footer a:visited {
+    color: var(--accent-green);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.oculto {
+    display: none !important;
+}

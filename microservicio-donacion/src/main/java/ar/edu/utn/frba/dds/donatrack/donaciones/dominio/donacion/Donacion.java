@@ -1,5 +1,6 @@
 package ar.edu.utn.frba.dds.donatrack.donaciones.dominio.donacion;
 
+import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.bien.tipobien.Perecedero;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.donante.Donante;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.beneficiario.Beneficiario;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.bien.Bien;
@@ -14,6 +15,7 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 import lombok.Setter;
 
@@ -145,10 +147,21 @@ public class Donacion {
     setEstadoActual(TipoEstadoDonacion.EN_DEPOSITO, null);
   }
 
+  public boolean esPerecedera() {
+    return bienes.stream().anyMatch(b -> b instanceof Perecedero);
+  }
+
+  public boolean sePuedeMarcarVencida() {
+    return getEstadoActual() == TipoEstadoDonacion.EN_DEPOSITO && esPerecedera();
+  }
+
   // [En Deposito] -> [Vencida] FIN
   public void vencida() {
     if (getEstadoActual() != TipoEstadoDonacion.EN_DEPOSITO)
       throw new CambioDeEstadoNoPermitidoException("No se puede marcar como vencida si no esta en deposito");
+
+    if (!esPerecedera())
+      throw new CambioDeEstadoNoPermitidoException("Solo se puede marcar como vencida una donación con bienes perecederos");
 
     setEstadoActual(TipoEstadoDonacion.VENCIDA, null);
     this.estadoModificable = false;
@@ -168,7 +181,7 @@ public class Donacion {
   //====================== FUNCIONES AUXILIARES ==========================
   private String setDescripcionGeneral(List<Bien> bienes) {
     return bienes.stream()
-        .map(b -> b.getCantidad() + " " + b.getUnidadMedida() + " de " + b.getDescripcion())
+        .map(b -> b.getCantidad() + " " + b.getUnidadMedida().toString().toLowerCase() + " de " + b.getDescripcion())
         .collect(Collectors.joining(", "));
   }
 

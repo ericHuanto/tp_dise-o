@@ -2,7 +2,7 @@
 
 ## Diagrama de despliegue:
 
-![](docs/terceraEntrega/diagrama_de_despliegue.png)
+![](docs/cuartaEntrega/diagrama_de_despliegue_nube.png)
 
 ## Diagrama de clases logistica: 
 
@@ -14,7 +14,7 @@
 
 ## DER Donaciones:
 
-![](docs/terceraEntrega/der_donaciones.png)
+![](docs/cuartaEntrega/der_donaciones_v2.png)
 
 ## DER Logistica:
 

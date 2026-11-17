@@ -14,10 +14,12 @@ import java.util.Arrays;
 
 @Getter
 @NoArgsConstructor
-@Embeddable //No puede tener ID y no ser una identidad a la vez
+@Entity
+@Table(name = "necesidades")
 public class Necesidad {
   @Setter
   @Column(name = "id_necesidad")
+  @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
   @Column(name = "descripcion")
   private String descripcion;

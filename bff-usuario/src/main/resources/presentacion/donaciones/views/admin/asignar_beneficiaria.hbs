@@ -1,0 +1,134 @@
+{{#partial "nombre_pestaña"}}
+    Asignar beneficiaria - DonaTrack
+{{/partial}}
+
+{{#partial "css_extra"}}
+    <link rel="stylesheet" href="donaciones/css/admin/donaciones.css">
+{{/partial}}
+
+{{#partial "contenido_propio"}}
+    <section class="pagina-admin">
+        <nav class="breadcrumb">
+            <a href="/">Inicio</a><span>›</span><a href="/asignaciones">Asignaciones</a><span>›</span>{{donacion.codigo}}
+        </nav>
+
+        <h1>Asignar beneficiaria
+            <span class="mono codigo-titulo">{{donacion.codigo}}</span>
+            <span class="estado estado-{{donacion.estadoClave}}">{{donacion.estadoTexto}}</span>
+        </h1>
+
+        <form action="/rankings/{{ranking.id}}" method="POST">
+            <div class="asignar-grid">
+
+                <aside class="tarjeta">
+                    <h2>Donación</h2>
+                    <ul class="bienes">
+                        {{#each donacion.bienes}}
+                            <li>
+                                <span class="bien-desc"><strong>{{this.descripcion}}</strong>
+                                    <small>{{this.categoria}} › {{this.subcategoria}}</small>
+                                </span>
+                                <span class="bien-cant mono">{{this.cantidad}} {{this.unidadMedida}}</span>
+                            </li>
+                        {{/each}}
+                    </ul>
+                    <dl class="datos">
+                        <dt>Ingreso</dt><dd class="mono">{{donacion.fechaIngreso}}</dd>
+                        {{#if donacion.vencimiento}}
+                            <dt>Vence</dt><dd class="mono">{{donacion.vencimiento}}</dd>
+                        {{/if}}
+                        <dt>Donantes</dt>
+                        <dd>{{#each donacion.donantes}}{{this.nombre}}{{#unless @last}}, {{/unless}}{{/each}}</dd>
+                    </dl>
+                </aside>
+
+                <section class="tarjeta tarjeta-tabla">
+                    <div class="tarjeta-cabecera">
+                        <div>
+                            <h2>Entidades candidatas</h2>
+                            <p class="subtitulo">Ranking calculado el <span class="mono">{{ranking.fechaGeneracion}}</span></p>
+                        </div>
+                        <div class="criterios" role="tablist">
+                            {{#each criterios}}
+                                <a href="?criterio={{this.clave}}" class="{{#if this.activo}}activo{{/if}}">{{this.texto}}</a>
+                            {{/each}}
+                        </div>
+                    </div>
+
+                    <div class="tabla-scroll">
+                        <table class="tabla">
+                            <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Entidad</th>
+                                <th>Puntaje</th>
+                                <th>Necesidad que cubre</th>
+                                <th>Distancia</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {{#each candidatos}}
+                                <tr>
+                                    <td class="celda-radio">
+                                        <label>
+                                            <input type="radio" name="id_beneficiario" value="{{this.beneficiario.id}}"
+                                                   data-nombre="{{this.beneficiario.razonSocial}}" data-pos="{{this.posicion}}"
+                                                   {{#if @first}}checked{{/if}} required>
+                                            <span class="mono">{{this.posicion}}</span>
+                                        </label>
+                                    </td>
+                                    <td><strong>{{this.beneficiario.razonSocial}}</strong>
+                                        <small>{{this.beneficiario.zona}}</small></td>
+                                    <td>
+                                        <span class="puntaje mono">{{this.puntaje}}</span>
+                                        <span class="barra"><span style="width: {{this.puntaje}}%"></span></span>
+                                    </td>
+                                    <td>{{this.necesidad.descripcion}} · faltan {{this.necesidad.faltante}}
+                                        <span class="urgencia urgencia-{{this.necesidad.urgenciaClave}}">{{this.necesidad.urgenciaTexto}}</span>
+                                    </td>
+                                    <td class="mono">{{this.distanciaKm}} km</td>
+                                </tr>
+                            {{/each}}
+                            </tbody>
+                        </table>
+                    </div>
+                    <p class="criterio-nota">Criterio: {{criterioDescripcion}}</p>
+                </section>
+            </div>
+
+            {{#if pendiente}}
+                <div class="barra-seleccion">
+                    <p>Entidad seleccionada: <strong id="seleccionNombre"></strong>
+                        · posición <span class="mono" id="seleccionPos"></span> del ranking</p>
+                    <div>
+                       <a href="/asignaciones" class="btn-secondary">Volver</a>
+                       <button type="submit" class="btn-primary">Confirmar asignación</button>
+                    </div>
+                </div>
+            {{else}}
+                <div class="barra-seleccion">
+                    <p>Esta donación ya fue asignada a <strong>{{donacion.beneficiaria}}</strong>.</p>
+                    <a href="/asignaciones" class="btn-sec">Volver</a>
+                </div>
+            {{/if}}
+        </form>
+    </section>
+{{/partial}}
+
+{{#partial "scripts"}}
+    <script>
+        const nombre = document.getElementById('seleccionNombre');
+        const pos = document.getElementById('seleccionPos');
+        function actualizarSeleccion() {
+            const r = document.querySelector('input[name="id_beneficiario"]:checked');
+            if (!r || !nombre) return;
+            nombre.textContent = r.dataset.nombre;
+            pos.textContent = r.dataset.pos;
+        }
+        document.querySelectorAll('input[name="id_beneficiario"]')
+            .forEach(r => r.addEventListener('change', actualizarSeleccion));
+        actualizarSeleccion();
+    </script>
+{{/partial}}
+
+{{> donaciones/partials/layout.hbs}}

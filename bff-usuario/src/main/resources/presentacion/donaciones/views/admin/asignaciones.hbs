@@ -1,0 +1,55 @@
+{{#partial "nombre_pestaña"}}
+    Asignaciones - DonaTrack
+{{/partial}}
+
+{{#partial "css_extra"}}
+    <link rel="stylesheet" href="/donaciones/css/admin/donaciones.css">
+{{/partial}}
+
+{{#partial "contenido_propio"}}
+    <section class="pagina-admin">
+        <nav class="breadcrumb"><a href="/">Inicio</a><span>›</span>Asignaciones</nav>
+
+        <h1>Asignaciones</h1>
+        <p class="subtitulo">Donaciones con ranking de entidades candidatas.</p>
+
+        {{#if asignadaCodigo}}
+            <p class="aviso-ok" role="status">La donación {{asignadaCodigo}} fue asignada a {{asignadaEntidad}}.</p>
+        {{/if}}
+
+        <div class="tabla-scroll">
+            <table class="tabla">
+                <thead>
+                <tr>
+                    <th>Código</th>
+                    <th>Donación</th>
+                    <th>Ranking calculado</th>
+                    <th>Candidatas</th>
+                    <th>Estado</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                {{#each rankings}}
+                    <tr>
+                        <td class="mono">{{this.donacion.codigo}}</td>
+                        <td>{{this.donacion.descripcion}}</td>
+                        <td class="mono">{{this.fechaGeneracion}}</td>
+                        <td class="mono">{{this.cantCandidatos}}</td>
+                        <td><span class="estado estado-{{this.donacion.estadoClave}}">{{this.donacion.estadoTexto}}</span></td>
+                        <td>
+                            <a class="btn-link" href="/asignaciones/{{this.id}}">
+                                {{#if this.pendiente}}Elegir entidad{{else}}Ver ranking{{/if}}
+                            </a>
+                        </td>
+                    </tr>
+                {{else}}
+                    <tr><td colspan="6" class="vacio">Todavía no hay rankings generados.</td></tr>
+                {{/each}}
+                </tbody>
+            </table>
+        </div>
+    </section>
+{{/partial}}
+
+{{> donaciones/partials/layout.hbs}}

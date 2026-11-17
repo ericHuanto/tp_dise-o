@@ -4,12 +4,12 @@ import ar.edu.utn.frba.dds.donatrack.logistica.dominio.beneficiario.Beneficiario
 import ar.edu.utn.frba.dds.donatrack.logistica.dominio.camion.Camion;
 import ar.edu.utn.frba.dds.donatrack.logistica.dominio.planificacion.Lote;
 import ar.edu.utn.frba.dds.donatrack.logistica.persistencia.BeneficiarioRepository;
-import ar.edu.utn.frba.dds.donatrack.logistica.web.integracion.planificadorexterno.ClientePlanificadorExterno;
+import ar.edu.utn.frba.dds.donatrack.logistica.dominio.planificadorexterno.ClientePlanificadorExterno;
 import ar.edu.utn.frba.dds.donatrack.logistica.dominio.beneficiario.DonacionEnTransito;
 import ar.edu.utn.frba.dds.donatrack.logistica.dominio.entrega.Entrega;
 import ar.edu.utn.frba.dds.donatrack.logistica.dominio.ruta.Ruta;
-import ar.edu.utn.frba.dds.donatrack.logistica.web.dto.planificacion.CallbackPlanificacionRequest;
-import ar.edu.utn.frba.dds.donatrack.logistica.web.integracion.microserviciosdonaciones.ConectorDonacionesApi;
+import ar.edu.utn.frba.dds.donatrack.logistica.web.shared.dto.planificacion.CallbackPlanificacionRequest;
+import ar.edu.utn.frba.dds.donatrack.logistica.web.shared.integracion.microserviciosdonaciones.ConectorDonaciones;
 import ar.edu.utn.frba.dds.donatrack.logistica.persistencia.CamionRepository;
 import ar.edu.utn.frba.dds.donatrack.logistica.persistencia.EntregaRepository;
 import ar.edu.utn.frba.dds.donatrack.logistica.persistencia.RutaRepository;
@@ -28,13 +28,14 @@ public class CoordinadorRuta {
   private final RutaRepository rutaRepository;
   private final CamionRepository camionRepository;
   private final EntregaRepository entregaRepository;
-  private final ConectorDonacionesApi donacionesClient;
+  //private final ConectorDonacionesApi donacionesClient;
   private final ClientePlanificadorExterno clienteExterno;
+  private final ConectorDonaciones donacionesClient;
   private final BeneficiarioRepository beneficiarioRepository;
 
   public CoordinadorRuta(RutaRepository rutaRepository, CamionRepository camionRepository,
-                         EntregaRepository entregaRepository, BeneficiarioRepository beneficiarioRepository, ConectorDonacionesApi donacionesClient,
-                         ClientePlanificadorExterno clienteExterno){
+                         EntregaRepository entregaRepository, BeneficiarioRepository beneficiarioRepository,
+                         ConectorDonaciones donacionesClient, ClientePlanificadorExterno clienteExterno){
     this.rutaRepository = rutaRepository;
     this.camionRepository = camionRepository;
     this.entregaRepository = entregaRepository;

@@ -1,0 +1,62 @@
+{{#partial "nombre_pestaña"}}
+    Notificaciones
+{{/partial}}
+
+{{#partial "breadcrumbs"}}
+    <span>Inicio</span>
+    <span>Notificaciones</span>
+{{/partial}}
+
+{{#partial "contenido_propio"}}
+
+    <section class="notificaciones">
+
+        <h1>Notificaciones</h1>
+
+        <p>Consultá los cambios de estado de tus donaciones asignadas.</p>
+
+        {{#if novedades}}
+
+            <div class="lista-notificaciones">
+
+                {{#each novedades}}
+
+                    <article class="notificacion-card">
+
+                        <h3>Donación #{{idDonacion}}</h3>
+
+                        <p>
+                            <strong>Estado:</strong> {{tipoEstado}}
+                        </p>
+
+                        <p>{{descripcion}}</p>
+
+                        {{#if detalle}}
+                            <p>{{detalle}}</p>
+                        {{/if}}
+
+                        <p>
+                            <strong>Fecha:</strong> {{fecha}}
+                        </p>
+
+                        <a href="/mis-donaciones/{{idDonacion}}">
+                            Ver donación
+                        </a>
+
+                    </article>
+
+                {{/each}}
+
+            </div>
+
+        {{else}}
+
+            <p>Todavía no tenés novedades sobre tus donaciones.</p>
+
+        {{/if}}
+
+    </section>
+
+{{/partial}}
+
+{{> donaciones/partials/layout.hbs}}

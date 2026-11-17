@@ -1,0 +1,199 @@
+.donaciones-asignadas {
+    max-width: 1200px;
+    margin: 40px auto 70px;
+    padding: 0 24px;
+}
+
+.donaciones-asignadas h1 {
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--accent-dark);
+    margin-bottom: 10px;
+}
+
+.donaciones-subtitulo {
+    color: var(--text-muted);
+    margin-bottom: 30px;
+}
+
+/* Filtros */
+
+.filtros-donaciones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 28px;
+}
+
+.filtro {
+    padding: 10px 18px;
+    border: 1px solid var(--border-color);
+    border-radius: 24px;
+    background: var(--white);
+    color: var(--accent-dark);
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.filtro:hover {
+    border-color: var(--accent-green);
+}
+
+.filtro.activo {
+    background: var(--accent-dark);
+    color: var(--white);
+    border-color: var(--accent-dark);
+}
+
+/* Tabla */
+
+.tabla-contenedor {
+    background: var(--white);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    overflow-x: auto;
+}
+
+.tabla-donaciones {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.tabla-donaciones th {
+    background: #f7f7f3;
+    padding: 18px 20px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.tabla-donaciones td {
+    padding: 20px;
+    border-bottom: 1px solid var(--border-color);
+    font-size: 14px;
+    vertical-align: middle;
+}
+
+.tabla-donaciones tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.tabla-donaciones tr[hidden] {
+    display: none;
+}
+
+.codigo-donacion {
+    font-weight: 600;
+}
+
+.descripcion-donacion {
+    max-width: 400px;
+    line-height: 1.5;
+}
+
+/* Estados */
+
+.estado-donacion {
+    display: inline-block;
+    padding: 7px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.estado-donacion[data-estado="ASIGNACION_REALIZADA"] {
+    background: #e8eefc;
+    color: #3158a6;
+}
+
+.estado-donacion[data-estado="LISTA_PARA_ENTREGAR"] {
+    background: #f1edfc;
+    color: #7251a5;
+}
+
+.estado-donacion[data-estado="EN_TRASLADO"] {
+    background: #fff1d8;
+    color: #936100;
+}
+
+.estado-donacion[data-estado="ENTREGADA"] {
+    background: #e3f3e9;
+    color: #286445;
+}
+
+.estado-donacion[data-estado="ENTREGA_FALLIDA"] {
+    background: #fbe5e5;
+    color: #a43b3b;
+}
+
+/* Acciones */
+
+.accion-detalle {
+    color: var(--accent-green);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.accion-detalle:hover {
+    text-decoration: underline;
+}
+
+.mensaje-sin-resultados {
+    padding: 30px;
+    text-align: center;
+    color: var(--text-muted);
+}
+
+.mensaje-sin-resultados[hidden] {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .donaciones-asignadas {
+        padding: 0 16px;
+    }
+
+    .donaciones-asignadas h1 {
+        font-size: 26px;
+    }
+
+    .tabla-donaciones {
+        min-width: 650px;
+    }
+
+    /* Botón Ver detalle */
+
+    .accion-detalle {
+        display: inline-block;
+        padding: 8px 16px;
+
+        background-color: var(--accent-dark, #245c46);
+        color: #ffffff;
+
+        border: 1px solid transparent;
+        border-radius: 8px;
+
+        font-size: 13px;
+        font-weight: 600;
+        text-decoration: none;
+
+        cursor: pointer;
+        transition: background-color 0.2s ease,
+        transform 0.2s ease;
+    }
+
+    .accion-detalle:hover {
+        background-color: #174532;
+        color: #ffffff;
+        transform: translateY(-1px);
+        text-decoration: none;
+    }
+
+    .accion-detalle:focus-visible {
+        outline: 2px solid #174532;
+        outline-offset: 3px;
+    }
+}

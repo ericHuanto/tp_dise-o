@@ -15,7 +15,7 @@ public class BeneficiarioRepository implements WithLogisticaPersistenceUnit {
   }
 
   public void guardar(Beneficiario beneficiario) {
-    withTransaction(() -> entityManager().persist(beneficiario));
+    entityManager().persist(beneficiario);
   }
 
   public Beneficiario buscarPorId(Long id) {
@@ -32,7 +32,7 @@ public class BeneficiarioRepository implements WithLogisticaPersistenceUnit {
       throw new RegistroNoEncontradoException(
           "No se puede actualizar: no existe beneficiario con id " + beneficiario.getId());
     }
-    withTransaction(() -> entityManager().merge(beneficiario));
+    entityManager().merge(beneficiario);
   }
 
   public void eliminar(Long id) {
@@ -40,6 +40,6 @@ public class BeneficiarioRepository implements WithLogisticaPersistenceUnit {
     if (beneficiario == null) {
       throw new RegistroNoEncontradoException("No existe beneficiario con id " + id);
     }
-    withTransaction(() -> entityManager().remove(beneficiario));
+    entityManager().remove(beneficiario);
   }
 }

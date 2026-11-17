@@ -8,7 +8,7 @@ public class ConfiguracionEntorno {
   private final Dotenv dotenv;
 
   private ConfiguracionEntorno() {
-    this.dotenv = Dotenv.load();
+    this.dotenv = Dotenv.configure().ignoreIfMissing().load();
   }
 
   public static ConfiguracionEntorno getInstance() {
@@ -31,6 +31,10 @@ public class ConfiguracionEntorno {
     return elegirPuerto("PUERTO_LOGISTICA", puertoPorDefecto);
   }
 
+  public Integer puertoBff(int puertoPorDefecto) {
+    return elegirPuerto("PUERTO_BFF", puertoPorDefecto);
+  }
+
   public String getTwilioAccountSid() {
     return obtenerObligatorio("TWILIO_ACCOUNT_SID");
   }
@@ -49,6 +53,85 @@ public class ConfiguracionEntorno {
 
   public String elegirUrlDonaciones(String urlPorDefecto) {
     return elegirUrl("URL_API_DONACIONES", urlPorDefecto);
+  }
+
+  public Integer puertoGrpcDonaciones(int puertoPorDefecto) {
+    return elegirPuerto("PUERTO_GRPC_DONACIONES", puertoPorDefecto);
+  }
+
+  public String hostGrpcDonaciones(String hostPorDefecto) {
+    String valor = dotenv.get("HOST_GRPC_DONACIONES");
+    if (valor == null || valor.isBlank()) {
+      System.out.println("Falta la variable de entorno: 'HOST_GRPC_DONACIONES' Se va a usar el host por default: " + hostPorDefecto);
+      return hostPorDefecto;
+    }
+    return valor;
+  }
+
+  // Métodos para la DB
+  public String getDbUrlDonaciones() {
+    return obtenerObligatorio("DB_URL_DONACIONES");
+  }
+
+  public String getDbUrlLogistica() {
+    return obtenerObligatorio("DB_URL_LOGISTICA");
+  }
+
+  public String getDbUrlBff() {
+    return obtenerObligatorio("DB_URL_BFF");
+  }
+
+  public String getDbUser() {
+    return obtenerObligatorio("DB_USER");
+  }
+
+  public String getDbPassword() {
+    String password = dotenv.get("DB_PASSWORD");
+
+    if (password == null) {
+      throw new ConfigurationEntornoException(
+          "Falta la variable de entorno: 'DB_PASSWORD'"
+      );
+    }
+
+    return password;
+  }
+
+  public String getDbDriver()  {
+    return obtenerObligatorio("DB_DRIVER");
+  }
+
+  public String getDbDialect() {
+    return obtenerObligatorio("DB_DIALECT");
+  }
+
+  // Métodos para gRPC
+  public Integer puertoGrpcLogistica(int puertoPorDefecto) {
+    return elegirPuerto("PUERTO_GRPC_LOGISTICA", puertoPorDefecto);
+  }
+
+  public String hostGrpcLogistica(String hostPorDefecto) {
+    String valor = dotenv.get("HOST_GRPC_LOGISTICA");
+    if (valor == null || valor.isBlank()) {
+      System.out.println("Falta la variable de entorno: 'HOST_GRPC_LOGISTICA' Se va a usar el host por default: " + hostPorDefecto);
+      return hostPorDefecto;
+    }
+    return valor;
+  }
+
+
+  public String adminUsuario(String porDefecto) {
+    String v = dotenv.get("ADMIN_USUARIO");
+    return (v == null || v.isBlank()) ? porDefecto : v;
+  }
+
+  public String adminPassword(String porDefecto) {
+    String v = dotenv.get("ADMIN_PASSWORD");
+    if (v == null || v.isBlank()) {
+      System.out.println("Falta 'ADMIN_PASSWORD': se usa la clave por defecto (solo para pruebas locales)");
+      return porDefecto;
+    }
+    return v;
   }
 
   //=================== FUNCIONES AUXILIARES =====================

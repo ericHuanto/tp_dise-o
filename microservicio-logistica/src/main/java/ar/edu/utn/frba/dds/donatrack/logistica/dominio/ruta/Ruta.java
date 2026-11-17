@@ -32,23 +32,18 @@ public class Ruta {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "id_ruta")
   private Long id;
-
   @ManyToOne
   @JoinColumn(name = "camion_patente")
   private Camion camion;
-
   @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
   @JoinColumn(name = "chofer_licencia")
   private Chofer chofer;
-
   @Column(name = "fecha")
   private LocalDate fecha;
-
   @OneToMany
   @JoinColumn(name = "id_ruta")
   @OrderColumn(name = "orden_entrega")
   private List<Entrega> entregasOrdenadas;
-
   @Column(name = "esta_iniciada")
   private boolean estaIniciada;
 

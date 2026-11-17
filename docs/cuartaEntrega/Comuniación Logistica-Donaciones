@@ -1,0 +1,37 @@
+#	Método en logística	Verbo y ruta que arma el cliente	Ruta real en donaciones	Body	Qué hace en donaciones
+1	buscarDonacionesAsignadas()
+ruta que arma logistica: GET /donaciones?estado=ASIGNACION_REALIZADA
+ruta en donaciones: GET /api/donaciones (obtenerTodos)
+Body: no
+Devuelve las donaciones asignadas, y logística arma las Entrega agrupando por beneficiario.
+
+2	marcarDonacionListaParaEntregar(Long id)
+ruta que arma logistica: PATCH /donaciones/{id}/lista-para-entregar
+ruta en donaciones: PATCH /api/donaciones/{id}/lista-para-entregar
+Body: no
+Asignación Realizada → Lista Para Entregar.
+
+3	marcarDonacionEnCamino(Long id, linkMapa)
+ruta que arma logistica: PATCH /donaciones/{id}/en-camino
+ruta en donaciones: PATCH /api/donaciones/{id}/en-camino
+Body: {linkMapa}
+Lista Para Entregar → En Traslado. Publica EventoInicioDeRuta.
+
+4	marcarDonacionEntregaExitosa(Long id, link)
+ruta que arma logistica: PATCH /donaciones/{id}/entregada
+ruta que arma donaciones: PATCH /api/donaciones/{id}/entregada
+Body: {linkComprobanteEntrega}
+En Traslado → Entregada. Publica EventoEntregaExitosa.
+
+5	marcarDonacionErrorEntrega(Long id, motivo)
+ruta que arma logistica: PATCH /donaciones/{id}/error-entrega
+ruta que arma donaciones: PATCH /api/donaciones/{id}/error-entrega
+Body: donaciones exige observacion
+En Traslado → Entrega Fallida. Publica EventoEntregaFallida.
+
+6	marcarDonacionVueltaDeposito(Long id)
+ruta que arma logistica: PATCH /donaciones/{id}/vuelta-deposito
+ruta que arma donaciones: PATCH /api/donaciones/{id}/vuelta-deposito
+Body: no
+Entrega Fallida → En Depósito.
+

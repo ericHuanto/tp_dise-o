@@ -16,6 +16,7 @@
         <module>microservicio-donacion</module>
         <module>microservicio-logistica</module>
         <module>shared</module>
+        <module>bff-usuario</module>
     </modules>
 
     <properties>
@@ -157,6 +158,13 @@
             <artifactId>mysql-connector-j</artifactId>
             <version>26.7.0</version>
             <!-- <scope>compile</scope> -->
+        </dependency>
+        <!-- Source: https://mvnrepository.com/artifact/org.mindrot/jbcrypt
+        Motivo: Permite hashear contraseñas -->
+        <dependency>
+            <groupId>org.mindrot</groupId>
+            <artifactId>jbcrypt</artifactId>
+            <version>0.4</version>
         </dependency>
     </dependencies>
     </dependencyManagement>

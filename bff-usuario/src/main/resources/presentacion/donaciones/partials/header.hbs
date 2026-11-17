@@ -1,0 +1,39 @@
+<header>
+    <div class="header-left">
+        <a href="/" class="logo-link">
+            <div class="icono-logo">D</div>
+            <span>DonaTrack</span>
+        </a>
+        {{#unless usuario}}
+            <a href="/beneficiarios/donaciones/recibidas" class="nav-tab">Ver entregas</a>
+        {{/unless}}
+    </div>
+
+    {{#if usuario}}
+        {{> donaciones/partials/navbar.hbs}}
+        <span class="usuario-actual">@{{usuario.nombreUsuario}}</span>
+        <div class="header-right">
+            <form action="/logout" method="POST">
+                <button type="submit" class="btn-secondary">Cerrar Sesión</button>
+            </form>
+        </div>
+    {{else}}
+        <div class="header-right">
+            <a href="/login">Iniciar sesión</a>
+            <a href="/perfil/donante-humana" class="btn-primary">Registrarse</a>
+        </div>
+    {{/if}}
+</header>
+
+<!-- Marca como "activo" la pestaña actual -->
+<script>
+    const ruta = window.location.pathname;
+    const links = [...document.querySelectorAll('.header-left a.nav-tab, .nav-links a')];
+    const coincide = l => {
+        const h = l.getAttribute('href');
+        return h === ruta || (h !== '/' && ruta.startsWith(h + '/'));
+    };
+    const mejor = links.filter(coincide)
+        .sort((a, b) => b.getAttribute('href').length - a.getAttribute('href').length)[0];
+    if (mejor) mejor.classList.add('active');
+</script>

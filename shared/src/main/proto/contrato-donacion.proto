@@ -1,0 +1,438 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "ar.edu.utn.frba.dds.donatrack.grpc";
+
+service DonacionesService {
+  // Comunicación con Logística
+  rpc BuscarDonacionesAsignadas (Vacio) returns (ListaDonaciones);
+  rpc MarcarListaParaEntregar  (DonacionId) returns (Resultado);
+  rpc MarcarEnCamino           (EnCaminoRequest) returns (Resultado);
+  rpc MarcarEntregada          (EntregadaRequest) returns (Resultado);
+  rpc MarcarErrorEntrega       (ErrorEntregaRequest) returns (Resultado);
+  rpc MarcarVueltaDeposito     (DonacionId) returns (Resultado);
+
+  // BFF
+  // Registro de Perfiles
+  rpc RegistrarDonanteHumana   (RegistrarHumanaRequest) returns (RegistroActorResponse);
+  rpc RegistrarDonanteJuridica (RegistrarJuridicaRequest) returns (RegistroActorResponse);
+  rpc RegistrarBeneficiario    (RegistrarBeneficiarioRequest) returns (RegistroActorResponse);
+
+  // Mapa de Beneficiarios
+  rpc ObtenerDatosMapaDonacionesRecibidas (Vacio) returns (DatosMapaResponse);
+
+  //Donante
+  rpc ObtenerVistaDonacionesDonante (FiltroDonacionesDonanteRequest) returns (VistaDonacionesDonanteResponse);
+  rpc ListarBeneficiariosParaDonante (Vacio)                         returns (ListaBeneficiariosParaDonanteResponse);
+  rpc ObtenerDetalleBeneficiario     (BeneficiarioIdRequest)         returns (DetalleBeneficiarioResponse);
+
+  //Gestion de Donaciones
+  rpc ListarDonacionesAdmin         (FiltroDonacionesAdminRequest)   returns (ListaDonacionesAdminResponse);
+  rpc MarcarDonacionComoVencida     (DonacionId)                     returns (Resultado);
+
+  //Necesidades
+  rpc ListarNecesidades (ListarNecesidadesRequest) returns (ListarNecesidadesResponse);
+  rpc ObtenerDatosFormularioNecesidad (Vacio) returns (DatosFormularioNecesidadResponse);
+  rpc GuardarNecesidad (GuardarNecesidadRequest) returns (Resultado);
+  rpc ObtenerDatosEdicionNecesidad (NecesidadIdRequest) returns (DatosEdicionNecesidadResponse);
+  rpc ActualizarNecesidad (ActualizarNecesidadRequest) returns (Resultado);
+
+  //DonacionBeneficiario
+  rpc ListarDonacionesPorBeneficiario (BeneficiarioIdRequest) returns (ListaDonacionesBeneficiarioResponse);
+  rpc ObtenerDetalleDonacionBeneficiario (DetalleDonacionBeneficiarioRequest) returns (DetalleDonacionBeneficiarioResponse);
+  rpc ListarNovedadesBeneficiario (BeneficiarioIdRequest) returns (ListaNovedadesBeneficiarioResponse);
+
+  //Asignacion
+  rpc ListarRankingsVigentes (Vacio) returns (ListaRankingsResponse);
+  rpc ConfirmarAsignacion    (ConfirmarAsignacionRequest) returns (Resultado);
+
+  //Importador CSV
+  rpc ImportarDonantesCsv (ImportarCsvRequest) returns (ImportarCsvResponse);
+
+  //RegistroEntrega
+  rpc ListarSubcategorias (Vacio) returns (ListaSubcategoriasResponse);
+  rpc BuscarDonantes      (BuscarDonantesRequest) returns (ListaDonantesResumenResponse);
+  rpc RegistrarEntrega    (RegistrarEntregaRequest) returns (RegistrarEntregaResponse);
+}
+
+
+
+message Vacio {}
+message DonacionId { int64 id = 1; }
+message EnCaminoRequest { int64 id = 1; string link_mapa = 2; }
+message EntregadaRequest { int64 id = 1; string link_comprobante_entrega = 2; }
+message ErrorEntregaRequest { int64 id = 1; string observacion = 2; }
+message Resultado { string mensaje = 1; }
+
+message BeneficiarioMsg { int64 id = 1; string razon_social = 2; string direccion = 3; }
+message DonacionMsg { int64 id = 1; string descripcion = 2; BeneficiarioMsg beneficiario = 3; }
+message ListaDonaciones { repeated DonacionMsg donaciones = 1; }
+
+message ContactoMsg {
+  string tipo_contacto = 1;
+  string valor = 2;
+  bool es_principal = 3;
+}
+
+message RegistrarHumanaRequest {
+  string nombre = 1;
+  string apellido = 2;
+  string tipo_documento = 3;
+  string numero_documento = 4;
+  string fecha_nacimiento = 5;
+  string genero = 6;
+  string direccion = 7;
+  repeated ContactoMsg contactos = 8;
+}
+
+message RegistrarJuridicaRequest {
+  string razon_social = 1;
+  string tipo_documento = 2;
+  string numero_documento = 3;
+  string tipo_organizacion = 4;
+  string rubro = 5;
+  string nombre_representante = 6;
+  string apellido_representante = 7;
+  string tipo_documento_representante = 8;
+  string numero_documento_representante = 9;
+  string direccion_representante = 10;
+  repeated ContactoMsg contactos = 11;
+}
+
+message RegistrarBeneficiarioRequest {
+  string razon_social = 1;
+  string direccion = 2;
+  repeated ContactoMsg contactos = 3;
+}
+
+message RegistroActorResponse {
+  int64 id_creado = 1;
+}
+
+//Mapa de Beneficiarios
+message CategoriaMsg {
+  int64 id = 1;
+  string nombre = 2;
+}
+
+message DatosMapaResponse {
+  string marcadores_json = 1;
+  repeated CategoriaMsg categorias = 2;
+}
+
+//Donante
+message SubcategoriaMsg {
+  int64 id = 1;
+  string nombre = 2;
+  CategoriaMsg categoria = 3;
+}
+
+//RegistroEntrega
+message ListaSubcategoriasResponse {
+  repeated SubcategoriaMsg subcategorias = 1;
+}
+
+message BuscarDonantesRequest {
+  string q = 1;
+}
+
+message DonanteResumenMsg {
+  int64 id = 1;
+  string nombre = 2;
+  string documento = 3;
+  string tipo_persona = 4;
+}
+
+message ListaDonantesResumenResponse {
+  repeated DonanteResumenMsg donantes = 1;
+}
+
+message BienEntregaMsg {
+  string tipo = 1;
+  string categoria = 2;
+  string subcategoria = 3;
+  string descripcion = 4;
+  float cantidad = 5;
+  string unidad_medida = 6;
+  string fecha_vencimiento = 7;
+  bool usado = 8;
+}
+
+message RegistrarEntregaRequest {
+  int64 id_donante = 1;
+  string fecha_recepcion = 2;    // ISO yyyy-MM-dd
+  string observaciones = 3;
+  repeated BienEntregaMsg bienes = 4;
+}
+
+message RegistrarEntregaResponse {
+  int64 id_registro = 1;
+  int32 cantidad_donaciones = 2;
+}
+
+enum UnidadMedidaProto {
+  KILOGRAMOS = 0;
+  GRAMOS = 1;
+  LITROS = 2;
+  MILILITROS = 3;
+  UNIDADES = 4;
+}
+
+
+enum TipoEstadoDonacionProto {
+  EN_DEPOSITO = 0;
+  ASIGNACION_REALIZADA = 1;
+  LISTA_PARA_ENTREGAR = 2;
+  EN_TRASLADO = 3;
+  ENTREGADA = 4;
+  ENTREGA_FALLIDA = 5;
+  VENCIDA = 6;
+}
+
+message FiltroDonacionesDonanteRequest {
+  int64 id_donante = 1;
+  string estado = 2;
+  int64 id_categoria = 3;
+  repeated int64 ids_subcategorias = 4;
+}
+
+message DonacionVistaMsg {
+  int64 id = 1;
+  string descripcion = 2;
+  SubcategoriaMsg subcategoria =3;
+  string estado_actual = 4;
+}
+
+message VistaDonacionesDonanteResponse {
+  repeated DonacionVistaMsg donaciones = 1;
+  repeated string estados = 2;
+  repeated CategoriaMsg categorias = 3;
+  repeated SubcategoriaMsg subcategorias = 4;
+}
+
+message NecesidadVistaMsg {
+  string descripcion = 1;
+  string tipo = 2;
+  string frecuencia = 3;
+  SubcategoriaMsg subcategoria = 4;
+  string cantidad_requerida = 5;
+  string cantidad_recibida = 6;
+  string unidad_medida = 7;
+}
+
+message BeneficiarioDetalleMsg {
+  int64 id = 1;
+  string razon_social = 2;
+  string direccion = 3;
+  repeated NecesidadVistaMsg necesidades = 4;
+}
+
+message ListaBeneficiariosParaDonanteResponse {
+  repeated BeneficiarioDetalleMsg beneficiarios = 1;
+}
+
+message BeneficiarioIdRequest {
+  int64 id = 1;
+}
+
+message DetalleBeneficiarioResponse {
+  bool encontrado = 1;
+  BeneficiarioDetalleMsg beneficiario = 2;
+}
+
+//Donacion
+message FiltroDonacionesAdminRequest {
+  string q = 1; //búsqueda libre: código (D-0001), bien o donante
+  string estado = 2;
+  string categoria = 3;
+  string vencimiento = 4;
+}
+
+message BienFilaMsg {
+  string descripcion = 1;
+  string categoria = 2;
+  string subcategoria = 3;
+  float cantidad = 4;
+  string unidad_medida = 5;
+}
+
+message DonacionAdminFilaMsg {
+  int64 id = 1;
+  repeated string donantes = 2;
+  string fecha_ingreso = 3;
+  repeated BienFilaMsg bienes = 4;
+  string vencimiento = 5;
+  string estado_actual = 6;
+  bool vencible = 7;
+}
+
+message ListaDonacionesAdminResponse {
+  repeated DonacionAdminFilaMsg donaciones = 1;
+  repeated string categorias = 2;
+}
+
+//Necesidad
+message ListarNecesidadesRequest {
+  bool es_admin = 1;
+  int64 id_beneficiario = 2;
+}
+
+message NecesidadResponseMsg {
+  int64 id = 1;
+  string tipo = 2;
+  string descripcion = 3;
+  string unidad_medida = 4;
+  string categoria = 5;
+  string subcategoria = 6;
+  int32 cantidad_recibida = 7;
+  bool esta_satisfecha = 8;
+  int32 cantidad_por_periodo = 9; // Vale 0 si es EXTRAORDINARIA
+  string periodo = 10;
+  int32 cantidad_requerida = 11;
+}
+
+message ListarNecesidadesResponse {
+  repeated NecesidadResponseMsg necesidades = 1;
+}
+
+message DatosFormularioNecesidadResponse {
+  repeated CategoriaMsg categorias = 1;
+  repeated SubcategoriaMsg subcategorias = 2;
+}
+
+message GuardarNecesidadRequest {
+  int64 id_beneficiario = 1;
+  string tipo = 2;
+  string descripcion = 3;
+  string unidad_medida = 4;
+  string categoria = 5;
+  string subcategoria = 6;
+  int32 cantidad_por_periodo = 7;
+  string periodo = 8;
+  int32 cantidad_requerida = 9;
+}
+
+message NecesidadIdRequest {
+  int64 id_necesidad = 1;
+}
+
+message NecesidadEdicionMsg {
+  int64 id = 1;
+  string tipo = 2;
+  string descripcion = 3;
+  SubcategoriaMsg subcategoria = 4;
+  string unidad_medida = 5;
+  string frecuencia = 6;
+  int32 cantidad_requerida = 7;
+}
+
+message DatosEdicionNecesidadResponse {
+  bool encontrada = 1;
+  NecesidadEdicionMsg necesidad = 2;
+  bool es_extraordinaria = 3;
+  bool es_recurrente = 4;
+  BeneficiarioMsg beneficiario = 5;
+  repeated CategoriaMsg categorias = 6;
+  repeated SubcategoriaMsg subcategorias = 7;
+}
+
+message ActualizarNecesidadRequest {
+  int64 id_necesidad = 1;
+  string descripcion = 2;
+  string categoria = 3;
+  string subcategoria = 4;
+  string unidad_medida = 5;
+  int32 cantidad_por_periodo = 6;
+  int32 cantidad_requerida = 7;
+  string periodo = 8;
+}
+
+//DonacionBeneficiario
+message DonacionBeneficiarioMsg {
+  int64 id = 1;
+  string descripcion = 2;
+  string estado_actual = 3;
+  string fecha_asignacion = 4;
+}
+
+message ListaDonacionesBeneficiarioResponse {
+  repeated DonacionBeneficiarioMsg donaciones = 1;
+}
+
+message DetalleDonacionBeneficiarioRequest {
+  int64 id_beneficiario = 1;
+  int64 id_donacion = 2;
+}
+
+message DetalleDonacionBeneficiarioResponse {
+  DonacionBeneficiarioMsg donacion = 1;
+  string fecha_asignacion = 2;
+}
+
+message NovedadDonacionMsg {
+  int64 id_donacion = 1;
+  string descripcion = 2;
+  string tipo_estado = 3;
+  string fecha = 4;
+  string detalle = 5;
+}
+
+message ListaNovedadesBeneficiarioResponse {
+  repeated NovedadDonacionMsg novedades = 1;  // ordenadas de más reciente a más antigua
+}
+
+//Asignacion
+message DonanteNombreMsg {
+  string nombre = 1;
+}
+
+message DonacionRankingMsg {
+  int64 id = 1;
+  string descripcion = 2;
+  string estado = 3;
+  repeated DonanteNombreMsg donantes = 4;
+}
+
+message CandidatoRankingMsg {
+  int32 posicion = 1;
+  BeneficiarioMsg beneficiario = 2;
+}
+
+message RankingVistaMsg {
+  int64 id = 1;
+  string fecha_generacion = 2;
+  DonacionRankingMsg donacion = 3;
+  repeated CandidatoRankingMsg candidatos = 4;
+}
+
+message ListaRankingsResponse {
+  repeated RankingVistaMsg rankings = 1;
+}
+
+message ConfirmarAsignacionRequest {
+  int64 id_ranking = 1;
+  int64 id_beneficiario = 2;
+}
+
+//Importador CSV
+message ImportarCsvRequest {
+  string nombre_archivo = 1;
+  bytes contenido_csv = 2;
+}
+
+message DonanteImportadoUsuarioMsg {
+  int64 id_donante = 1;
+  string username = 2;
+  string password = 3;
+}
+
+message FilaErrorMsg {
+  int32 numero_fila = 1;
+  string motivo_error = 2;
+}
+
+message ImportarCsvResponse {
+  int32 cant_exitosa = 1;
+  repeated DonanteImportadoUsuarioMsg usuarios_generados = 2;
+  repeated FilaErrorMsg errores_encontrados = 3;
+}
