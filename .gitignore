@@ -11,6 +11,5 @@ Estacion-dds-*/
 # Ignorar el contenido dentro de uploads (y sus subcarpetas)
 **/uploads/**/*
 
-# Excepción: NO ignorar los archivos .gitkeep
+# Excepción: NO ignorar los archivos .gitkeep para conservar la estructura
 !**/uploads/**/.gitkeep
-/microservicio-logistica/uploads/
