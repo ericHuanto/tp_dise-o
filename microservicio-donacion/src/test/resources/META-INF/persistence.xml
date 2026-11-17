@@ -21,7 +21,6 @@
         <class>ar.edu.utn.frba.dds.donatrack.donaciones.dominio.donacion.Donacion</class>
         <class>ar.edu.utn.frba.dds.donatrack.donaciones.dominio.donacion.EstadoDonacion</class>
         <class>ar.edu.utn.frba.dds.donatrack.donaciones.dominio.beneficiario.Beneficiario</class>
-        <class>ar.edu.utn.frba.dds.donatrack.donaciones.dominio.usuario.Usuario</class>
         <class>ar.edu.utn.frba.dds.donatrack.donaciones.dominio.necesidades.Necesidad</class>
         <properties>
             <property name="hibernate.connection.driver_class" value="org.hsqldb.jdbcDriver"/>

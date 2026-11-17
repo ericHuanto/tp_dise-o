@@ -17,7 +17,7 @@ public class GeneradorDonantesCsvTest {
 
   @BeforeEach
   public void configuracionInicial() {
-    archivoExistente = "simple.csv"; //4 donantes 2 validos
+    archivoExistente = "src/test/resources/simple.csv"; //4 donantes 2 validos
     archivoInexistente = "no_existo.csv";
   }
 
@@ -27,13 +27,12 @@ public class GeneradorDonantesCsvTest {
     ImportadorCsv importador = new ImportadorCsv();
     GeneradorDonantesCsv generadorDonantes = new GeneradorDonantesCsv(repoDonantes, importador);
 
-    assertEquals(0, repoDonantes.buscarTodos().size());
-    //primera prueba verificamos que la lista este vacía
+    int donantesAntes = repoDonantes.buscarTodos().size();
 
     List<FilaError> errores = generadorDonantes.iniciarCarga(archivoExistente);
     errores.forEach(e -> System.out.println(" fila " + e.getNumeroFila() + " motivo: " + e.getMotivoError()));
 
-    assertEquals(2, repoDonantes.buscarTodos().size());
+    assertEquals(donantesAntes + 2, repoDonantes.buscarTodos().size());
     assertEquals(2, errores.size());
   }
 
