@@ -51,6 +51,8 @@ service DonacionesService {
 
   //RegistroEntrega
   rpc ListarSubcategorias (Vacio) returns (ListaSubcategoriasResponse);
+  rpc BuscarDonantes      (BuscarDonantesRequest) returns (ListaDonantesResumenResponse);
+  rpc RegistrarEntrega    (RegistrarEntregaRequest) returns (RegistrarEntregaResponse);
 }
 
 
@@ -77,7 +79,7 @@ message RegistrarHumanaRequest {
   string apellido = 2;
   string tipo_documento = 3;
   string numero_documento = 4;
-  string fecha_nacimiento = 5; // Formato YYYY-MM-DD
+  string fecha_nacimiento = 5;
   string genero = 6;
   string direccion = 7;
   repeated ContactoMsg contactos = 8;
@@ -128,6 +130,44 @@ message SubcategoriaMsg {
 //RegistroEntrega
 message ListaSubcategoriasResponse {
   repeated SubcategoriaMsg subcategorias = 1;
+}
+
+message BuscarDonantesRequest {
+  string q = 1;
+}
+
+message DonanteResumenMsg {
+  int64 id = 1;
+  string nombre = 2;
+  string documento = 3;
+  string tipo_persona = 4;
+}
+
+message ListaDonantesResumenResponse {
+  repeated DonanteResumenMsg donantes = 1;
+}
+
+message BienEntregaMsg {
+  string tipo = 1;
+  string categoria = 2;
+  string subcategoria = 3;
+  string descripcion = 4;
+  float cantidad = 5;
+  string unidad_medida = 6;
+  string fecha_vencimiento = 7;
+  bool usado = 8;
+}
+
+message RegistrarEntregaRequest {
+  int64 id_donante = 1;
+  string fecha_recepcion = 2;    // ISO yyyy-MM-dd
+  string observaciones = 3;
+  repeated BienEntregaMsg bienes = 4;
+}
+
+message RegistrarEntregaResponse {
+  int64 id_registro = 1;
+  int32 cantidad_donaciones = 2;
 }
 
 enum UnidadMedidaProto {
@@ -202,10 +242,10 @@ message DetalleBeneficiarioResponse {
 
 //Donacion
 message FiltroDonacionesAdminRequest {
-  string q = 1;            // búsqueda libre: código (D-0001), bien o donante
-  string estado = 2;       // nombre de TipoEstadoDonacion, "" = todos
-  string categoria = 3;    // nombre de la categoría, "" = todas
-  string vencimiento = 4;  // 7_dias | 30_dias | vencidas | no_perecedero | todos
+  string q = 1; //búsqueda libre: código (D-0001), bien o donante
+  string estado = 2;
+  string categoria = 3;
+  string vencimiento = 4;
 }
 
 message BienFilaMsg {
@@ -219,16 +259,16 @@ message BienFilaMsg {
 message DonacionAdminFilaMsg {
   int64 id = 1;
   repeated string donantes = 2;
-  string fecha_ingreso = 3;     // ISO yyyy-MM-dd
+  string fecha_ingreso = 3;
   repeated BienFilaMsg bienes = 4;
-  string vencimiento = 5;       // ISO yyyy-MM-dd, "" si no es perecedera
-  string estado_actual = 6;     // nombre de TipoEstadoDonacion
-  bool vencible = 7;            // regla de negocio: se puede marcar como vencida
+  string vencimiento = 5;
+  string estado_actual = 6;
+  bool vencible = 7;
 }
 
 message ListaDonacionesAdminResponse {
   repeated DonacionAdminFilaMsg donaciones = 1;
-  repeated string categorias = 2;  // nombres de categorías para el combo de filtro
+  repeated string categorias = 2;
 }
 
 //Necesidad
@@ -332,8 +372,8 @@ message DetalleDonacionBeneficiarioResponse {
 message NovedadDonacionMsg {
   int64 id_donacion = 1;
   string descripcion = 2;
-  string tipo_estado = 3;   // nombre de TipoEstadoDonacion
-  string fecha = 4;         // ISO yyyy-MM-ddTHH:mm:ss, "" si no tiene
+  string tipo_estado = 3;
+  string fecha = 4;
   string detalle = 5;
 }
 

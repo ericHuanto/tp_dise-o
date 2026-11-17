@@ -3,6 +3,8 @@ package ar.edu.utn.frba.dds.donatrack.donaciones.web.shared.grpc;
 import static ar.edu.utn.frba.dds.donatrack.donaciones.web.shared.convers.ContactoMapper.aDominio;
 
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.beneficiario.Beneficiario;
+import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.bien.Bien;
+import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.bien.BienFactory;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.bien.Subcategoria;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.bien.UnidadMedida;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.comunicaciones.DispatcherEventos;
@@ -13,6 +15,8 @@ import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.donacion.Donacion;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.donacion.EstadoDonacion;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.donacion.TipoEstadoDonacion;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.donante.Donante;
+import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.donante.entrega.RegistroEntrega;
+import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.segmentador.SegmentadorDonaciones;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.donante.documento.Documento;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.donante.documento.TipoDocumento;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.donante.tipodonantes.Genero;
@@ -33,6 +37,7 @@ import ar.edu.utn.frba.dds.donatrack.donaciones.persistencia.CategoriaRepository
 import ar.edu.utn.frba.dds.donatrack.donaciones.persistencia.DonacionRepository;
 import ar.edu.utn.frba.dds.donatrack.donaciones.persistencia.DonanteRepository;
 import ar.edu.utn.frba.dds.donatrack.donaciones.persistencia.RankingRepository;
+import ar.edu.utn.frba.dds.donatrack.donaciones.persistencia.RegistroEntregaRepository;
 import ar.edu.utn.frba.dds.donatrack.donaciones.persistencia.SubcategoriaRepository;
 import ar.edu.utn.frba.dds.donatrack.donaciones.web.shared.convers.BeneficiarioMapper;
 import ar.edu.utn.frba.dds.donatrack.donaciones.web.shared.convers.ContactoMapper;
@@ -58,6 +63,7 @@ import java.nio.file.Path;
 import java.security.SecureRandom;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -74,6 +80,8 @@ public class DonacionesGrpc extends DonacionesServiceGrpc.DonacionesServiceImplB
   private final CategoriaRepository repoCategorias;
   private final SubcategoriaRepository repoSubcategorias;
   private final RankingRepository repoRankings;
+  private final RegistroEntregaRepository repoRegistros = RegistroEntregaRepository.getInstancia();
+  private final SegmentadorDonaciones segmentador = new SegmentadorDonaciones();
 
   public DonacionesGrpc(DonacionRepository repoDonaciones) {
     this.repoDonaciones = repoDonaciones;
@@ -854,6 +862,55 @@ public class DonacionesGrpc extends DonacionesServiceGrpc.DonacionesServiceImplB
     }));
   }
 
+  //Buscador de donantes de la pantalla "Registrar entrega"
+  @Override
+  public void buscarDonantes(BuscarDonantesRequest req, StreamObserver<ListaDonantesResumenResponse> out) {
+    responder(out, () -> withTransaction(() -> {
+      String q = req.getQ().trim().toLowerCase();
+      ListaDonantesResumenResponse.Builder builder = ListaDonantesResumenResponse.newBuilder();
+
+      repoDonantes.buscarTodos().stream()
+          .filter(d -> q.isEmpty()
+              || nvlTexto(d.getNombreCompleto()).toLowerCase().contains(q)
+              || documentoDe(d).toLowerCase().contains(q))
+          .limit(20)
+          .forEach(d -> builder.addDonantes(DonanteResumenMsg.newBuilder()
+              .setId(d.getId())
+              .setNombre(nvlTexto(d.getNombreCompleto()))
+              .setDocumento(documentoDe(d))
+              .setTipoPersona(nvlTexto(d.getTipo()).toUpperCase())
+              .build()));
+
+      return builder.build();
+    }));
+  }
+
+  //Crea el RegistroEntrega y lo segmenta en donaciones EN_DEPOSITO
+  @Override
+  public void registrarEntrega(RegistrarEntregaRequest req, StreamObserver<RegistrarEntregaResponse> out) {
+    responder(out, () -> withTransaction(() -> {
+      if (req.getIdDonante() == 0) throw new DominioException("Elegí una persona donante");
+      if (req.getBienesCount() == 0) throw new DominioException("La entrega debe tener al menos un bien");
+
+      Donante donante = repoDonantes.buscarPorId(req.getIdDonante());
+      if (donante == null) throw new DominioException("La persona donante no existe");
+
+      List<Bien> bienes = req.getBienesList().stream().map(this::aBien).toList();
+      String observaciones = req.getObservaciones().isBlank() ? null : req.getObservaciones().trim();
+      RegistroEntrega registro = new RegistroEntrega(
+          parsearFecha(req.getFechaRecepcion(), "fecha de recepción"), observaciones, bienes, donante);
+
+      List<Donacion> donaciones = segmentador.segmentar(List.of(registro));
+      donaciones.forEach(repoDonaciones::guardar);
+      repoRegistros.guardar(registro);
+
+      return RegistrarEntregaResponse.newBuilder()
+          .setIdRegistro(registro.getId() == null ? 0 : registro.getId())
+          .setCantidadDonaciones(donaciones.size())
+          .build();
+    }));
+  }
+
   //================ FUNCIONES AUXILIARES ===============
 
   private String generarContraseniaTemporal() {
@@ -1032,6 +1089,53 @@ public class DonacionesGrpc extends DonacionesServiceGrpc.DonacionesServiceImplB
   }
 
   private String nvl(String valor) {
+    return valor == null ? "" : valor;
+  }
+
+  //REGISTRO ENTREGA
+  private Bien aBien(BienEntregaMsg b) {
+    if (b.getDescripcion().isBlank()) throw new DominioException("Todos los bienes necesitan descripción");
+
+    Subcategoria subcategoria = repoSubcategorias.buscarPorNombre(b.getCategoria(), b.getSubcategoria());
+    if (subcategoria == null) {
+      throw new DominioException("No existe la subcategoría '" + b.getSubcategoria()
+          + "' en la categoría '" + b.getCategoria() + "'");
+    }
+
+    boolean perecedero = "PERECEDERO".equalsIgnoreCase(b.getTipo());
+    LocalDate vencimiento = perecedero ? parsearFecha(b.getFechaVencimiento(), "fecha de vencimiento") : null;
+    Boolean usado = perecedero ? null : b.getUsado();
+
+    return BienFactory.crear(b.getTipo(), b.getDescripcion().trim(), b.getCantidad(),
+        aUnidadMedida(b.getUnidadMedida()), null, subcategoria, vencimiento, usado);
+  }
+
+  private UnidadMedida aUnidadMedida(String unidad) {
+    if (unidad == null || unidad.isBlank()) {
+      throw new DominioException("El campo 'unidad_medida' es obligatorio, en el Bien");
+    }
+    try {
+      return UnidadMedida.valueOf(unidad.toUpperCase());
+    } catch (IllegalArgumentException e) {
+      throw new DominioException("La unidad de medida: " + unidad + " no existe, debe ser: "
+          + Arrays.toString(UnidadMedida.values()));
+    }
+  }
+
+  private LocalDate parsearFecha(String iso, String campo) {
+    if (iso == null || iso.isBlank()) throw new DominioException("Falta la " + campo);
+    try {
+      return LocalDate.parse(iso);
+    } catch (DateTimeParseException e) {
+      throw new DominioException("La " + campo + " no es válida: " + iso);
+    }
+  }
+
+  private String documentoDe(Donante d) {
+    return d.getDocumento() == null ? "" : nvlTexto(d.getDocumento().getDetalle());
+  }
+
+  private String nvlTexto(String valor) {
     return valor == null ? "" : valor;
   }
 }

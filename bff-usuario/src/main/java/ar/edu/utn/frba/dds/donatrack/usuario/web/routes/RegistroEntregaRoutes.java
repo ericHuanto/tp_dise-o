@@ -8,5 +8,8 @@ public class RegistroEntregaRoutes {
 
   public static void registrar(RoutesConfig ruta, RegistroEntregaController controller) {
     ruta.get("/registros-entrega/nueva", controller::mostrarFormulario);
+    // Endpoints JSON que consume el JavaScript de registrar_entrega.hbs
+    ruta.get("/api/donantes", controller::buscarDonantes);
+    ruta.post("/api/registros-entrega", controller::registrarEntrega);
   }
 }

@@ -7,14 +7,14 @@
 </head>
 <body>
     <!-- HEADER -->
-    {{> partials/header/header.hbs}}
+    {{> logistica/partials/header/header.hbs}}
     <!-- MAIN -->
     <main>
         <nav> {{#block "breadcrumbs"}} <a href="/">Inicio</a> {{/block}} </nav>
         {{#block "contenido_propio"}} {{/block}}
     </main>
     <!-- FOOTER -->
-    {{> partials/footer/footer.hbs}}
+    {{> logistica/partials/footer/footer.hbs}}
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <!-- Más Scripts -->
     {{#block "scripts"}}{{/block}}
