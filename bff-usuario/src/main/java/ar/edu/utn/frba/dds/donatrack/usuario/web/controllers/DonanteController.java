@@ -2,7 +2,6 @@ package ar.edu.utn.frba.dds.donatrack.usuario.web.controllers;
 
 import ar.edu.utn.frba.dds.donatrack.grpc.*;
 import ar.edu.utn.frba.dds.donatrack.usuario.dominio.usuario.Usuario;
-import ar.edu.utn.frba.dds.donatrack.usuario.web.dto.CategoriaVistaDto;
 import io.grpc.StatusRuntimeException;
 import io.javalin.http.Context;
 import io.javalin.validation.ValidationException;
@@ -49,15 +48,11 @@ public class DonanteController {
 
       VistaDonacionesDonanteResponse response = donacionesStub.obtenerVistaDonacionesDonante(request);
 
-      List<CategoriaVistaDto> categorias = response.getCategoriasList().stream()
-          .map(c -> new CategoriaVistaDto(c.getId(), c.getNombre()))
-          .toList();
-
       Map<String, Object> modelo = new HashMap<>();
       modelo.put("usuario", context.sessionAttribute("usuario_actual"));
       modelo.put("donaciones", response.getDonacionesList());
       modelo.put("estados", response.getEstadosList());
-      modelo.put("categorias", categorias);
+      modelo.put("categorias", response.getCategoriasList());
       modelo.put("subcategorias", response.getSubcategoriasList());
       modelo.put("estadoElegido", estado);
       modelo.put("categoriaElegida", idCategoria);

@@ -1,4 +1,4 @@
-package ar.edu.utn.frba.dds.donatrack.usuario.dominio.vista;
+package ar.edu.utn.frba.dds.donatrack.usuario.web.dto;
 
 import java.util.List;
 import lombok.Builder;

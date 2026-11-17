@@ -2,18 +2,12 @@ package ar.edu.utn.frba.dds.donatrack.usuario.web.dto;
 
 import ar.edu.utn.frba.dds.donatrack.grpc.BienFilaMsg;
 import ar.edu.utn.frba.dds.donatrack.grpc.DonacionAdminFilaMsg;
-import ar.edu.utn.frba.dds.donatrack.usuario.dominio.vista.DonacionFila;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 
-/**
- * Traduce los mensajes gRPC del microservicio de donaciones a los modelos que usan las vistas.
- * Solo contiene lógica de presentación (formatos de fecha, textos y clases CSS);
- * las reglas de negocio (filtros, si es vencible, etc.) las resuelve el microservicio.
- */
 public final class DonacionVistaMapper {
   private static final DateTimeFormatter FECHA = DateTimeFormatter.ofPattern("dd/MM/yyyy");
   private static final DateTimeFormatter FECHA_HORA = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
