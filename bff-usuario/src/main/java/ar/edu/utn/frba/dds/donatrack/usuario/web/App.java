@@ -77,7 +77,7 @@ public class App {
     CsvController csvController = new CsvController(grpcClients.getDonacionesStub(), usuarioRepository);
     RegistroEntregaController registroEntregaController = new RegistroEntregaController(grpcClients.getDonacionesStub());
 
-    //LOGISTICA
+    //LOGÍSTICA
     CamionController camionController = new CamionController(grpcClients.getLogisticaStub());
     EntregaController entregaController = new EntregaController(grpcClients.getLogisticaStub());
     RutaController rutaController = new RutaController(grpcClients.getLogisticaStub());
@@ -95,10 +95,12 @@ public class App {
 
       config.routes.get("/health", ctx -> ctx.json("BFF Usuario funcionando"));
 
+      //Rutas de gateway/bff
       HomeRoutes.registrar(config.routes, homeController);
       SesionRoutes.registrar(config.routes, sesionController);
       PerfilRoutes.registrar(config.routes, perfilController);
       MapaRoutes.registrar(config.routes, mapaController);
+      //Rutas de donaciones
       DonacionRoutes.registrar(config.routes, donacionController);
       DonanteRoutes.registrar(config.routes, donanteController);
       NecesidadRoutes.registrar(config.routes, necesidadController);
@@ -106,20 +108,14 @@ public class App {
       AsignacionRoutes.registrar(config.routes, asignacionController);
       CsvRoutes.registrar(config.routes, csvController);
       RegistroEntregaRoutes.registrar(config.routes, registroEntregaController);
-
+      //Rutas de logística
       CamionRoutes.registrar(config.routes, camionController);
       EntregaRoutes.registrar(config.routes, entregaController);
       RutaRoutes.registrar(config.routes, rutaController);
 
+      //Registramos las excepciones
       ExceptionHandlers.registrar(config.routes);
 
-      config.routes.after(ctx -> {
-        var acceso = WithSimplePersistenceUnit.PER_THREAD_ENTITY_MANAGER_ACCESS;
-        if (acceso.isAttached() && acceso.get().getTransaction().isActive()) {
-          acceso.get().getTransaction().rollback();
-        }
-        WithSimplePersistenceUnit.dispose();
-      });
     });
   }
 }

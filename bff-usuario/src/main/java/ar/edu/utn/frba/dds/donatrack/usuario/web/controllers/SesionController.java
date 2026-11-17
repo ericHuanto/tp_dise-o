@@ -6,6 +6,9 @@ import ar.edu.utn.frba.dds.donatrack.usuario.persistencia.UsuarioRepository;
 import io.github.flbulgarelli.jpa.extras.simple.WithSimplePersistenceUnit;
 import io.javalin.http.Context;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class SesionController implements WithSimplePersistenceUnit {
   private final UsuarioRepository repoUsuarios;
 
@@ -14,7 +17,14 @@ public class SesionController implements WithSimplePersistenceUnit {
   }
 
   public void mostrarFormularioInicioSesion(Context context) {
-    context.render("donaciones/views/auth/login.hbs");
+    String errorFlash = context.consumeSessionAttribute("errorFlash");
+    String nombreUsuario = context.consumeSessionAttribute("nombreEscrito");
+
+    Map<String, Object> modelo = new HashMap<>();
+    modelo.put("mensajeError", errorFlash);
+    modelo.put("nombreEscritoAnteriormente", nombreUsuario);
+
+    context.render("donaciones/views/auth/login.hbs", modelo);
   }
 
   public void iniciarSesion(Context context) {
@@ -24,9 +34,13 @@ public class SesionController implements WithSimplePersistenceUnit {
     Usuario usuario = repoUsuarios.buscarPorCredenciales(nombreUsuario);
 
     if (usuario == null) {
-      context.redirect("/login?error=El_usuario_no_existe");
+      context.sessionAttribute("errorFlash", "El usuario no existe");
+      context.sessionAttribute("nombreEscrito", nombreUsuario);
+      context.redirect("/login");
     } else if (!Integridad.validar(contraseña, usuario.getContraseña())) {
-      context.redirect("/login?error=La_contraseña_es_incorrecta");
+      context.sessionAttribute("errorFlash", "La contraseña es incorrecta");
+      context.sessionAttribute("nombreEscrito", nombreUsuario);
+      context.redirect("/login");
     } else {
       usuario.inicializarPermisos();
       context.sessionAttribute("usuario_actual", usuario);

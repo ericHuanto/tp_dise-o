@@ -23,27 +23,20 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "usuarios")
 public class Usuario {
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "id_usuario")
   private Long id;
-
   @Column(name = "nombre_usuario", unique = true)
   private String nombreUsuario;
-
   @Column(name = "contraseña_hasheada")
   private String contraseña;
-
   @ElementCollection(fetch = FetchType.EAGER)
   @Enumerated(EnumType.STRING)
   @CollectionTable(name = "usuario_permiso", joinColumns = @JoinColumn(name = "id_usuario"))
   @Column(name = "permiso")
   private List<Permiso> permisos;
-
-  // Referencias por ID hacia el microservicio de donaciones (NULL para Admin)
   @Column(name = "id_donante")
   private Long idDonante;
-
   @Column(name = "id_beneficiario")
   private Long idBeneficiario;
 
