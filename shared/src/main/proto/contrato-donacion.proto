@@ -27,7 +27,7 @@ service DonacionesService {
   rpc ObtenerDetalleBeneficiario     (BeneficiarioIdRequest)         returns (DetalleBeneficiarioResponse);
 
   //Gestion de Donaciones
-  rpc ListarDonacionesAdmin         (FiltroEstadoDonacionRequest)    returns (ListaDonacionesAdminResponse);
+  rpc ListarDonacionesAdmin         (FiltroDonacionesAdminRequest)   returns (ListaDonacionesAdminResponse);
   rpc MarcarDonacionComoVencida     (DonacionId)                     returns (Resultado);
 
   //Necesidades
@@ -40,6 +40,7 @@ service DonacionesService {
   //DonacionBeneficiario
   rpc ListarDonacionesPorBeneficiario (BeneficiarioIdRequest) returns (ListaDonacionesBeneficiarioResponse);
   rpc ObtenerDetalleDonacionBeneficiario (DetalleDonacionBeneficiarioRequest) returns (DetalleDonacionBeneficiarioResponse);
+  rpc ListarNovedadesBeneficiario (BeneficiarioIdRequest) returns (ListaNovedadesBeneficiarioResponse);
 
   //Asignacion
   rpc ListarRankingsVigentes (Vacio) returns (ListaRankingsResponse);
@@ -47,6 +48,9 @@ service DonacionesService {
 
   //Importador CSV
   rpc ImportarDonantesCsv (ImportarCsvRequest) returns (ImportarCsvResponse);
+
+  //RegistroEntrega
+  rpc ListarSubcategorias (Vacio) returns (ListaSubcategoriasResponse);
 }
 
 
@@ -121,6 +125,30 @@ message SubcategoriaMsg {
   CategoriaMsg categoria = 3;
 }
 
+//RegistroEntrega
+message ListaSubcategoriasResponse {
+  repeated SubcategoriaMsg subcategorias = 1;
+}
+
+enum UnidadMedidaProto {
+  KILOGRAMOS = 0;
+  GRAMOS = 1;
+  LITROS = 2;
+  MILILITROS = 3;
+  UNIDADES = 4;
+}
+
+
+enum TipoEstadoDonacionProto {
+  EN_DEPOSITO = 0;
+  ASIGNACION_REALIZADA = 1;
+  LISTA_PARA_ENTREGAR = 2;
+  EN_TRASLADO = 3;
+  ENTREGADA = 4;
+  ENTREGA_FALLIDA = 5;
+  VENCIDA = 6;
+}
+
 message FiltroDonacionesDonanteRequest {
   int64 id_donante = 1;
   string estado = 2;
@@ -173,19 +201,34 @@ message DetalleBeneficiarioResponse {
 }
 
 //Donacion
-message FiltroEstadoDonacionRequest {
-  string estado_actual = 1; //Vacio si se buscan todas
+message FiltroDonacionesAdminRequest {
+  string q = 1;            // búsqueda libre: código (D-0001), bien o donante
+  string estado = 2;       // nombre de TipoEstadoDonacion, "" = todos
+  string categoria = 3;    // nombre de la categoría, "" = todas
+  string vencimiento = 4;  // 7_dias | 30_dias | vencidas | no_perecedero | todos
 }
 
-message DonacionAdminDtoMsg {
+message BienFilaMsg {
+  string descripcion = 1;
+  string categoria = 2;
+  string subcategoria = 3;
+  float cantidad = 4;
+  string unidad_medida = 5;
+}
+
+message DonacionAdminFilaMsg {
   int64 id = 1;
-  string descripcion = 2;
-  string estado_actual = 3;
-  BeneficiarioMsg beneficiario = 4;
+  repeated string donantes = 2;
+  string fecha_ingreso = 3;     // ISO yyyy-MM-dd
+  repeated BienFilaMsg bienes = 4;
+  string vencimiento = 5;       // ISO yyyy-MM-dd, "" si no es perecedera
+  string estado_actual = 6;     // nombre de TipoEstadoDonacion
+  bool vencible = 7;            // regla de negocio: se puede marcar como vencida
 }
 
 message ListaDonacionesAdminResponse {
-  repeated DonacionAdminDtoMsg donaciones = 1;
+  repeated DonacionAdminFilaMsg donaciones = 1;
+  repeated string categorias = 2;  // nombres de categorías para el combo de filtro
 }
 
 //Necesidad
@@ -284,6 +327,18 @@ message DetalleDonacionBeneficiarioRequest {
 message DetalleDonacionBeneficiarioResponse {
   DonacionBeneficiarioMsg donacion = 1;
   string fecha_asignacion = 2;
+}
+
+message NovedadDonacionMsg {
+  int64 id_donacion = 1;
+  string descripcion = 2;
+  string tipo_estado = 3;   // nombre de TipoEstadoDonacion
+  string fecha = 4;         // ISO yyyy-MM-ddTHH:mm:ss, "" si no tiene
+  string detalle = 5;
+}
+
+message ListaNovedadesBeneficiarioResponse {
+  repeated NovedadDonacionMsg novedades = 1;  // ordenadas de más reciente a más antigua
 }
 
 //Asignacion

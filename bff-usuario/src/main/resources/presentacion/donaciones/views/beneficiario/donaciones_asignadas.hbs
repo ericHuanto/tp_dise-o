@@ -1,0 +1,189 @@
+{{#partial "nombre_pestaña"}}
+    Donaciones asignadas
+{{/partial}}
+
+{{#partial "breadcrumbs"}}
+    <span>Inicio</span>
+    <span>Donaciones asignadas</span>
+{{/partial}}
+
+{{#partial "css_extra"}}
+    <link rel="stylesheet" href="/donaciones/css/beneficiario/donaciones_asignadas.css">
+{{/partial}}
+
+{{#partial "contenido_propio"}}
+
+    <main class="donaciones-asignadas">
+
+        <h1>Donaciones asignadas</h1>
+
+        <p class="donaciones-subtitulo">
+            Consultá el estado de las donaciones asignadas a tu organización.
+        </p>
+
+        <div class="filtros-donaciones">
+
+            <button type="button" class="filtro activo" data-estado="TODAS">
+                Todas
+            </button>
+
+            <button type="button" class="filtro" data-estado="ASIGNACION_REALIZADA">
+                Asignadas
+            </button>
+
+            <button type="button" class="filtro" data-estado="LISTA_PARA_ENTREGAR">
+                Preparando entrega
+            </button>
+
+            <button type="button" class="filtro" data-estado="EN_TRASLADO">
+                En traslado
+            </button>
+
+            <button type="button" class="filtro" data-estado="ENTREGADA">
+                Entregadas
+            </button>
+
+            <button type="button" class="filtro" data-estado="ENTREGA_FALLIDA">
+                Entrega fallida
+            </button>
+
+        </div>
+
+        <div class="tabla-contenedor">
+
+            <table class="tabla-donaciones">
+
+                <thead>
+                <tr>
+                    <th>Código</th>
+                    <th>Fecha de asignación</th>
+                    <th>Bienes</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                {{#each donaciones}}
+
+                    <tr class="fila-donacion" data-estado="{{estadoActual}}">
+
+                        <td class="codigo-donacion">
+                            #{{id}}
+                        </td>
+
+                        <td>
+                            {{fechaAsignacion}}
+                        </td>
+
+                        <td class="descripcion-donacion">
+                            {{descripcion}}
+                        </td>
+
+                        <td>
+                            <span class="estado-donacion"
+                                  data-estado="{{estadoActual}}">
+                                {{estadoActual}}
+                            </span>
+                        </td>
+
+                        <td>
+                            <a href="/mis-donaciones/{{id}}"
+                               class="accion-detalle">
+                                Ver detalle
+                            </a>
+                        </td>
+
+                    </tr>
+
+                {{/each}}
+                </tbody>
+
+            </table>
+
+            <p class="mensaje-sin-resultados" hidden>
+                No hay donaciones para el estado seleccionado.
+            </p>
+
+        </div>
+
+    </main>
+
+{{/partial}}
+
+{{#partial "scripts"}}
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const filtros = document.querySelectorAll(".filtro");
+            const filas = document.querySelectorAll(".fila-donacion");
+            const mensaje = document.querySelector(".mensaje-sin-resultados");
+
+            const nombresEstados = {
+                ASIGNACION_REALIZADA: "Asignada",
+                LISTA_PARA_ENTREGAR: "Preparando entrega",
+                EN_TRASLADO: "En traslado",
+                ENTREGADA: "Entregada",
+                ENTREGA_FALLIDA: "Entrega fallida",
+                EN_DEPOSITO: "En depósito",
+                VENCIDA: "Vencida"
+            };
+
+            // Mostrar los nombres de los estados en español
+            document.querySelectorAll(".estado-donacion").forEach(etiqueta => {
+
+                const estado = etiqueta.dataset.estado;
+
+                etiqueta.textContent = nombresEstados[estado] || estado;
+
+            });
+
+            // Filtrar las donaciones por estado
+            function filtrar(estadoSeleccionado) {
+
+                let visibles = 0;
+
+                filas.forEach(fila => {
+
+                    const mostrar =
+                            estadoSeleccionado === "TODAS" ||
+                            fila.dataset.estado === estadoSeleccionado;
+
+                    fila.hidden = !mostrar;
+
+                    if (mostrar) {
+                        visibles++;
+                    }
+
+                });
+
+                mensaje.hidden = visibles > 0;
+            }
+
+            // Eventos de los botones de filtro
+            filtros.forEach(filtro => {
+
+                filtro.addEventListener("click", function () {
+
+                    filtros.forEach(boton => {
+                        boton.classList.remove("activo");
+                    });
+
+                    filtro.classList.add("activo");
+
+                    filtrar(filtro.dataset.estado);
+
+                });
+
+            });
+
+            // Mostrar todas las donaciones al ingresar
+            filtrar("TODAS");
+
+        });
+    </script>
+
+{{/partial}}
+
+{{> donaciones/partials/layout.hbs}}

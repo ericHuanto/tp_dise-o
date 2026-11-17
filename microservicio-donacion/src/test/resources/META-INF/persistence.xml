@@ -7,6 +7,7 @@
     <persistence-unit name="simple-persistence-unit" transaction-type="RESOURCE_LOCAL">
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
         <class>ar.edu.utn.frba.dds.donatrack.donaciones.dominio.donante.Donante</class>
+        <class>ar.edu.utn.frba.dds.donatrack.donaciones.dominio.donante.documento.Documento</class>
         <class>ar.edu.utn.frba.dds.donatrack.donaciones.dominio.donante.tipodonantes.juridica.Juridica</class>
         <class>ar.edu.utn.frba.dds.donatrack.donaciones.dominio.donante.tipodonantes.persona.Humana</class>
         <class>ar.edu.utn.frba.dds.donatrack.donaciones.dominio.donante.tipodonantes.juridica.Representante</class>
@@ -15,10 +16,13 @@
         <class>ar.edu.utn.frba.dds.donatrack.donaciones.dominio.bien.Bien</class>
         <class>ar.edu.utn.frba.dds.donatrack.donaciones.dominio.bien.Subcategoria</class>
         <class>ar.edu.utn.frba.dds.donatrack.donaciones.dominio.bien.Categoria</class>
+        <class>ar.edu.utn.frba.dds.donatrack.donaciones.dominio.bien.tipobien.NoPerecedero</class>
+        <class>ar.edu.utn.frba.dds.donatrack.donaciones.dominio.bien.tipobien.Perecedero</class>
         <class>ar.edu.utn.frba.dds.donatrack.donaciones.dominio.donacion.Donacion</class>
         <class>ar.edu.utn.frba.dds.donatrack.donaciones.dominio.donacion.EstadoDonacion</class>
         <class>ar.edu.utn.frba.dds.donatrack.donaciones.dominio.beneficiario.Beneficiario</class>
         <class>ar.edu.utn.frba.dds.donatrack.donaciones.dominio.usuario.Usuario</class>
+        <class>ar.edu.utn.frba.dds.donatrack.donaciones.dominio.necesidades.Necesidad</class>
         <properties>
             <property name="hibernate.connection.driver_class" value="org.hsqldb.jdbcDriver"/>
             <property name="hibernate.connection.url" value="jdbc:hsqldb:mem:donaciones-db"/>

@@ -11,13 +11,17 @@
         <a href="/entregas/pendientes">Confirmar Entregas</a>
         <a href="/mis-necesidades">Mis Necesidades</a>
         <a href="/mis-donaciones">Mis Donaciones</a>
+        <a href="/notificaciones">Notificaciones</a>
     {{/if}}
 
-    {{#if usuario.admin}}
-        <a href="/donaciones?estado_actual=en_deposito">Depósito</a>
-        <a href="/donaciones?estado_actual=asignada">Donaciones Asignadas</a>
-        <a href="/mis-necesidades">Mis Necesidades</a>
-    {{/if}}
+   {{#if usuario.admin}}
+       <a href="/donantes">Donantes</a>
+       <a href="/beneficiarios">Beneficiarios</a>
+       <a href="/donaciones">Donaciones</a>
+       <a href="/asignaciones">Asignaciones</a>
+       <a href="{{urlLogistica}}/entregas" target="_blank" rel="noopener">Logística ↗</a>
+       <a href="/donantes/importacion">Importar</a>
+   {{/if}}
 
     <a href="/perfil">Mi Perfil</a>
 </nav>

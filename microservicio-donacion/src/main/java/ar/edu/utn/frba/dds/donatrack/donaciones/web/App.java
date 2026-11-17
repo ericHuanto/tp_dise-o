@@ -8,6 +8,7 @@ import ar.edu.utn.frba.dds.donatrack.donaciones.web.api.routes.BeneficiarioApiRo
 import ar.edu.utn.frba.dds.donatrack.donaciones.web.api.routes.DonacionApiRoutes;
 import ar.edu.utn.frba.dds.donatrack.donaciones.web.api.routes.DonanteApiRoutes;
 import ar.edu.utn.frba.dds.donatrack.donaciones.web.api.routes.NecesidadApiRoutes;
+import ar.edu.utn.frba.dds.donatrack.donaciones.web.api.routes.RegistroEntregaApiRoutes;
 import ar.edu.utn.frba.dds.donatrack.shared.ConfiguracionEntorno;
 import ar.edu.utn.frba.dds.donatrack.shared.ExceptionHandlers;
 import ar.edu.utn.frba.dds.donatrack.shared.GsonConfig;
@@ -69,6 +70,11 @@ public class App {
     BeneficiarioApiController beneficiarioApiController = new BeneficiarioApiController(beneficiarioRepository);
     NecesidadApiController necesidadApiController = new NecesidadApiController(beneficiarioRepository, subcategoriaRepository);
     AsignacionApiController asignacionApiController = new AsignacionApiController(donacionRepository, beneficiarioRepository, rankingRepository);
+    RegistroEntregaApiController entregaApiController = new RegistroEntregaApiController(
+        RegistroEntregaRepository.getInstancia(),
+        DonacionRepository.getInstancia(),
+        DonanteRepository.getInstancia(),
+        SubcategoriaRepository.getInstancia());
 
     Javalin app = Javalin.create(config -> {
       config.jsonMapper(GsonConfig.jsonMapper());
@@ -82,6 +88,7 @@ public class App {
       BeneficiarioApiRoutes.registrar(config.routes, beneficiarioApiController);
       NecesidadApiRoutes.registrar(config.routes, necesidadApiController);
       AsignacionApiRoutes.registrar(config.routes, asignacionApiController);
+      RegistroEntregaApiRoutes.registrar(config.routes, entregaApiController );
 
       //Registramos las excepciones
       ExceptionHandlers.registrar(config.routes); //Revisar

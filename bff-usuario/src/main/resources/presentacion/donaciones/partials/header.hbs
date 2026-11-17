@@ -11,6 +11,7 @@
 
     {{#if usuario}}
         {{> donaciones/partials/navbar.hbs}}
+        <span class="usuario-actual">@{{usuario.nombreUsuario}}</span>
         <div class="header-right">
             <form action="/logout" method="POST">
                 <button type="submit" class="btn-secondary">Cerrar Sesión</button>
@@ -26,9 +27,13 @@
 
 <!-- Marca como "activo" la pestaña actual -->
 <script>
-    document.querySelectorAll('.header-left a.nav-tab, .nav-links a').forEach(link => {
-        if (link.getAttribute('href') === window.location.pathname) {
-            link.classList.add('active');
-        }
-    });
+    const ruta = window.location.pathname;
+    const links = [...document.querySelectorAll('.header-left a.nav-tab, .nav-links a')];
+    const coincide = l => {
+        const h = l.getAttribute('href');
+        return h === ruta || (h !== '/' && ruta.startsWith(h + '/'));
+    };
+    const mejor = links.filter(coincide)
+        .sort((a, b) => b.getAttribute('href').length - a.getAttribute('href').length)[0];
+    if (mejor) mejor.classList.add('active');
 </script>

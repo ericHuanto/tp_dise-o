@@ -17,6 +17,7 @@ import ar.edu.utn.frba.dds.donatrack.usuario.web.controllers.HomeController;
 import ar.edu.utn.frba.dds.donatrack.usuario.web.controllers.MapaController;
 import ar.edu.utn.frba.dds.donatrack.usuario.web.controllers.NecesidadController;
 import ar.edu.utn.frba.dds.donatrack.usuario.web.controllers.PerfilController;
+import ar.edu.utn.frba.dds.donatrack.usuario.web.controllers.RegistroEntregaController;
 import ar.edu.utn.frba.dds.donatrack.usuario.web.controllers.RutaController;
 import ar.edu.utn.frba.dds.donatrack.usuario.web.controllers.SesionController;
 import ar.edu.utn.frba.dds.donatrack.usuario.web.routes.AsignacionRoutes;
@@ -30,6 +31,7 @@ import ar.edu.utn.frba.dds.donatrack.usuario.web.routes.HomeRoutes;
 import ar.edu.utn.frba.dds.donatrack.usuario.web.routes.MapaRoutes;
 import ar.edu.utn.frba.dds.donatrack.usuario.web.routes.NecesidadRoutes;
 import ar.edu.utn.frba.dds.donatrack.usuario.web.routes.PerfilRoutes;
+import ar.edu.utn.frba.dds.donatrack.usuario.web.routes.RegistroEntregaRoutes;
 import ar.edu.utn.frba.dds.donatrack.usuario.web.routes.RutaRoutes;
 import ar.edu.utn.frba.dds.donatrack.usuario.web.routes.SesionRoutes;
 import com.github.jknack.handlebars.Handlebars;
@@ -73,6 +75,7 @@ public class App {
     DonacionBeneficiarioController donacionBeneficiarioController = new DonacionBeneficiarioController(grpcClients.getDonacionesStub());
     AsignacionController asignacionController = new AsignacionController(grpcClients.getDonacionesStub());
     CsvController csvController = new CsvController(grpcClients.getDonacionesStub(), usuarioRepository);
+    RegistroEntregaController registroEntregaController = new RegistroEntregaController(grpcClients.getDonacionesStub());
 
     //LOGISTICA
     CamionController camionController = new CamionController(grpcClients.getLogisticaStub());
@@ -102,6 +105,7 @@ public class App {
       DonacionBeneficiarioRoutes.registrar(config.routes, donacionBeneficiarioController);
       AsignacionRoutes.registrar(config.routes, asignacionController);
       CsvRoutes.registrar(config.routes, csvController);
+      RegistroEntregaRoutes.registrar(config.routes, registroEntregaController);
 
       CamionRoutes.registrar(config.routes, camionController);
       EntregaRoutes.registrar(config.routes, entregaController);

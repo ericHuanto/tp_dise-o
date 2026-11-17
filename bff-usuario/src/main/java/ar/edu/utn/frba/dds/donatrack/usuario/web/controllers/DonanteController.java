@@ -55,7 +55,6 @@ public class DonanteController {
 
       Map<String, Object> modelo = new HashMap<>();
       modelo.put("usuario", context.sessionAttribute("usuario_actual"));
-      // REVISAR: Si donaciones_donante.hbs necesita un VistaDto específico en lugar del mensaje Proto, mapeamos getDonacionesList()
       modelo.put("donaciones", response.getDonacionesList());
       modelo.put("estados", response.getEstadosList());
       modelo.put("categorias", categorias);

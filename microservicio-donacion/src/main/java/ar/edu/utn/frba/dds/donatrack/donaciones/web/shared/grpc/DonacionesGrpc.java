@@ -10,6 +10,7 @@ import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.comunicaciones.eventos.E
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.comunicaciones.eventos.EventoEntregaFallida;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.comunicaciones.eventos.EventoInicioDeRuta;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.donacion.Donacion;
+import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.donacion.EstadoDonacion;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.donacion.TipoEstadoDonacion;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.donante.Donante;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.donante.documento.Documento;
@@ -42,6 +43,7 @@ import ar.edu.utn.frba.dds.donatrack.donaciones.web.shared.dto.beneficiario.Bene
 import ar.edu.utn.frba.dds.donatrack.donaciones.web.shared.dto.contacto.ContactoDto;
 import ar.edu.utn.frba.dds.donatrack.donaciones.web.shared.dto.necesidad.NecesidadRequest;
 import ar.edu.utn.frba.dds.donatrack.donaciones.web.shared.dto.necesidad.NecesidadResponse;
+import ar.edu.utn.frba.dds.donatrack.donaciones.web.shared.dto.vista.DonacionVistaMapper;
 import ar.edu.utn.frba.dds.donatrack.grpc.*;
 import ar.edu.utn.frba.dds.donatrack.shared.excepciones.BodyException;
 import ar.edu.utn.frba.dds.donatrack.shared.excepciones.CambioDeEstadoNoPermitidoException;
@@ -55,14 +57,17 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.SecureRandom;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Supplier;
 
 public class DonacionesGrpc extends DonacionesServiceGrpc.DonacionesServiceImplBase
     implements WithSimplePersistenceUnit {
+  private static final DateTimeFormatter FECHA_HORA_ISO = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
   private final DonacionRepository repoDonaciones;
   private final DonanteRepository repoDonantes;
   private final BeneficiarioRepository repoBeneficiarios;
@@ -360,40 +365,34 @@ public class DonacionesGrpc extends DonacionesServiceGrpc.DonacionesServiceImplB
 
   //Donacion
   @Override
-  public void listarDonacionesAdmin(FiltroEstadoDonacionRequest req,
+  public void listarDonacionesAdmin(FiltroDonacionesAdminRequest req,
                                     StreamObserver<ListaDonacionesAdminResponse> out) {
     responder(out, () -> withTransaction(() -> {
-      List<Donacion> donaciones;
-      if (!req.getEstadoActual().isBlank()) {
-        TipoEstadoDonacion estadoFiltro;
-        try {
-          estadoFiltro = TipoEstadoDonacion.valueOf(req.getEstadoActual().toUpperCase());
-        } catch (IllegalArgumentException e) {
-          throw new DominioException("El estado de donación: " + req.getEstadoActual()
-              + " no existe, debe ser: " + Arrays.toString(TipoEstadoDonacion.values()));
-        }
-        donaciones = repoDonaciones.buscarPorEstadoActualCoincidenteCon(estadoFiltro);
-      } else {
-        donaciones = repoDonaciones.buscarTodos();
-      }
+      String q = req.getQ().trim();
+      String categoria = req.getCategoria().trim();
+      String estado = req.getEstado().trim();
+      String vencimiento = req.getVencimiento().isBlank() ? "todos" : req.getVencimiento().trim();
+      LocalDate hoy = LocalDate.now();
+
+      List<Donacion> filtradas = repoDonaciones.buscarTodos().stream()
+          .filter(d -> coincideBusqueda(d, q))
+          .filter(d -> categoria.isEmpty() || coincideCategoria(d, categoria))
+          .filter(d -> estado.isEmpty() || d.getEstadoActual().name().equalsIgnoreCase(estado))
+          .filter(d -> coincideVencimiento(d, vencimiento, hoy))
+          .sorted(Comparator
+              .comparing(DonacionVistaMapper::vencimientoDe, Comparator.nullsLast(Comparator.naturalOrder()))
+              .thenComparing(Donacion::getId))
+          .toList();
 
       ListaDonacionesAdminResponse.Builder builder = ListaDonacionesAdminResponse.newBuilder();
-      for(Donacion d : donaciones) {
-        DonacionAdminDtoMsg.Builder msg = DonacionAdminDtoMsg.newBuilder()
-            .setId(d.getId())
-            .setDescripcion(d.getDescripcion() != null ? d.getDescripcion() : "")
-            .setEstadoActual(d.getEstadoActual().name());
+      filtradas.forEach(d -> builder.addDonaciones(aDonacionAdminFilaMsg(d)));
 
-        if (d.getBeneficiario() != null) {
-          Beneficiario b = d.getBeneficiario();
-          msg.setBeneficiario(BeneficiarioMsg.newBuilder()
-              .setId(b.getId())
-              .setRazonSocial(b.getRazonSocial() != null ? b.getRazonSocial() : "")
-              .setDireccion(b.getDireccion() != null ? b.getDireccion() : "")
-              .build());
-        }
-        builder.addDonaciones(msg.build());
-      }
+      repoSubcategorias.buscarTodas().stream()
+          .map(s -> s.getCategoria().getNombre())
+          .distinct()
+          .sorted()
+          .forEach(builder::addCategorias);
+
       return builder.build();
     }));
   }
@@ -672,13 +671,43 @@ public class DonacionesGrpc extends DonacionesServiceGrpc.DonacionesServiceImplB
         throw new RecursoNoEncontradoException("Donación no encontrada para este beneficiario");
       }
 
-      String fechaAsignacionStr = donacion.getFechaAsignacion() != null
-          ? donacion.getFechaAsignacion().toString()
-          : "";
-
       return DetalleDonacionBeneficiarioResponse.newBuilder()
           .setDonacion(aDonacionBeneficiarioMsg(donacion))
-          .setFechaAsignacion(fechaAsignacionStr)
+          .setFechaAsignacion(fechaAsignacionDe(donacion))
+          .build();
+    }));
+  }
+
+  @Override
+  public void listarNovedadesBeneficiario(BeneficiarioIdRequest req,
+                                          StreamObserver<ListaNovedadesBeneficiarioResponse> out) {
+    responder(out, () -> withTransaction(() -> {
+      if (repoBeneficiarios.buscarPorId(req.getId()) == null) {
+        throw new RecursoNoEncontradoException("Beneficiario no encontrado");
+      }
+
+      List<NovedadDonacionMsg> novedades = new ArrayList<>();
+      for (Donacion donacion : repoDonaciones.buscarPorBeneficiario(req.getId())) {
+        for (EstadoDonacion estado : donacion.getHistorialEstados()) {
+          if (estado.getTipoEstado() == TipoEstadoDonacion.EN_DEPOSITO) {
+            continue;
+          }
+          novedades.add(NovedadDonacionMsg.newBuilder()
+              .setIdDonacion(donacion.getId())
+              .setDescripcion(nvl(donacion.getDescripcion()))
+              .setTipoEstado(estado.getTipoEstado().name())
+              .setFecha(estado.getFecha() == null ? "" : estado.getFecha().format(FECHA_HORA_ISO))
+              .setDetalle(nvl(estado.getDetalle()))
+              .build());
+        }
+      }
+
+      // Formato ISO de ancho fijo: el orden alfabético coincide con el cronológico.
+      // Más recientes primero; las que no tienen fecha ("") quedan al final.
+      novedades.sort(Comparator.comparing(NovedadDonacionMsg::getFecha, Comparator.reverseOrder()));
+
+      return ListaNovedadesBeneficiarioResponse.newBuilder()
+          .addAllNovedades(novedades)
           .build();
     }));
   }
@@ -812,6 +841,21 @@ public class DonacionesGrpc extends DonacionesServiceGrpc.DonacionesServiceImplB
     });
   }
 
+  @Override
+  public void listarSubcategorias(Vacio req, StreamObserver<ListaSubcategoriasResponse> out) {
+    responder(out, () -> withTransaction(() -> {
+      List<Subcategoria> subcategorias = repoSubcategorias.buscarTodas();
+      ListaSubcategoriasResponse.Builder builder = ListaSubcategoriasResponse.newBuilder();
+
+      for (Subcategoria s : subcategorias) {
+        builder.addSubcategorias(aSubcategoriaMsg(s));
+      }
+      return builder.build();
+    }));
+  }
+
+  //================ FUNCIONES AUXILIARES ===============
+
   private String generarContraseniaTemporal() {
     String caracteres = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
     SecureRandom random = new SecureRandom();
@@ -822,7 +866,6 @@ public class DonacionesGrpc extends DonacionesServiceGrpc.DonacionesServiceImplB
     return codigo.toString();
   }
 
-  //================ FUNCIONES AUXILIARES ===============
   private <T> void responder(StreamObserver<T> out, Supplier<T> accion) {
     try {
       out.onNext(accion.get());
@@ -924,8 +967,71 @@ public class DonacionesGrpc extends DonacionesServiceGrpc.DonacionesServiceImplB
         .setId(d.getId())
         .setDescripcion(d.getDescripcion() != null ? d.getDescripcion() : "")
         .setEstadoActual(d.getEstadoActual() != null ? d.getEstadoActual().name() : "")
-        .setFechaAsignacion(d.getFechaAsignacion() != null ? d.getFechaAsignacion().toString() : "");
+        .setFechaAsignacion(fechaAsignacionDe(d));
 
     return builder.build();
+  }
+
+  // getFechaAsignacion() lanza DominioException si la donación nunca fue asignada
+  private String fechaAsignacionDe(Donacion d) {
+    try {
+      return d.getFechaAsignacion().toLocalDate().toString();
+    } catch (DominioException e) {
+      return "";
+    }
+  }
+
+  private DonacionAdminFilaMsg aDonacionAdminFilaMsg(Donacion d) {
+    LocalDate vence = DonacionVistaMapper.vencimientoDe(d);
+    String fechaIngreso = d.getHistorialEstados().isEmpty() || d.getHistorialEstados().get(0).getFecha() == null
+        ? ""
+        : d.getHistorialEstados().get(0).getFecha().toLocalDate().toString();
+
+    DonacionAdminFilaMsg.Builder msg = DonacionAdminFilaMsg.newBuilder()
+        .setId(d.getId())
+        .setFechaIngreso(fechaIngreso)
+        .setVencimiento(vence == null ? "" : vence.toString())
+        .setEstadoActual(d.getEstadoActual().name())
+        .setVencible(d.sePuedeMarcarVencida());
+
+    d.getDonantes().forEach(donante -> msg.addDonantes(nvl(donante.getNombreCompleto())));
+    d.getBienes().forEach(bien -> msg.addBienes(BienFilaMsg.newBuilder()
+        .setDescripcion(nvl(bien.getDescripcion()))
+        .setCategoria(nvl(bien.getSubcategoria().getCategoria().getNombre()))
+        .setSubcategoria(nvl(bien.getSubcategoria().getNombre()))
+        .setCantidad(bien.getCantidad())
+        .setUnidadMedida(bien.getUnidadMedida().toString())
+        .build()));
+
+    return msg.build();
+  }
+
+  private boolean coincideBusqueda(Donacion donacion, String q) {
+    if (q.isEmpty()) return true;
+    String buscado = q.toLowerCase();
+    return DonacionVistaMapper.codigo(donacion.getId()).toLowerCase().contains(buscado)
+        || donacion.getBienes().stream().anyMatch(b -> b.getDescripcion().toLowerCase().contains(buscado))
+        || donacion.getDonantes().stream().anyMatch(d -> d.getNombreCompleto().toLowerCase().contains(buscado));
+  }
+
+  private boolean coincideCategoria(Donacion donacion, String categoria) {
+    return donacion.getBienes().stream()
+        .anyMatch(b -> b.getSubcategoria().getCategoria().getNombre().equalsIgnoreCase(categoria));
+  }
+
+  private boolean coincideVencimiento(Donacion donacion, String filtro, LocalDate hoy) {
+    LocalDate vence = DonacionVistaMapper.vencimientoDe(donacion);
+    return switch (filtro) {
+      case "7_dias" -> vence != null && !vence.isAfter(hoy.plusDays(7));
+      case "30_dias" -> vence != null && !vence.isAfter(hoy.plusDays(30));
+      case "vencidas" -> vence != null && vence.isBefore(hoy);
+      case "no_perecedero" -> vence == null;
+      case "todos" -> true;
+      default -> throw new DominioException("El filtro de vencimiento: " + filtro + " no existe");
+    };
+  }
+
+  private String nvl(String valor) {
+    return valor == null ? "" : valor;
   }
 }

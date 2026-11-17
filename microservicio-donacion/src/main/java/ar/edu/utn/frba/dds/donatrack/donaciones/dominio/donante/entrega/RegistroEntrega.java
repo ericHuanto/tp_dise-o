@@ -2,6 +2,10 @@ package ar.edu.utn.frba.dds.donatrack.donaciones.dominio.donante.entrega;
 
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.bien.Bien;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.donante.Donante;
+import ar.edu.utn.frba.dds.donatrack.shared.excepciones.DominioException;
+import java.time.LocalDate;
+import java.util.stream.Collectors;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -31,20 +35,37 @@ public class RegistroEntrega {
   private Long id;
   @Column(name = "fecha")
   private LocalDateTime fecha;
+  @Column(name = "observaciones")
+  private String observaciones;
   @Column(name = "descripcion_general")
   private String descripcionGeneral;
-  @OneToMany
+  @OneToMany(cascade = CascadeType.PERSIST)
   @JoinColumn(name = "id_registro_entrega")
   private List<Bien> bienes;
   @ManyToOne
   @JoinColumn(name = "id_donante")
   private Donante donante; //Doble Referencia
 
-  public RegistroEntrega(String descripcionGeneral, List<Bien> bienes, Donante donante) {
-    this.fecha = LocalDateTime.now();
-    this.donante = donante;
-    this.descripcionGeneral = descripcionGeneral;
+  public RegistroEntrega(LocalDate fechaRecepcion, String observaciones,
+                         List<Bien> bienes, Donante donante) {
+    checkDatos(fechaRecepcion, bienes, donante);
+    this.fecha = fechaRecepcion.atStartOfDay();
+    this.observaciones = (observaciones == null || observaciones.isBlank()) ? null : observaciones.trim();
+    this.descripcionGeneral = bienes.stream()
+        .map(b -> b.getCantidad() + " " + b.getUnidadMedida().toString().toLowerCase() + " de " + b.getDescripcion())
+        .collect(Collectors.joining(", "));
     this.bienes = new ArrayList<>(bienes);
+    this.donante = donante;
   }
 
+  private void checkDatos(LocalDate fechaRecepcion, List<Bien> bienes, Donante donante) {
+    if (fechaRecepcion == null)
+      throw new DominioException("El registro de entrega debe tener fecha de recepción");
+    if (fechaRecepcion.isAfter(LocalDate.now()))
+      throw new DominioException("La fecha de recepción no puede ser futura");
+    if (bienes == null || bienes.isEmpty())
+      throw new DominioException("Un registro de entrega debe tener al menos un bien");
+    if (donante == null)
+      throw new DominioException("Un registro de entrega debe tener una persona donante");
+  }
 }

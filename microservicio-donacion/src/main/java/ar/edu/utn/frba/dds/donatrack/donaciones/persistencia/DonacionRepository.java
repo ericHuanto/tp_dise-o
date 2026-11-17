@@ -64,5 +64,15 @@ public class DonacionRepository implements WithSimplePersistenceUnit {
         .filter(d -> idsSubcategorias.isEmpty() || idsSubcategorias.contains(d.getSubcategoria().getId()))
         .toList();
   }
+  public List<Donacion> buscarPorBeneficiario(Long idBeneficiario) {
+    return entityManager()
+        .createQuery(
+            "SELECT d FROM Donacion d " +
+                "WHERE d.beneficiario.id = :idBeneficiario",
+            Donacion.class
+        )
+        .setParameter("idBeneficiario", idBeneficiario)
+        .getResultList();
+  }
 
 }

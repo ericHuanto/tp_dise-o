@@ -1,6 +1,7 @@
 package ar.edu.utn.frba.dds.donatrack.usuario.web.controllers;
 
 import ar.edu.utn.frba.dds.donatrack.grpc.*;
+import ar.edu.utn.frba.dds.donatrack.grpc.DonacionesServiceGrpc.DonacionesServiceBlockingStub;
 import ar.edu.utn.frba.dds.donatrack.usuario.dominio.usuario.Usuario;
 import ar.edu.utn.frba.dds.donatrack.usuario.persistencia.UsuarioRepository;
 import com.google.protobuf.ByteString;
@@ -15,12 +16,12 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class CsvController implements WithSimplePersistenceUnit {
-  private final DonacionesServiceGrpc.DonacionesServiceBlockingStub donacionesStub;
+  private final DonacionesServiceBlockingStub donacionesStub;
   private final UsuarioRepository repoUsuarios;
 
   private static final ConcurrentHashMap<String, Map<String, Object>> tareasEnProceso = new ConcurrentHashMap<>();
 
-  public CsvController(DonacionesServiceGrpc.DonacionesServiceBlockingStub donacionesStub, UsuarioRepository repoUsuarios) {
+  public CsvController(DonacionesServiceBlockingStub donacionesStub, UsuarioRepository repoUsuarios) {
     this.donacionesStub = donacionesStub;
     this.repoUsuarios = repoUsuarios;
   }

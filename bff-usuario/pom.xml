@@ -77,7 +77,7 @@
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>ar.edu.utn.frba.dds.donatrack.usuario.web.App</mainClass> <!-- REVISAR-->
+                                    <mainClass>ar.edu.utn.frba.dds.donatrack.usuario.web.App</mainClass>
                                 </transformer>
                             </transformers>
                         </configuration>
