@@ -53,9 +53,11 @@ public class App {
     ConfiguracionEntorno config = ConfiguracionEntorno.getInstance();
 
     //Conexión a la db desde el .env
-    if (System.getenv("DB_URL_BFF") != null) {
-      String url = config.getDbUrlBff();
-      WithSimplePersistenceUnit.configure(p -> p.putAll(ConfiguracionPersistencia.propiedadesBaseDeDatos(url)));
+    String urlDb = config.obtenerOpcional("DB_URL_BFF");
+    if (urlDb != null) {
+      WithSimplePersistenceUnit.configure(p -> p.putAll(ConfiguracionPersistencia.propiedadesBaseDeDatos(urlDb)));
+    } else {
+      System.out.println("[AVISO] DB_URL_BFF no está definida: se usa la base del persistence.xml");
     }
 
     GrpcClientsConfig grpcClients = new GrpcClientsConfig();

@@ -42,9 +42,13 @@ public class App {
     ConfiguracionEntorno config = ConfiguracionEntorno.getInstance();
 
     //Conexión a la db desde el .env
-    WithLogisticaPersistenceUnit.PER_THREAD_ENTITY_MANAGER_ACCESS.configure(p ->
-        p.putAll(ConfiguracionPersistencia.propiedadesBaseDeDatos(config.getDbUrlLogistica())));
-
+    String urlDb = config.obtenerOpcional("DB_URL_LOGISTICA");
+    if (urlDb != null) {
+      WithLogisticaPersistenceUnit.PER_THREAD_ENTITY_MANAGER_ACCESS.configure(p ->
+          p.putAll(ConfiguracionPersistencia.propiedadesBaseDeDatos(urlDb)));
+    } else {
+      System.out.println("[AVISO] DB_URL_LOGISTICA no está definida: se usa la base del persistence.xml");
+    }
     //Servidor gRPC
     Server grpc = ServerBuilder
         .forPort(config.puertoGrpcLogistica(PUERTO_GRPC))

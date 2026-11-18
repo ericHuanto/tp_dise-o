@@ -13,11 +13,7 @@
         <properties>
             <property name="hibernate.archive.autodetection" value="class"/>
 
-            <!-- opción 1: DB real, forma desplegada
-            <property name="hibernate.connection.driver_class" value="com.mysql.cj.jdbc.Driver"/>
-            <property name="hibernate.connection.url" value="jdbc:mysql://localhost:3306/donatrack_usuarios?serverTimezone=UTC&amp;allowPublicKeyRetrieval=true&amp;useSSL=false"/>
-            <property name="hibernate.dialect" value="org.hibernate.dialect.MySQL8Dialect"/>
-            -->
+            <!-- opción 1: DB real, forma desplegada: Ahora se obtiene del .env, a través de ConfiguracionPersistencia.java -->
 
             <!-- opción 2: DB real, forma Local
             <property name="hibernate.connection.driver_class" value="com.mysql.cj.jdbc.Driver"/>

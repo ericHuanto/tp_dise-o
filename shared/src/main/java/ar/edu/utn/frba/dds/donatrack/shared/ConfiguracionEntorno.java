@@ -135,6 +135,11 @@ public class ConfiguracionEntorno {
   }
 
   //=================== FUNCIONES AUXILIARES =====================
+  public String obtenerOpcional(String nombre) {
+    String valor = dotenv.get(nombre);
+    return (valor == null || valor.isBlank()) ? null : valor;
+  }
+
   private String obtenerObligatorio(String nombre) {
     String clave = dotenv.get(nombre);
     if (clave == null || clave.isBlank()) {

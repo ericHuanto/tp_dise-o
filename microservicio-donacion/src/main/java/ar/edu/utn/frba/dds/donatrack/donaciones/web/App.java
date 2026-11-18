@@ -30,9 +30,12 @@ public class App {
     ConfiguracionEntorno config = ConfiguracionEntorno.getInstance();
 
     //Conexión a la db desde el .env
-    WithSimplePersistenceUnit.configure(p ->
-        p.putAll(ConfiguracionPersistencia.propiedadesBaseDeDatos(config.getDbUrlDonaciones())));
-
+    String urlDb = config.obtenerOpcional("DB_URL_DONACIONES");
+    if (urlDb != null) {
+      WithSimplePersistenceUnit.configure(p -> p.putAll(ConfiguracionPersistencia.propiedadesBaseDeDatos(urlDb)));
+    } else {
+      System.out.println("[AVISO] DB_URL_DONACIONES no está definida: se usa la base del persistence.xml");
+    }
     DatosIniciales.init();
     SuscriptorNotificacion.init();
 
