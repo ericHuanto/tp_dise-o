@@ -330,6 +330,16 @@ textarea:focus {
     font-weight: 500;
 }
 
+.btn-link {
+    background: none;
+    border: none;
+    padding: 0;
+    font: inherit;
+    font-size: 0.74rem;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
 .alerta-error-login {
     background-color: #F9E6DF;
     color: #9E3F24;
@@ -337,6 +347,17 @@ textarea:focus {
     border-radius: 8px;
     font-size: 0.85rem;
     font-weight: 500;
+    margin-bottom: 18px;
+}
+
+.alerta-exito {
+    background-color: #E3EFEA;
+    color: var(--accent-green);
+    border: 1px solid rgba(59, 107, 91, 0.2);
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
     margin-bottom: 18px;
 }
 

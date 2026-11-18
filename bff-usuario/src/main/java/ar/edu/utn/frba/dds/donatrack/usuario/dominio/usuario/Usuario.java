@@ -36,9 +36,9 @@ public class Usuario {
   @Column(name = "permiso")
   private List<Permiso> permisos;
   @Column(name = "id_donante")
-  private Long idDonante;
+  private Long idDonante; //No es común tener ID en las clases de dominio
   @Column(name = "id_beneficiario")
-  private Long idBeneficiario;
+  private Long idBeneficiario;//No es común tener ID en las clases de dominio
 
   public Usuario(String nombreUsuario, String contraseña) {
     this.nombreUsuario = nombreUsuario;
@@ -78,6 +78,10 @@ public class Usuario {
 
   public boolean isAdmin() {
     return tienePermiso(Permiso.ADMINISTRADOR);
+  }
+
+  public void actualizarContraseña(String contraseña) {
+    this.contraseña = hashear(contraseña);
   }
 
   //================== FUNCIONES AUXILIARES ===================

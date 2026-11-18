@@ -43,6 +43,7 @@ public class CorreoDeContacto extends MedioContacto {
 
   @Override
   public void enviarMensaje(String message) {
+    clienteCorreo = new ClienteCorreoMock(); // agregado para evitar el problema de que es null, ya que no fue persistido.
     clienteCorreo.enviarCorreo(detalle, message);
   }
 

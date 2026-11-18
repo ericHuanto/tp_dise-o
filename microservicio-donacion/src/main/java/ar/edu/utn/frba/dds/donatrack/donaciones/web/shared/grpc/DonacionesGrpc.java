@@ -911,6 +911,82 @@ public class DonacionesGrpc extends DonacionesServiceGrpc.DonacionesServiceImplB
     }));
   }
 
+  @Override
+  public void enviarPinRecuperacion(NotificacionPinRequest req, StreamObserver<Resultado> out) {
+    responder(out, () -> withTransaction(() -> {
+
+      String mensaje = "Tu código de recuperación de cuenta es: " + req.getPin();
+      boolean fueNotificado = false;
+
+      if (req.getIdBeneficiario() > 0) {
+        Beneficiario beneficiario = repoBeneficiarios.buscarPorId(req.getIdBeneficiario());
+        if (beneficiario != null) {
+          beneficiario.recibirNotificacion(mensaje);
+          fueNotificado = true;
+        }
+      }
+
+      else if (req.getIdDonante() > 0) {
+        Donante donante = repoDonantes.buscarPorId(req.getIdDonante());
+        if (donante != null) {
+          donante.recibirNotificacion(mensaje);
+          fueNotificado = true;
+        }
+      }
+
+      if (!fueNotificado) {
+        return ok("No se encontró beneficiario ni donante con ese ID");
+      }
+
+      return ok("Notificación enviada correctamente");
+    }));
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   //================ FUNCIONES AUXILIARES ===============
 
   private String generarContraseniaTemporal() {

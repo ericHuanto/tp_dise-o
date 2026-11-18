@@ -53,9 +53,10 @@ service DonacionesService {
   rpc ListarSubcategorias (Vacio) returns (ListaSubcategoriasResponse);
   rpc BuscarDonantes      (BuscarDonantesRequest) returns (ListaDonantesResumenResponse);
   rpc RegistrarEntrega    (RegistrarEntregaRequest) returns (RegistrarEntregaResponse);
+
+  //Notificar Mensaje a beneficiario y donante
+  rpc EnviarPinRecuperacion (NotificacionPinRequest) returns (Resultado);
 }
-
-
 
 message Vacio {}
 message DonacionId { int64 id = 1; }
@@ -435,4 +436,10 @@ message ImportarCsvResponse {
   int32 cant_exitosa = 1;
   repeated DonanteImportadoUsuarioMsg usuarios_generados = 2;
   repeated FilaErrorMsg errores_encontrados = 3;
+}
+
+message NotificacionPinRequest {
+  int64 id_beneficiario = 1;
+  int64 id_donante = 2;
+  string pin = 3;
 }
