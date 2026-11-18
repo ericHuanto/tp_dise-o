@@ -1,4 +1,3 @@
-.env
 *.iml
 .idea/**
 target
@@ -14,3 +13,10 @@ Estacion-dds-*/
 # Excepción: NO ignorar los archivos .gitkeep
 !**/uploads/**/.gitkeep
 /microservicio-logistica/uploads/
+
+# Archivos de entorno reales
+deploy/env/*.env
+.env
+
+# Fotos guardadas en la VM
+deploy/datos/

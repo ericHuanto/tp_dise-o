@@ -10,6 +10,7 @@ import ar.edu.utn.frba.dds.donatrack.donaciones.web.api.routes.DonanteApiRoutes;
 import ar.edu.utn.frba.dds.donatrack.donaciones.web.api.routes.NecesidadApiRoutes;
 import ar.edu.utn.frba.dds.donatrack.donaciones.web.api.routes.RegistroEntregaApiRoutes;
 import ar.edu.utn.frba.dds.donatrack.shared.ConfiguracionEntorno;
+import ar.edu.utn.frba.dds.donatrack.shared.ConfiguracionPersistencia;
 import ar.edu.utn.frba.dds.donatrack.shared.ExceptionHandlers;
 import ar.edu.utn.frba.dds.donatrack.shared.GsonConfig;
 import io.github.flbulgarelli.jpa.extras.simple.WithSimplePersistenceUnit;
@@ -28,13 +29,10 @@ public class App {
   public static void main(String[] args) throws IOException {
     ConfiguracionEntorno config = ConfiguracionEntorno.getInstance();
 
-    //TODO esta configuración debería estar en persistence.xml
-    //Cargo credenciales para la db desde el .env
-    //setPropiedad("hibernate.connection.driver_class", config.getDbDriver());   // LOCAL: no commitear
-    System.setProperty("hibernate.connection.url", config.getDbUrlDonaciones());
-    System.setProperty("hibernate.connection.username", config.getDbUser());
-    System.setProperty("hibernate.connection.password", config.getDbPassword());
-    //setPropiedad("hibernate.dialect",                 config.getDbDialect());   // LOCAL: no commitear
+    //Conexión a la db desde el .env
+    WithSimplePersistenceUnit.configure(p ->
+        p.putAll(ConfiguracionPersistencia.propiedadesBaseDeDatos(config.getDbUrlDonaciones())));
+
     DatosIniciales.init();
     SuscriptorNotificacion.init();
 

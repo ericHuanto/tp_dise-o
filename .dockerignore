@@ -1,0 +1,10 @@
+.git
+.idea
+*.iml
+**/target
+data
+docs
+deploy
+**/uploads
+**/.env
+*.log

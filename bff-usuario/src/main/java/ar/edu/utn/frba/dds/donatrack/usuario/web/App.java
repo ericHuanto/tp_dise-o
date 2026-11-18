@@ -1,6 +1,7 @@
 package ar.edu.utn.frba.dds.donatrack.usuario.web;
 
 import ar.edu.utn.frba.dds.donatrack.shared.ConfiguracionEntorno;
+import ar.edu.utn.frba.dds.donatrack.shared.ConfiguracionPersistencia;
 import ar.edu.utn.frba.dds.donatrack.shared.ExceptionHandlers;
 import ar.edu.utn.frba.dds.donatrack.shared.GsonConfig;
 import ar.edu.utn.frba.dds.donatrack.usuario.persistencia.DatosIniciales;
@@ -42,6 +43,8 @@ import io.github.flbulgarelli.jpa.extras.simple.WithSimplePersistenceUnit;
 import io.javalin.Javalin;
 import io.javalin.http.staticfiles.Location;
 import io.javalin.rendering.template.JavalinHandlebars;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 public class App {
   public static final int PUERTO = 8080;
@@ -49,10 +52,10 @@ public class App {
   public static void main(String[] args) {
     ConfiguracionEntorno config = ConfiguracionEntorno.getInstance();
 
+    //Conexión a la db desde el .env
     if (System.getenv("DB_URL_BFF") != null) {
-      System.setProperty("hibernate.connection.url", config.getDbUrlBff());
-      System.setProperty("hibernate.connection.username", config.getDbUser());
-      System.setProperty("hibernate.connection.password", config.getDbPassword());
+      String url = config.getDbUrlBff();
+      WithSimplePersistenceUnit.configure(p -> p.putAll(ConfiguracionPersistencia.propiedadesBaseDeDatos(url)));
     }
 
     GrpcClientsConfig grpcClients = new GrpcClientsConfig();
@@ -85,6 +88,16 @@ public class App {
     return Javalin.create(config -> {
       config.jsonMapper(GsonConfig.jsonMapper());
       config.staticFiles.add("/presentacion", Location.CLASSPATH);
+
+      //Guarda las fotos de recepcion de entrega en /uploads
+      Path directorioFotos = Path.of(System.getenv().getOrDefault("DIRECTORIO_FOTOS", "microservicio-logistica/uploads"));
+      if (Files.isDirectory(directorioFotos)) {
+        config.staticFiles.add(staticFiles -> {
+          staticFiles.hostedPath = "/uploads";
+          staticFiles.directory = directorioFotos.toAbsolutePath().toString();
+          staticFiles.location = Location.EXTERNAL;
+        });
+      }
 
       TemplateLoader loader = new ClassPathTemplateLoader("/presentacion", "");
       Handlebars motorHandlebars = new Handlebars(loader);

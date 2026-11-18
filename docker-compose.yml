@@ -1,0 +1,76 @@
+services:
+
+  mysql:
+    image: mysql:8.0
+    container_name: donatrack-mysql
+    env_file: ./deploy/env/mysql.env
+    volumes:
+      - mysql-datos:/var/lib/mysql                                      # los datos sobreviven a reinicios y redeploys
+      - ./deploy/mysql/init.sh:/docker-entrypoint-initdb.d/init.sh:ro   # crea esquemas y usuarios (solo la 1ra vez)
+    ports:
+      - "127.0.0.1:3306:3306"
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -uroot -p$$MYSQL_ROOT_PASSWORD --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+    mem_limit: 600m
+    restart: unless-stopped
+
+  donaciones:
+    build:
+      context: .
+      dockerfile: microservicio-donacion/Dockerfile
+    image: donatrack-donaciones
+    container_name: donatrack-donaciones
+    env_file: ./deploy/env/donaciones.env
+    depends_on:
+      mysql:
+        condition: service_healthy
+    mem_limit: 1200m
+    restart: unless-stopped
+
+  logistica:
+    build:
+      context: .
+      dockerfile: microservicio-logistica/Dockerfile
+    image: donatrack-logistica
+    container_name: donatrack-logistica
+    env_file: ./deploy/env/logistica.env
+    volumes:
+      - ./deploy/datos/uploads:/app/microservicio-logistica/uploads
+    depends_on:
+      mysql:
+        condition: service_healthy
+      donaciones:
+        condition: service_started
+    mem_limit: 1200m
+    restart: unless-stopped
+
+  bff:
+    build:
+      context: .
+      dockerfile: bff-usuario/Dockerfile
+    image: donatrack-bff
+    container_name: donatrack-bff
+    env_file: ./deploy/env/bff.env
+    volumes:
+      - ./deploy/datos/uploads:/app/uploads:ro #read only
+    depends_on:
+      mysql:
+        condition: service_healthy
+      donaciones:
+        condition: service_started
+      logistica:
+        condition: service_started
+    ports:
+      - "80:8080"
+    mem_limit: 800m
+    restart: unless-stopped
+
+volumes:
+  mysql-datos:
+
+networks:
+  default:
+    name: donatrack

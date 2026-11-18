@@ -20,6 +20,9 @@ public class DatosIniciales implements WithLogisticaPersistenceUnit {
   }
 
   public void comenzar() {
+    if(!repoCamiones.buscarTodos().isEmpty()){
+      return;
+    }
     //Entidades
     Camion camion = new Camion("ABC-123", 10f, 2.5f, 1500f);
     Gps gps = new Gps("000A");

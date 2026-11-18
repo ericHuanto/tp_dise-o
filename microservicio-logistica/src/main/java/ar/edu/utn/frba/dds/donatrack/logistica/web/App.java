@@ -17,6 +17,7 @@ import ar.edu.utn.frba.dds.donatrack.logistica.persistencia.CamionRepository;
 import ar.edu.utn.frba.dds.donatrack.logistica.persistencia.RutaRepository;
 import ar.edu.utn.frba.dds.donatrack.logistica.persistencia.EntregaRepository;
 import ar.edu.utn.frba.dds.donatrack.shared.ConfiguracionEntorno;
+import ar.edu.utn.frba.dds.donatrack.shared.ConfiguracionPersistencia;
 import ar.edu.utn.frba.dds.donatrack.shared.ExceptionHandlers;
 import ar.edu.utn.frba.dds.donatrack.shared.GsonConfig;
 import io.grpc.Server;
@@ -40,10 +41,9 @@ public class App {
   public static void main(String[] args) throws IOException {
     ConfiguracionEntorno config = ConfiguracionEntorno.getInstance();
 
-    //Cargo credenciales para la db desde el .env. NO COMMITEAR COMENTADO!!!
-    System.setProperty("hibernate.connection.url", config.getDbUrlLogistica());
-    System.setProperty("hibernate.connection.username", config.getDbUser());
-    System.setProperty("hibernate.connection.password", config.getDbPassword());
+    //Conexión a la db desde el .env
+    WithLogisticaPersistenceUnit.PER_THREAD_ENTITY_MANAGER_ACCESS.configure(p ->
+        p.putAll(ConfiguracionPersistencia.propiedadesBaseDeDatos(config.getDbUrlLogistica())));
 
     //Servidor gRPC
     Server grpc = ServerBuilder

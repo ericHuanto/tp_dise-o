@@ -230,7 +230,7 @@ public class LogisticaGrpc extends LogisticaServiceGrpc.LogisticaServiceImplBase
             String nombreArchivo = UUID.randomUUID().toString().substring(0, 8) + "-" + foto.getNombreArchivo();
             Path rutaDestino = directorioFotos.resolve(nombreArchivo);
             Files.write(rutaDestino, foto.getContenido().toByteArray());
-            String url = "/upload/entregas/" + nombreArchivo;
+            String url = "/uploads/entregas/" + nombreArchivo;
             entrega.agregarFotoRecepcion(url);
           }
         } catch (IOException e) {
