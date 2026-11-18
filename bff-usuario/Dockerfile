@@ -2,7 +2,7 @@
 FROM maven:3.9-eclipse-temurin-17 AS compilacion
 WORKDIR /build
 
-COPY ../shared/pom.xml .
+COPY pom.xml .
 COPY shared/pom.xml shared/
 COPY microservicio-donacion/pom.xml microservicio-donacion/
 COPY microservicio-logistica/pom.xml microservicio-logistica/
