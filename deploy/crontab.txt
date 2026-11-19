@@ -6,7 +6,7 @@
 #  Formato: minuto hora día-del-mes mes día-de-la-semana   comando
 
 SHELL=/bin/bash
-PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin #Path estándar de Ubuntu
 
 # Planificación diaria de rutas (logística): todos los días a las 02:00
 0 2 * * *   cd $HOME/DonaTrack && docker compose run --rm --no-deps -T logistica  java -Xmx256m -cp app.jar ar.edu.utn.frba.dds.donatrack.logistica.cron.ProcesoLogistica       >> $HOME/DonaTrack/deploy/logs/logistica.log   2>&1
@@ -16,3 +16,4 @@ PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
 # Aviso a donantes ausentes: los lunes a las 10:00
 0 10 * * 1  cd $HOME/DonaTrack && docker compose run --rm --no-deps -T donaciones java -Xmx256m -cp app.jar ar.edu.utn.frba.dds.donatrack.donaciones.cron.AusenciaBeneficiario >> $HOME/DonaTrack/deploy/logs/ausencias.log   2>&1
+
