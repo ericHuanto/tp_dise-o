@@ -1,0 +1,231 @@
+/* ---------- Comunes a lista y detalle ---------- */
+.pagina-asignacion h1 {
+    margin-bottom: 28px;
+}
+
+.pagina-asignacion > .subtitulo {
+    margin-top: -20px;           /* el subtítulo va pegado al título */
+}
+
+.pagina-asignacion .tabla th {
+    padding: 14px 24px;
+}
+
+.pagina-asignacion .tabla td {
+    padding: 20px 24px;
+    font-size: 0.95rem;
+}
+
+.pagina-asignacion .tabla td strong {
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.pagina-asignacion .tabla small {
+    margin-top: 3px;
+    font-size: 0.85rem;
+}
+
+/* ---------- Lista ---------- */
+.tabla-asignaciones tbody tr {
+    transition: background-color 0.15s;
+}
+
+.tabla-asignaciones tbody tr:hover {
+    background: #FAF9F5;
+}
+
+.tabla-asignaciones .celda-accion {
+    text-align: right;
+}
+
+.btn-elegir,
+.btn-elegir:visited {
+    display: inline-block;
+    padding: 8px 16px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    color: var(--accent-dark);
+    font-size: 0.88rem;
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: border-color 0.2s, background-color 0.2s, color 0.2s;
+}
+
+.btn-elegir:hover {
+    border-color: var(--accent-green);
+    background: #F3F7F5;
+    color: var(--accent-green);
+}
+
+/* ---------- Detalle: distribución ---------- */
+.pagina-asignacion .asignar-grid {
+    grid-template-columns: 360px 1fr;
+    gap: 24px;
+}
+
+/* ---------- Detalle: tarjeta de la donación ---------- */
+.tarjeta-donacion {
+    padding: 28px 32px;
+}
+
+.tarjeta-donacion h2 {
+    margin-bottom: 20px;
+    font-size: 1.15rem;
+}
+
+.bien-bloque + .bien-bloque {
+    margin-top: 18px;
+    padding-top: 18px;
+    border-top: 1px solid #EFECE6;
+}
+
+.bien-bloque h3 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--accent-dark);
+}
+
+.bien-categoria {
+    margin-top: 2px;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+.tarjeta-donacion .datos {
+    grid-template-columns: 100px 1fr;
+    gap: 12px 16px;
+    margin-top: 14px;
+    font-size: 0.95rem;
+}
+
+.tarjeta-donacion .datos-donacion {
+    margin-top: 18px;
+    padding-top: 18px;
+    border-top: 1px solid #EFECE6;
+}
+
+/* ---------- Detalle: tarjeta de candidatas ---------- */
+.pagina-asignacion .tarjeta-cabecera {
+    padding: 28px 32px 20px;
+}
+
+.pagina-asignacion .tarjeta-cabecera h2 {
+    margin-bottom: 0;
+    font-size: 1.15rem;
+}
+
+.tabla-candidatas th:first-child,
+.tabla-candidatas td:first-child {
+    padding-left: 32px;
+}
+
+.tabla-candidatas th:last-child,
+.tabla-candidatas td:last-child {
+    padding-right: 32px;
+}
+
+/* Toda la fila se puede elegir, y la elegida queda resaltada (:has, sin JS) */
+.tabla-candidatas tbody tr {
+    cursor: pointer;
+    transition: background-color 0.15s;
+}
+
+.tabla-candidatas tbody tr:hover {
+    background: #FAF9F5;
+}
+
+.tabla-candidatas tbody tr:has(input:checked) {
+    background: #F1F6F3;
+}
+
+.tabla-candidatas .celda-radio label {
+    gap: 18px;
+}
+
+.posicion {
+    font-size: 1.05rem;
+}
+
+/* Radio con aspecto propio: aro gris, y aro + punto verde cuando está elegido */
+.tabla-candidatas .celda-radio input {
+    appearance: none;
+    -webkit-appearance: none;
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    margin: 0;
+    transform: none;
+    border: 2px solid #C9C7BC;
+    border-radius: 50%;
+    background: var(--white);
+    cursor: pointer;
+    transition: border-color 0.15s;
+}
+
+.tabla-candidatas .celda-radio input:checked {
+    border-color: var(--accent-green);
+    background: radial-gradient(circle, var(--accent-green) 0 42%, var(--white) 48%);
+}
+
+.tabla-candidatas .celda-radio input:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+/* Necesidades: texto arriba, etiqueta abajo */
+.necesidad + .necesidad {
+    margin-top: 14px;
+}
+
+.necesidad-texto {
+    display: block;
+}
+
+.pagina-asignacion .urgencia {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin: 6px 0 0;
+    padding: 3px 8px;
+    border-radius: 5px;
+    font-family: ui-monospace, Menlo, Consolas, monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.pagina-asignacion .urgencia::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+}
+
+/* ---------- Detalle: nota y barra inferior ---------- */
+.pagina-asignacion .criterio-nota {
+    padding: 16px 32px;
+}
+
+.pagina-asignacion .barra-seleccion {
+    margin-top: 24px;
+    padding: 20px 32px;
+}
+
+.pagina-asignacion .barra-seleccion p {
+    font-size: 0.98rem;
+}
+
+.pagina-asignacion .barra-seleccion .btn-primary,
+.pagina-asignacion .barra-seleccion .btn-secondary {
+    padding: 12px 26px;
+    font-size: 0.95rem;
+}
+
+@media (max-width: 900px) {
+    .pagina-asignacion .asignar-grid { grid-template-columns: 1fr; }
+    .tabla-candidatas th:first-child,
+    .tabla-candidatas td:first-child { padding-left: 20px; }
+}

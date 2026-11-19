@@ -8,7 +8,8 @@ public class AsignacionRoutes {
   private AsignacionRoutes() { }
 
   public static void registrar(RoutesConfig ruta, AsignacionController controller) {
-    ruta.get("/rankings", controller::mostrarTodos);
-    ruta.post("/rankings/{id}", controller::confirmarAsignacion);
+    ruta.get("/asignaciones", controller::mostrarTodos);
+    ruta.get("/asignaciones/{id}", controller::mostrarDetalle);
+    ruta.post("/asignaciones/{id}", controller::confirmarAsignacion);
   }
 }

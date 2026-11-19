@@ -45,6 +45,7 @@ service DonacionesService {
   //Asignacion
   rpc ListarRankingsVigentes (Vacio) returns (ListaRankingsResponse);
   rpc ConfirmarAsignacion    (ConfirmarAsignacionRequest) returns (Resultado);
+  rpc ObtenerRanking         (RankingIdRequest) returns (RankingDetalleResponse);
 
   //Importador CSV
   rpc ImportarDonantesCsv (ImportarCsvRequest) returns (ImportarCsvResponse);
@@ -413,6 +414,32 @@ message ListaRankingsResponse {
 message ConfirmarAsignacionRequest {
   int64 id_ranking = 1;
   int64 id_beneficiario = 2;
+}
+
+message RankingIdRequest { int64 id = 1; }
+
+message NecesidadCubiertaMsg {
+  string descripcion = 1;
+  string tipo = 2;
+  int32 faltante = 3;
+  string unidad_medida = 4;
+}
+
+message CandidatoDetalleMsg {
+  int32 posicion = 1;
+  int64 id_beneficiario = 2;
+  string razon_social = 3;
+  string direccion = 4;
+  repeated NecesidadCubiertaMsg necesidades = 5;
+}
+
+message RankingDetalleResponse {
+  int64 id = 1;
+  string fecha_generacion = 2; //yyyy-MM-ddTHH:mm:ss
+  bool vigente = 3; //false si ya se confirmó (o se regeneraron los rankings)
+  DonacionAdminFilaMsg donacion = 4;
+  string beneficiaria_asignada = 5;
+  repeated CandidatoDetalleMsg candidatos = 6;
 }
 
 //Importador CSV

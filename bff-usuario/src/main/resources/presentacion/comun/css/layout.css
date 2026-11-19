@@ -220,3 +220,21 @@ footer a:visited {
     background-color: var(--primary-color);
     color: var(--accent-green);
 }
+
+/* BREADCRUMB*/
+.breadcrumb {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-bottom: 24px;
+}
+
+.breadcrumb a,
+.breadcrumb a:visited {
+    color: var(--accent-green);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.breadcrumb span {
+    margin: 0 6px;
+}
