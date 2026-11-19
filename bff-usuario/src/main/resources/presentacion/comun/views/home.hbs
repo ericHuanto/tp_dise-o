@@ -1,0 +1,97 @@
+{{#partial "nombre_pestaña"}}
+    Inicio - DonaTrack
+{{/partial}}
+
+{{#partial "css_extra"}}
+    <link rel="stylesheet" href="/comun/css/home.css">
+{{/partial}}
+
+{{#partial "contenido_propio"}}
+    <section class="home-bienvenida">
+        <span class="home-rol">
+            {{#if usuario.admin}}ADMINISTRACIÓN{{/if}}
+            {{#if usuario.beneficiario}}ENTIDAD BENEFICIARIA{{/if}}
+            {{#if usuario.donante}}PERSONA DONANTE{{/if}}
+        </span>
+        <h1>Hola, {{usuario.nombreUsuario}}</h1>
+        <p>¿Qué querés hacer hoy?</p>
+    </section>
+
+    <section class="home-accesos">
+        {{#if usuario.admin}}
+            <a href="/donaciones" class="home-tarjeta">
+                <h3>Donaciones</h3>
+                <p>Consultá el depósito, filtrá por estado y vencimiento, y marcá las vencidas.</p>
+                <span class="home-ir">Ir →</span>
+            </a>
+            <a href="/registros-entrega/nueva" class="home-tarjeta">
+                <h3>Registrar entrega</h3>
+                <p>Cargá los bienes que llegaron al depósito y asocialos a la persona donante.</p>
+                <span class="home-ir">Ir →</span>
+            </a>
+            <a href="/rankings" class="home-tarjeta">
+                <h3>Asignaciones</h3>
+                <p>Elegí la entidad beneficiaria de cada donación según el ranking del sistema.</p>
+                <span class="home-ir">Ir →</span>
+            </a>
+            <a href="/camiones" class="home-tarjeta">
+                <h3>Camiones</h3>
+                <p>Administrá la flota y los GPS asignados a cada camión.</p>
+                <span class="home-ir">Ir →</span>
+            </a>
+            <a href="/donantes/importacion" class="home-tarjeta">
+                <h3>Importar donantes</h3>
+                <p>Dá de alta personas donantes existentes desde un archivo CSV.</p>
+                <span class="home-ir">Ir →</span>
+            </a>
+        {{/if}}
+
+        {{#if usuario.beneficiario}}
+            <a href="/mis-donaciones" class="home-tarjeta">
+                <h3>Mis Donaciones</h3>
+                <p>Mirá el estado de las donaciones que te fueron asignadas.</p>
+                <span class="home-ir">Ir →</span>
+            </a>
+            <a href="/mis-entregas" class="home-tarjeta">
+                <h3>Recepciones</h3>
+                <p>Confirmá las entregas que recibiste, con fotos.</p>
+                <span class="home-ir">Ir →</span>
+            </a>
+            <a href="/seguimiento_entregas" class="home-tarjeta">
+                <h3>Seguimiento</h3>
+                <p>Seguí en el mapa los camiones que traen tus donaciones.</p>
+                <span class="home-ir">Ir →</span>
+            </a>
+            <a href="/mis-necesidades" class="home-tarjeta">
+                <h3>Mis Necesidades</h3>
+                <p>Registrá lo que necesita tu organización.</p>
+                <span class="home-ir">Ir →</span>
+            </a>
+            <a href="/notificaciones" class="home-tarjeta">
+                <h3>Historial</h3>
+                <p>Revisá las novedades de tus asignaciones y entregas.</p>
+                <span class="home-ir">Ir →</span>
+            </a>
+        {{/if}}
+
+        {{#if usuario.donante}}
+            <a href="/donante/donaciones" class="home-tarjeta">
+                <h3>Mis Donaciones</h3>
+                <p>Consultá tus donaciones y filtralas por estado o categoría.</p>
+                <span class="home-ir">Ir →</span>
+            </a>
+            <a href="/donante/beneficiarios" class="home-tarjeta">
+                <h3>Entidades beneficiarias</h3>
+                <p>Conocé a las organizaciones que reciben donaciones.</p>
+                <span class="home-ir">Ir →</span>
+            </a>
+            <a href="/seguimiento_entregas" class="home-tarjeta">
+                <h3>Seguimiento</h3>
+                <p>Seguí en el mapa los camiones que llevan tus donaciones.</p>
+                <span class="home-ir">Ir →</span>
+            </a>
+        {{/if}}
+    </section>
+{{/partial}}
+
+{{> comun/partials/layout.hbs}}

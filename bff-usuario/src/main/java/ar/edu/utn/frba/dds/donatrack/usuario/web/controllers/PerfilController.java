@@ -26,14 +26,14 @@ public class PerfilController implements WithSimplePersistenceUnit {
   }
 
   public void mostrarFormularioRegistroBeneficiario(Context context) {
-    context.render("donaciones/views/auth/registro_beneficiario.hbs", new HashMap<>());
+    context.render("comun/views/auth/registro_beneficiario.hbs", new HashMap<>());
   }
 
   public void mostrarFormularioRegistroDonanteHumano(Context context) {
     Map<String, Object> modelo = new HashMap<>();
     modelo.put("tiposDocumento", List.of("DNI", "CUIT", "PASAPORTE"));
     modelo.put("generos", List.of("FEMENINO", "MASCULINO", "X", "SIN_ESPECIFICAR"));
-    context.render("donaciones/views/auth/registro_persona_humana.hbs", modelo);
+    context.render("comun/views/auth/registro_persona_humana.hbs", modelo);
   }
 
   public void mostrarFormularioRegistroDonanteJuridica(Context context) {
@@ -41,7 +41,7 @@ public class PerfilController implements WithSimplePersistenceUnit {
     modelo.put("tiposDocumentoJuridica", List.of("CUIT"));
     modelo.put("tiposDocumentoHumana", List.of("DNI", "PASAPORTE"));
     modelo.put("tiposOrganizacion", List.of("GUBERNAMENTAL", "ONG", "EMPRESA", "INSTITUCION", "SIN_ESPECIFICAR"));
-    context.render("donaciones/views/auth/registro_persona_juridica.hbs", modelo);
+    context.render("comun/views/auth/registro_persona_juridica.hbs", modelo);
   }
 
   public void guardarBeneficiario(Context context) {
