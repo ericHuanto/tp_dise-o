@@ -1,0 +1,87 @@
+/* Contenedor principal (igual que la landing) */
+main {
+    flex: 1;
+    padding: 48px 60px 80px;
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+/* BIENVENIDA */
+.home-bienvenida {
+    margin-bottom: 40px;
+}
+
+.home-rol {
+    display: inline-block;
+    background-color: #D3E0D7;
+    color: var(--accent-green);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    padding: 6px 12px;
+    border-radius: 12px;
+    margin-bottom: 16px;
+}
+
+.home-bienvenida h1 {
+    font-size: 2.6rem;
+    font-weight: 700;
+    color: var(--accent-dark);
+    margin-bottom: 8px;
+}
+
+.home-bienvenida p {
+    font-size: 1.1rem;
+    color: var(--text-muted);
+}
+
+/* TARJETAS DE ACCESO */
+.home-accesos {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 20px;
+}
+
+.home-tarjeta,
+.home-tarjeta:visited {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 28px;
+    background-color: var(--white);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    color: var(--accent-dark);
+    text-decoration: none;
+    transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+}
+
+.home-tarjeta:hover {
+    border-color: var(--accent-green);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+    transform: translateY(-2px);
+}
+
+.home-tarjeta h3 {
+    font-size: 1.15rem;
+    font-weight: 600;
+}
+
+.home-tarjeta p {
+    flex: 1;
+    font-size: 0.92rem;
+    line-height: 1.55;
+    color: var(--text-muted);
+}
+
+.home-ir {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--accent-green);
+}
+
+@media (max-width: 800px) {
+    main { padding: 32px 20px 60px; }
+    .home-bienvenida h1 { font-size: 2rem; }
+}

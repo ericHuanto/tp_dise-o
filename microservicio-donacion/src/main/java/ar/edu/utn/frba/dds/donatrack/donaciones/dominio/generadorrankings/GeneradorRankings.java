@@ -23,7 +23,7 @@ public class GeneradorRankings implements WithSimplePersistenceUnit {
   }
 
   public List<Ranking> generar(List<Donacion> donaciones, List<Beneficiario> beneficiarios) {
-    if (beneficiarios == null || beneficiarios.isEmpty()) throw new DominioException("No se puede generar rankings sino hay beneficiarios");
+    if (beneficiarios == null || beneficiarios.isEmpty()) throw new DominioException("No se puede generar rankings si no hay beneficiarios");
 
     List<Ranking> rankings = donaciones.stream()
         .map(d -> generarRanking(d, beneficiarios)).toList();

@@ -96,7 +96,7 @@ public final class DonacionVistaMapper {
     return "Vence en " + dias + (dias == 1 ? " día" : " días");
   }
 
-  private static String estadoClave(String estado) {
+  public static String estadoClave(String estado) {
     return switch (estado) {
       case "EN_DEPOSITO" -> "pendiente";
       case "ASIGNACION_REALIZADA" -> "asignada";

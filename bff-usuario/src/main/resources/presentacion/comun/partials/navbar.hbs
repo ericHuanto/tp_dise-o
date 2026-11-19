@@ -1,0 +1,25 @@
+<nav class="nav-links">
+    {{#if usuario.donante}}
+        <a href="/donante/donaciones">Mis Donaciones</a>
+        <a href="/donante/beneficiarios">Entidades beneficiarias</a>
+        <a href="/seguimiento_entregas">Seguimiento</a>
+    {{/if}}
+
+    {{#if usuario.beneficiario}}
+        <!--<a href="/solicitudes/nueva">Solicitar Donación</a> -->
+        <a href="/mis-donaciones">Mis Donaciones</a>
+        <a href="/mis-entregas">Recepciones</a>
+        <a href="/seguimiento_entregas">Seguimiento</a>
+        <a href="/mis-necesidades">Mis Necesidades</a>
+        <a href="/notificaciones">Historial</a>
+    {{/if}}
+
+    {{#if usuario.admin}}
+        <!--<a href="/donantes">Donantes</a> -->
+        <!--<a href="/beneficiarios">Beneficiarios</a> -->
+        <a href="/donaciones">Donaciones</a>
+        <a href="/asignaciones">Asignaciones</a>
+        <a href="/camiones">Camiones</a>
+        <a href="/donantes/importacion">Importar</a>
+    {{/if}}
+</nav>

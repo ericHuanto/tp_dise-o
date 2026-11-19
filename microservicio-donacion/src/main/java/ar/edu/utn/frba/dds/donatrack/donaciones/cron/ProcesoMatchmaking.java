@@ -4,6 +4,8 @@ import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.donacion.TipoEstadoDonac
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.generadorrankings.GeneradorRankings;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.beneficiario.Beneficiario;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.donacion.Donacion;
+import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.generadorrankings.algoritmos.CompatibilidadSemantica;
+import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.generadorrankings.algoritmos.PrioridadSubAtendidos;
 import ar.edu.utn.frba.dds.donatrack.donaciones.persistencia.BeneficiarioRepository;
 import ar.edu.utn.frba.dds.donatrack.donaciones.persistencia.DonacionRepository;
 import ar.edu.utn.frba.dds.donatrack.donaciones.persistencia.RankingRepository;
@@ -30,10 +32,14 @@ public class ProcesoMatchmaking {
     DonacionRepository repoDonaciones = DonacionRepository.getInstancia();
     RankingRepository repoRankings = RankingRepository.getInstancia();
 
+    repoRankings.withTransaction(repoRankings::vaciarSoft);
+
     List<Beneficiario> beneficiarios = repoBeneficiarios.buscarTodos();
     List<Donacion> donaciones = repoDonaciones.buscarTodoPorEstado(TipoEstadoDonacion.EN_DEPOSITO);
 
     GeneradorRankings generadorRankings = new GeneradorRankings(repoRankings);
+    generadorRankings.agregarAlgoritmo(new CompatibilidadSemantica());
+    generadorRankings.agregarAlgoritmo(new PrioridadSubAtendidos());
     generadorRankings.generar(donaciones, beneficiarios);
   }
 }

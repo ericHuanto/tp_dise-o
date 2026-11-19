@@ -443,15 +443,6 @@
 }
 
 /* =========================================
-   HEADER: USUARIO ACTUAL
-   ========================================= */
-.header-right .usuario-actual {
-    color: var(--text-muted);
-    font-family: ui-monospace, Menlo, Consolas, monospace;
-    font-size: 0.85rem;
-}
-
-/* =========================================
    RESPONSIVE
    ========================================= */
 @media (max-width: 800px) {

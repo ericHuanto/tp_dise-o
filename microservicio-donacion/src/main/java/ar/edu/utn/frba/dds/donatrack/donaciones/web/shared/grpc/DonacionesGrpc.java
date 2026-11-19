@@ -796,6 +796,45 @@ public class DonacionesGrpc extends DonacionesServiceGrpc.DonacionesServiceImplB
     });
   }
 
+  @Override
+  public void obtenerRanking(RankingIdRequest req, StreamObserver<RankingDetalleResponse> out) {
+    responder(out, () -> withTransaction(() -> {
+      Ranking ranking = repoRankings.buscarPorId(req.getId());
+      if (ranking == null) {
+        throw new RecursoNoEncontradoException("No existe el ranking: " + req.getId());
+      }
+
+      Donacion donacion = ranking.getDonacion();
+      RankingDetalleResponse.Builder builder = RankingDetalleResponse.newBuilder()
+          .setId(ranking.getId())
+          .setFechaGeneracion(ranking.getFechaGeneracion() == null ? "" : ranking.getFechaGeneracion().format(FECHA_HORA_ISO))
+          .setVigente(Boolean.TRUE.equals(ranking.getEstaVigente()))
+          .setDonacion(aDonacionAdminFilaMsg(donacion))
+          .setBeneficiariaAsignada(donacion.getBeneficiario() == null ? "" : nvl(donacion.getBeneficiario().getRazonSocial()));
+
+      List<Beneficiario> candidatos = ranking.getCandidatos();
+      for (int i = 0; i < candidatos.size(); i++) {
+        Beneficiario beneficiario = candidatos.get(i);
+        CandidatoDetalleMsg.Builder candidato = CandidatoDetalleMsg.newBuilder()
+            .setPosicion(i + 1)   // la lista ya viene ordenada por los algoritmos (@OrderColumn)
+            .setIdBeneficiario(beneficiario.getId())
+            .setRazonSocial(nvl(beneficiario.getRazonSocial()))
+            .setDireccion(nvl(beneficiario.getDireccion()));
+
+        necesidadesQueCubre(beneficiario, donacion).forEach(n -> candidato.addNecesidades(
+            NecesidadCubiertaMsg.newBuilder()
+                .setDescripcion(nvl(n.getDescripcion()))
+                .setTipo(n.getTipo() == null ? "" : n.getTipo().name())
+                .setFaltante(faltanteDe(n))
+                .setUnidadMedida(n.getUnidadMedida() == null ? "" : n.getUnidadMedida().toString())
+                .build()));
+
+        builder.addCandidatos(candidato.build());
+      }
+      return builder.build();
+    }));
+  }
+
   // Importador CSV
   @Override
   public void importarDonantesCsv(ImportarCsvRequest req, StreamObserver<ImportarCsvResponse> out) {
@@ -1152,6 +1191,21 @@ public class DonacionesGrpc extends DonacionesServiceGrpc.DonacionesServiceImplB
         .build()));
 
     return msg.build();
+  }
+
+  //Necesidades sin satisfacer de la entidad, cuya subcategoría coincide con algún bien de la donación
+  private List<Necesidad> necesidadesQueCubre(Beneficiario beneficiario, Donacion donacion) {
+    return beneficiario.getNecesidades().stream()
+        .filter(n -> !n.estaSatisfecha())
+        .filter(n -> donacion.getBienes().stream()
+            .anyMatch(bien -> bien.getSubcategoria().esIgual(n.getSubcategoria())))
+        .toList();
+  }
+
+  private int faltanteDe(Necesidad necesidad) {
+    int requerida = necesidad.getCantidadRequerida() == null ? 0 : necesidad.getCantidadRequerida();
+    int recibida = necesidad.getCantidadRecibida() == null ? 0 : necesidad.getCantidadRecibida();
+    return Math.max(0, requerida - recibida);
   }
 
   private boolean coincideBusqueda(Donacion donacion, String q) {

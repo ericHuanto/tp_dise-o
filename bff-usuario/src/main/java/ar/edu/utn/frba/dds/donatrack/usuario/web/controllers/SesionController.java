@@ -14,7 +14,7 @@ public class SesionController implements WithSimplePersistenceUnit {
   }
 
   public void mostrarFormularioInicioSesion(Context context) {
-    context.render("donaciones/views/auth/login.hbs");
+    context.render("comun/views/auth/login.hbs");
   }
 
   public void iniciarSesion(Context context) {

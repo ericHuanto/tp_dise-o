@@ -6,22 +6,6 @@
     padding: 25px 40px 60px 40px;
 }
 
-.breadcrumb {
-    font-size: 0.85rem;
-    color: var(--text-muted);
-    margin-bottom: 16px;
-}
-
-.breadcrumb a {
-    color: var(--accent-green);
-    text-decoration: none;
-    font-weight: 500;
-}
-
-.breadcrumb span {
-    margin: 0 6px;
-}
-
 .entregas-header {
     display: flex;
     justify-content: space-between;

@@ -3,11 +3,12 @@
 {{/partial}}
 
 {{#partial "css_extra"}}
-    <link rel="stylesheet" href="donaciones/css/admin/donaciones.css">
+    <link rel="stylesheet" href="/donaciones/css/admin/donaciones.css">
+    <link rel="stylesheet" href="/donaciones/css/admin/asignaciones.css">
 {{/partial}}
 
 {{#partial "contenido_propio"}}
-    <section class="pagina-admin">
+    <section class="pagina-admin pagina-asignacion">
         <nav class="breadcrumb">
             <a href="/">Inicio</a><span>›</span><a href="/asignaciones">Asignaciones</a><span>›</span>{{donacion.codigo}}
         </nav>
@@ -17,28 +18,30 @@
             <span class="estado estado-{{donacion.estadoClave}}">{{donacion.estadoTexto}}</span>
         </h1>
 
-        <form action="/rankings/{{ranking.id}}" method="POST">
-            <div class="asignar-grid">
+        <form action="/asignaciones/{{ranking.id}}" method="POST">
+            <input type="hidden" name="id_donacion" value="{{donacion.id}}">
 
-                <aside class="tarjeta">
+            <div class="asignar-grid">
+                <aside class="tarjeta tarjeta-donacion">
                     <h2>Donación</h2>
-                    <ul class="bienes">
-                        {{#each donacion.bienes}}
-                            <li>
-                                <span class="bien-desc"><strong>{{this.descripcion}}</strong>
-                                    <small>{{this.categoria}} › {{this.subcategoria}}</small>
-                                </span>
-                                <span class="bien-cant mono">{{this.cantidad}} {{this.unidadMedida}}</span>
-                            </li>
-                        {{/each}}
-                    </ul>
-                    <dl class="datos">
+
+                    {{#each donacion.bienes}}
+                        <div class="bien-bloque">
+                            <h3>{{this.descripcion}}</h3>
+                            <p class="bien-categoria">{{this.categoria}} › {{this.subcategoria}}</p>
+                            <dl class="datos">
+                                <dt>Cantidad</dt><dd class="mono">{{this.cantidad}} {{this.unidadMedida}}</dd>
+                            </dl>
+                        </div>
+                    {{/each}}
+
+                    <dl class="datos datos-donacion">
                         <dt>Ingreso</dt><dd class="mono">{{donacion.fechaIngreso}}</dd>
                         {{#if donacion.vencimiento}}
                             <dt>Vence</dt><dd class="mono">{{donacion.vencimiento}}</dd>
                         {{/if}}
                         <dt>Donantes</dt>
-                        <dd>{{#each donacion.donantes}}{{this.nombre}}{{#unless @last}}, {{/unless}}{{/each}}</dd>
+                        <dd>{{#each donacion.donantes}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}</dd>
                     </dl>
                 </aside>
 
@@ -48,22 +51,15 @@
                             <h2>Entidades candidatas</h2>
                             <p class="subtitulo">Ranking calculado el <span class="mono">{{ranking.fechaGeneracion}}</span></p>
                         </div>
-                        <div class="criterios" role="tablist">
-                            {{#each criterios}}
-                                <a href="?criterio={{this.clave}}" class="{{#if this.activo}}activo{{/if}}">{{this.texto}}</a>
-                            {{/each}}
-                        </div>
                     </div>
 
                     <div class="tabla-scroll">
-                        <table class="tabla">
+                        <table class="tabla tabla-candidatas">
                             <thead>
                             <tr>
                                 <th>#</th>
                                 <th>Entidad</th>
-                                <th>Puntaje</th>
-                                <th>Necesidad que cubre</th>
-                                <th>Distancia</th>
+                                <th>Necesidades que cubre</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -71,28 +67,32 @@
                                 <tr>
                                     <td class="celda-radio">
                                         <label>
-                                            <input type="radio" name="id_beneficiario" value="{{this.beneficiario.id}}"
-                                                   data-nombre="{{this.beneficiario.razonSocial}}" data-pos="{{this.posicion}}"
-                                                   {{#if @first}}checked{{/if}} required>
-                                            <span class="mono">{{this.posicion}}</span>
+                                            <input type="radio" name="id_beneficiario" value="{{this.idBeneficiario}}"
+                                                   data-nombre="{{this.razonSocial}}" data-pos="{{this.posicionTexto}}"
+                                                   {{#if @first}}checked{{/if}} {{#unless ../pendiente}}disabled{{/unless}} required>
+                                            <span class="mono posicion">{{this.posicionTexto}}</span>
                                         </label>
                                     </td>
-                                    <td><strong>{{this.beneficiario.razonSocial}}</strong>
-                                        <small>{{this.beneficiario.zona}}</small></td>
+                                    <td><strong>{{this.razonSocial}}</strong>
+                                        <small>{{this.direccion}}</small></td>
                                     <td>
-                                        <span class="puntaje mono">{{this.puntaje}}</span>
-                                        <span class="barra"><span style="width: {{this.puntaje}}%"></span></span>
+                                        {{#each this.necesidades}}
+                                            <div class="necesidad">
+                                                <span class="necesidad-texto">{{this.descripcion}} · faltan {{this.faltante}} {{this.unidad}}</span>
+                                                <span class="urgencia urgencia-{{this.tipoClave}}">{{this.tipoTexto}}</span>
+                                            </div>
+                                        {{else}}
+                                            <small>Sin necesidades registradas para estos bienes</small>
+                                        {{/each}}
                                     </td>
-                                    <td>{{this.necesidad.descripcion}} · faltan {{this.necesidad.faltante}}
-                                        <span class="urgencia urgencia-{{this.necesidad.urgenciaClave}}">{{this.necesidad.urgenciaTexto}}</span>
-                                    </td>
-                                    <td class="mono">{{this.distanciaKm}} km</td>
                                 </tr>
+                            {{else}}
+                                <tr><td colspan="3" class="vacio">El ranking no tiene entidades candidatas.</td></tr>
                             {{/each}}
                             </tbody>
                         </table>
                     </div>
-                    <p class="criterio-nota">Criterio: {{criterioDescripcion}}</p>
+                    <p class="criterio-nota">Orden según los algoritmos de compatibilidad semántica y prioridad a entidades sub-atendidas.</p>
                 </section>
             </div>
 
@@ -101,14 +101,14 @@
                     <p>Entidad seleccionada: <strong id="seleccionNombre"></strong>
                         · posición <span class="mono" id="seleccionPos"></span> del ranking</p>
                     <div>
-                       <a href="/asignaciones" class="btn-secondary">Volver</a>
-                       <button type="submit" class="btn-primary">Confirmar asignación</button>
+                        <a href="/asignaciones" class="btn-secondary">Volver</a>
+                        <button type="submit" class="btn-primary">Confirmar asignación</button>
                     </div>
                 </div>
             {{else}}
                 <div class="barra-seleccion">
-                    <p>Esta donación ya fue asignada a <strong>{{donacion.beneficiaria}}</strong>.</p>
-                    <a href="/asignaciones" class="btn-sec">Volver</a>
+                    <p>{{#if beneficiariaAsignada}}Esta donación ya fue asignada a <strong>{{beneficiariaAsignada}}</strong>.{{else}}Este ranking ya no está vigente.{{/if}}</p>
+                    <a href="/asignaciones" class="btn-secondary">Volver</a>
                 </div>
             {{/if}}
         </form>
@@ -119,16 +119,28 @@
     <script>
         const nombre = document.getElementById('seleccionNombre');
         const pos = document.getElementById('seleccionPos');
+
         function actualizarSeleccion() {
             const r = document.querySelector('input[name="id_beneficiario"]:checked');
             if (!r || !nombre) return;
             nombre.textContent = r.dataset.nombre;
             pos.textContent = r.dataset.pos;
         }
+
+        // Clic en cualquier parte de la fila = elegir esa entidad
+        document.querySelectorAll('.tabla-candidatas tbody tr').forEach(fila => {
+            fila.addEventListener('click', () => {
+                const radio = fila.querySelector('input[name="id_beneficiario"]');
+                if (!radio || radio.disabled || radio.checked) return;
+                radio.checked = true;
+                actualizarSeleccion();
+            });
+        });
+
         document.querySelectorAll('input[name="id_beneficiario"]')
             .forEach(r => r.addEventListener('change', actualizarSeleccion));
         actualizarSeleccion();
     </script>
 {{/partial}}
 
-{{> donaciones/partials/layout.hbs}}
+{{> comun/partials/layout.hbs}}
