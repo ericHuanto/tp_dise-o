@@ -3,9 +3,8 @@
     Seguimiento de entregas - DonaTrack
 {{/partial}}
 
-{{#partial "breadcrumbs"}}
-    <a href="/">Inicio</a>
-    <span> / Seguimiento de entregas</span>
+{{#partial "css_extra"}}
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 {{/partial}}
 
 {{#partial "contenido_propio"}}
@@ -31,6 +30,7 @@
 {{/partial}}
 
 {{#partial "scripts"}}
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
         const map = L.map('mapa').setView([-34.6037, -58.3816], 11);
 
@@ -84,4 +84,4 @@
     </script>
 {{/partial}}
 
-{{> logistica/partials/layout.hbs}}
+{{> comun/partials/layout.hbs}}

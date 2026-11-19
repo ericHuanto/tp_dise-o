@@ -31,6 +31,8 @@ public class App {
 
     //Conexión a la db desde el .env
     configurarPersistencia();
+    DatosIniciales.init();
+    SuscriptorNotificacion.init();
 
     Server grpc = ServerBuilder
         .forPort(config.puertoGrpcDonaciones(PUERTO_GRPC))
@@ -56,8 +58,6 @@ public class App {
     } else {
       System.out.println("[AVISO] DB_URL_DONACIONES no está definida: se usa la base del persistence.xml");
     }
-    DatosIniciales.init();
-    SuscriptorNotificacion.init();
   }
 
   public static Javalin crearApp() {
