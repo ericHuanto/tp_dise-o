@@ -11,6 +11,7 @@ public class DonanteRoutes {
     ruta.get("/donante/donaciones", controller::donacionesPropias);
     ruta.get("/donante/beneficiarios", controller::beneficiarios);
     ruta.get("/donante/beneficiarios/{id}", controller::detalleBeneficiario);
+    ruta.get("/donante/seguimiento", controller::seguimientoEntregas);
   }
 
 }

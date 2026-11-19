@@ -20,6 +20,7 @@ service LogisticaService {
   //Rutas
   //verSeguimiento
   rpc ObtenerSeguimientoEntregas (VacioLogistica) returns (ListaMarcadoresCamionResponse);
+  rpc ObtenerCamionesDeDonaciones (DonacionesIdsRequest) returns (ListaCamionesDonacionesResponse);
 }
 
 message VacioLogistica {}
@@ -107,4 +108,20 @@ message MarcadorCamionMsg {
 
 message ListaMarcadoresCamionResponse {
   repeated MarcadorCamionMsg marcadores = 1;
+}
+
+message DonacionesIdsRequest {
+  repeated int64 ids_donaciones = 1;
+}
+
+message CamionDonacionesMsg {
+  string patente = 1;
+  string latitud = 2;
+  string longitud = 3;
+  string ultima_actualizacion = 4;
+  repeated int64 ids_donaciones = 5;
+}
+
+message ListaCamionesDonacionesResponse {
+  repeated CamionDonacionesMsg camiones = 1;
 }

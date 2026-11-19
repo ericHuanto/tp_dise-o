@@ -1,6 +1,7 @@
 package ar.edu.utn.frba.dds.donatrack.logistica.web.shared.grpc;
 
 import ar.edu.utn.frba.dds.donatrack.grpc.*;
+import ar.edu.utn.frba.dds.donatrack.logistica.dominio.beneficiario.DonacionEnTransito;
 import ar.edu.utn.frba.dds.donatrack.logistica.dominio.camion.Camion;
 import ar.edu.utn.frba.dds.donatrack.logistica.dominio.camion.Coordenada;
 import ar.edu.utn.frba.dds.donatrack.logistica.dominio.camion.Gps;
@@ -20,7 +21,11 @@ import io.grpc.stub.StreamObserver;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.Supplier;
 
@@ -242,6 +247,44 @@ public class LogisticaGrpc extends LogisticaServiceGrpc.LogisticaServiceImplBase
           .setMensaje("Recepción confirmada")
           .build();
     });
+  }
+
+  @Override
+  public void obtenerCamionesDeDonaciones(DonacionesIdsRequest req,
+                                          StreamObserver<ListaCamionesDonacionesResponse> out) {
+    responder(out, () -> withTransaction(() -> {
+      Set<Long> idsBuscados = new HashSet<>(req.getIdsDonacionesList());
+      Map<String, CamionDonacionesMsg.Builder> porPatente = new LinkedHashMap<>();
+
+      for (Entrega entrega : repoEntregas.buscarTodas()) {
+        if (entrega.getEstadoActual() != TipoEstadoEntrega.EN_TRASLADO) {
+          continue;
+        }
+        Camion camion = entrega.getCamionAsignado();
+        if (camion == null || camion.getUbicacionActual() == null) {
+          continue;
+        }
+        List<Long> idsEnEntrega = entrega.getDonaciones().stream()
+            .map(DonacionEnTransito::getId)
+            .filter(idsBuscados::contains)
+            .toList();
+        if (idsEnEntrega.isEmpty()) {
+          continue;
+        }
+
+        Coordenada ubicacion = camion.getUbicacionActual();
+        porPatente.computeIfAbsent(camion.getPatente(), patente -> CamionDonacionesMsg.newBuilder()
+                .setPatente(patente != null ? patente : "")
+                .setLatitud(String.valueOf(ubicacion.getLatitud()))
+                .setLongitud(String.valueOf(ubicacion.getLongitud()))
+                .setUltimaActualizacion("No disponible"))
+            .addAllIdsDonaciones(idsEnEntrega);
+      }
+
+      ListaCamionesDonacionesResponse.Builder builder = ListaCamionesDonacionesResponse.newBuilder();
+      porPatente.values().forEach(c -> builder.addCamiones(c.build()));
+      return builder.build();
+    }));
   }
 
   //Ruta

@@ -3,6 +3,7 @@ package ar.edu.utn.frba.dds.donatrack.usuario.web.controllers;
 import ar.edu.utn.frba.dds.donatrack.grpc.*;
 import ar.edu.utn.frba.dds.donatrack.usuario.dominio.usuario.Usuario;
 import ar.edu.utn.frba.dds.donatrack.usuario.web.dto.BeneficiarioTarjeta;
+import ar.edu.utn.frba.dds.donatrack.usuario.web.dto.CamionSeguimiento;
 import ar.edu.utn.frba.dds.donatrack.usuario.web.dto.DonacionDonanteFila;
 import ar.edu.utn.frba.dds.donatrack.usuario.web.dto.FiltroActivo;
 import ar.edu.utn.frba.dds.donatrack.usuario.web.dto.GrupoCategoria;
@@ -11,6 +12,7 @@ import ar.edu.utn.frba.dds.donatrack.usuario.web.dto.Opcion;
 import ar.edu.utn.frba.dds.donatrack.usuario.web.dto.ResumenDonaciones;
 import ar.edu.utn.frba.dds.donatrack.usuario.web.dto.BeneficiarioVistaMapper;
 import ar.edu.utn.frba.dds.donatrack.usuario.web.mappers.DonacionVistaMapper;
+import com.google.gson.Gson;
 import io.grpc.StatusRuntimeException;
 import io.javalin.http.Context;
 import io.javalin.validation.ValidationException;
@@ -28,9 +30,64 @@ public class DonanteController {
   private static final int DONACIONES_POR_PAGINA = 8;
 
   private final DonacionesServiceGrpc.DonacionesServiceBlockingStub donacionesStub;
+  private final LogisticaServiceGrpc.LogisticaServiceBlockingStub logisticaStub;
 
-  public DonanteController(DonacionesServiceGrpc.DonacionesServiceBlockingStub donacionesStub) {
+  public DonanteController(DonacionesServiceGrpc.DonacionesServiceBlockingStub donacionesStub,
+                           LogisticaServiceGrpc.LogisticaServiceBlockingStub logisticaStub) {
     this.donacionesStub = donacionesStub;
+    this.logisticaStub = logisticaStub;
+  }
+
+  public void seguimientoEntregas(Context context) {
+    Long idDonante = idDonanteLogueado(context);
+    if (idDonante == null) {
+      return;
+    }
+
+    Map<Long, String> donacionesDelDonante;
+    try {
+      donacionesDelDonante = donacionesStub.obtenerVistaDonacionesDonante(FiltroDonacionesDonanteRequest.newBuilder()
+              .setIdDonante(idDonante)
+              .build())
+          .getDonacionesList().stream()
+          .collect(Collectors.toMap(DonacionVistaMsg::getId,
+              d -> DonacionVistaMapper.codigo(d.getId()) + " · " + d.getDescripcion(),
+              (a, b) -> a, LinkedHashMap::new));
+    } catch (StatusRuntimeException e) {
+      context.redirect("/");
+      return;
+    }
+
+    List<CamionSeguimiento> camiones = List.of();
+    boolean logisticaDisponible = true;
+    if (!donacionesDelDonante.isEmpty()) {
+      try {
+        camiones = logisticaStub.obtenerCamionesDeDonaciones(DonacionesIdsRequest.newBuilder()
+                .addAllIdsDonaciones(donacionesDelDonante.keySet())
+                .build())
+            .getCamionesList().stream()
+            .map(c -> CamionSeguimiento.builder()
+                .patente(c.getPatente())
+                .latitud(c.getLatitud())
+                .longitud(c.getLongitud())
+                .ultimaActualizacion(c.getUltimaActualizacion())
+                .donaciones(c.getIdsDonacionesList().stream().map(donacionesDelDonante::get).toList())
+                .build())
+            .toList();
+      } catch (StatusRuntimeException e) {
+        logisticaDisponible = false;
+      }
+    }
+
+    Map<String, Object> modelo = new HashMap<>();
+    modelo.put("usuario", context.sessionAttribute("usuario_actual"));
+    modelo.put("camiones", camiones);
+    modelo.put("camionesJson", new Gson().toJson(camiones));
+    modelo.put("cantidadCamiones", camiones.size());
+    modelo.put("donacionesEnCamino", camiones.stream().mapToInt(c -> c.getDonaciones().size()).sum());
+    modelo.put("logisticaDisponible", logisticaDisponible);
+
+    context.render("donaciones/views/donante/seguimiento_entregas.hbs", modelo);
   }
 
   public void donacionesPropias(Context context) {

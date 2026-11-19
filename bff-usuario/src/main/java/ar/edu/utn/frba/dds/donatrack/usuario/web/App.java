@@ -71,7 +71,7 @@ public class App {
     PerfilController perfilController = new PerfilController(grpcClients.getDonacionesStub(), usuarioRepository);
     MapaController mapaController = new MapaController(grpcClients.getDonacionesStub());
     DonacionController donacionController = new DonacionController(grpcClients.getDonacionesStub());
-    DonanteController donanteController = new DonanteController(grpcClients.getDonacionesStub());
+    DonanteController donanteController = new DonanteController(grpcClients.getDonacionesStub(), grpcClients.getLogisticaStub());
     NecesidadController necesidadController = new NecesidadController(grpcClients.getDonacionesStub());
     DonacionBeneficiarioController donacionBeneficiarioController = new DonacionBeneficiarioController(grpcClients.getDonacionesStub());
     AsignacionController asignacionController = new AsignacionController(grpcClients.getDonacionesStub());
