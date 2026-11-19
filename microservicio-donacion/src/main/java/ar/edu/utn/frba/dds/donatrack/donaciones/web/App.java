@@ -30,14 +30,7 @@ public class App {
     ConfiguracionEntorno config = ConfiguracionEntorno.getInstance();
 
     //Conexión a la db desde el .env
-    String urlDb = config.obtenerOpcional("DB_URL_DONACIONES");
-    if (urlDb != null) {
-      WithSimplePersistenceUnit.configure(p -> p.putAll(ConfiguracionPersistencia.propiedadesBaseDeDatos(urlDb)));
-    } else {
-      System.out.println("[AVISO] DB_URL_DONACIONES no está definida: se usa la base del persistence.xml");
-    }
-    DatosIniciales.init();
-    SuscriptorNotificacion.init();
+    configurarPersistencia();
 
     Server grpc = ServerBuilder
         .forPort(config.puertoGrpcDonaciones(PUERTO_GRPC))
@@ -54,6 +47,17 @@ public class App {
     if (valor != null) {
       System.setProperty(clave, valor);
     }
+  }
+
+  public static void configurarPersistencia() {
+    String urlDb = ConfiguracionEntorno.getInstance().obtenerOpcional("DB_URL_DONACIONES");
+    if (urlDb != null) {
+      WithSimplePersistenceUnit.configure(p -> p.putAll(ConfiguracionPersistencia.propiedadesBaseDeDatos(urlDb)));
+    } else {
+      System.out.println("[AVISO] DB_URL_DONACIONES no está definida: se usa la base del persistence.xml");
+    }
+    DatosIniciales.init();
+    SuscriptorNotificacion.init();
   }
 
   public static Javalin crearApp() {

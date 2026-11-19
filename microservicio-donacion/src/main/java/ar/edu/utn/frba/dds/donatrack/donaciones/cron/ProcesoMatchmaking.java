@@ -7,10 +7,25 @@ import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.donacion.Donacion;
 import ar.edu.utn.frba.dds.donatrack.donaciones.persistencia.BeneficiarioRepository;
 import ar.edu.utn.frba.dds.donatrack.donaciones.persistencia.DonacionRepository;
 import ar.edu.utn.frba.dds.donatrack.donaciones.persistencia.RankingRepository;
+import ar.edu.utn.frba.dds.donatrack.donaciones.web.App;
 import java.util.List;
 
 public class ProcesoMatchmaking {
   public static void main(String[] args) {
+    int codigoSalida = 0;
+    try {
+      App.configurarPersistencia();
+      ejecutar();
+      System.out.println("[Cron] Matchmaking finalizado.");
+    } catch (Exception e) {
+      System.err.println("[Cron] Error en matchmaking: " + e.getMessage());
+      e.printStackTrace();
+      codigoSalida = 1;
+    }
+    System.exit(codigoSalida);
+  }
+
+  private static void ejecutar() {
     BeneficiarioRepository repoBeneficiarios = BeneficiarioRepository.getInstancia();
     DonacionRepository repoDonaciones = DonacionRepository.getInstancia();
     RankingRepository repoRankings = RankingRepository.getInstancia();
@@ -20,7 +35,5 @@ public class ProcesoMatchmaking {
 
     GeneradorRankings generadorRankings = new GeneradorRankings(repoRankings);
     generadorRankings.generar(donaciones, beneficiarios);
-
-    System.out.println("acabamossss");
   }
 }

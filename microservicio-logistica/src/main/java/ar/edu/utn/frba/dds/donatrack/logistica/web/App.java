@@ -42,13 +42,8 @@ public class App {
     ConfiguracionEntorno config = ConfiguracionEntorno.getInstance();
 
     //Conexión a la db desde el .env
-    String urlDb = config.obtenerOpcional("DB_URL_LOGISTICA");
-    if (urlDb != null) {
-      WithLogisticaPersistenceUnit.PER_THREAD_ENTITY_MANAGER_ACCESS.configure(p ->
-          p.putAll(ConfiguracionPersistencia.propiedadesBaseDeDatos(urlDb)));
-    } else {
-      System.out.println("[AVISO] DB_URL_LOGISTICA no está definida: se usa la base del persistence.xml");
-    }
+    configurarPersistencia();
+
     //Servidor gRPC
     Server grpc = ServerBuilder
         .forPort(config.puertoGrpcLogistica(PUERTO_GRPC))
@@ -59,6 +54,8 @@ public class App {
     Runtime.getRuntime().addShutdownHook(new Thread(grpc::shutdown));
 
     AppLogistica resultado = crearApp();
+
+    /*La planificación diaria ahora la dispara el crontab de la VM
 
     ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
     long minutosHasta = calcularMinutosHasta(LocalTime.of(2, 0));
@@ -77,8 +74,20 @@ public class App {
     );
 
     System.out.println("[Cron] Planificación programada en " + minutosHasta + " minutos");
+     */
+
     DatosIniciales.init();
     resultado.app().start(config.puertoLogistica(PUERTO));
+  }
+
+  public static void configurarPersistencia() {
+    String urlDb = ConfiguracionEntorno.getInstance().obtenerOpcional("DB_URL_LOGISTICA");
+    if (urlDb != null) {
+      WithLogisticaPersistenceUnit.PER_THREAD_ENTITY_MANAGER_ACCESS.configure(p ->
+          p.putAll(ConfiguracionPersistencia.propiedadesBaseDeDatos(urlDb)));
+    } else {
+      System.out.println("[AVISO] DB_URL_LOGISTICA no está definida: se usa la base del persistence.xml");
+    }
   }
 
   public record AppLogistica(Javalin app, ProcesoLogistica procesoLogistica) {}

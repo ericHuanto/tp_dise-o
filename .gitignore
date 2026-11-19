@@ -20,3 +20,6 @@ deploy/env/*.env
 
 # Fotos guardadas en la VM
 deploy/datos/
+
+# Logs de los jobs generados en la VM
+deploy/logs/

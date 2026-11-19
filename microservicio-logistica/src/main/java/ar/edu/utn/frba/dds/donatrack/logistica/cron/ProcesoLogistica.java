@@ -4,9 +4,11 @@ import ar.edu.utn.frba.dds.donatrack.logistica.persistencia.BeneficiarioReposito
 import ar.edu.utn.frba.dds.donatrack.logistica.persistencia.CamionRepository;
 import ar.edu.utn.frba.dds.donatrack.logistica.persistencia.EntregaRepository;
 import ar.edu.utn.frba.dds.donatrack.logistica.persistencia.RutaRepository;
+import ar.edu.utn.frba.dds.donatrack.logistica.web.App;
 import ar.edu.utn.frba.dds.donatrack.logistica.web.coordinadores.CoordinadorRuta;
 import ar.edu.utn.frba.dds.donatrack.logistica.web.shared.integracion.microserviciosdonaciones.ConectorDonacionesApi;
 import ar.edu.utn.frba.dds.donatrack.logistica.dominio.planificadorexterno.ClientePlanificadorExternoMock;
+import ar.edu.utn.frba.dds.donatrack.logistica.web.shared.integracion.microserviciosdonaciones.ConectorDonacionesGrpc;
 
 public class ProcesoLogistica {
   private final CoordinadorRuta coordinadorRuta;
@@ -22,15 +24,27 @@ public class ProcesoLogistica {
   }
 
   public static void main(String[] args) {
+    int codigoSalida = 0;
+    try {
+      App.configurarPersistencia();
+      crearProceso().ejecutar();
+    } catch (Exception e) {
+      System.err.println("[Cron] Error en planificación: " + e.getMessage());
+      e.printStackTrace();
+      codigoSalida = 1;
+    }
+    System.exit(codigoSalida);
+  }
+
+  private static ProcesoLogistica crearProceso() {
     CoordinadorRuta coordinadorRuta = new CoordinadorRuta(
         RutaRepository.getInstancia(),
         CamionRepository.getInstancia(),
         EntregaRepository.getInstancia(),
         BeneficiarioRepository.getInstancia(),
-        new ConectorDonacionesApi(),
+        new ConectorDonacionesGrpc(),
         new ClientePlanificadorExternoMock()
     );
-
-    new ProcesoLogistica(coordinadorRuta).ejecutar();
+    return new ProcesoLogistica(coordinadorRuta);
   }
 }
