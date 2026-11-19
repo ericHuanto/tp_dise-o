@@ -2,65 +2,149 @@
     Mis donaciones - DonaTrack
 {{/partial}}
 
-{{#partial "breadcrumbs"}}
-    <a href="/">Inicio</a> &gt; <span>Mis donaciones</span>
+{{#partial "css_extra"}}
+    <link rel="stylesheet" href="/donaciones/css/formularios.css">
+    <link rel="stylesheet" href="/donaciones/css/admin/donaciones.css">
+    <link rel="stylesheet" href="/donaciones/css/donante/donaciones.css">
 {{/partial}}
 
 {{#partial "contenido_propio"}}
-    <h1>Mis donaciones</h1>
+    <section class="pagina-admin pagina-donante">
+        <nav class="breadcrumb"><a href="/">Inicio</a><span>›</span>Mis donaciones</nav>
 
-    <form method="get" action="/donante/donaciones">
-        <label for="estado">Estado:</label>
-        <select id="estado" name="estado">
-            <option value="">Todos</option>
-            {{#each estados}}
-                <option value="{{this}}" {{#if (eq this ../estadoElegido)}}selected{{/if}}>{{this}}</option>
-            {{/each}}
-        </select>
+        <h1>Mis donaciones</h1>
 
-        <label for="categoria">Categoría:</label>
-        <select id="categoria" name="categoria">
-            <option value="">Todas</option>
-            {{#each categorias}}
-                <option value="{{id}}" {{#if (eq id ../categoriaElegida)}}selected{{/if}}>{{nombre}}</option>
-            {{/each}}
-        </select>
+        <div class="resumen-donaciones">
+            <div class="resumen-tarjeta">
+                <strong class="mono">{{resumen.total}}</strong>
+                <span>Donaciones</span>
+            </div>
+            <div class="resumen-tarjeta">
+                <strong class="mono">{{resumen.entregadas}}</strong>
+                <span>Entregadas</span>
+            </div>
+            <div class="resumen-tarjeta">
+                <strong class="mono">{{resumen.enCurso}}</strong>
+                <span>En curso</span>
+            </div>
+            <div class="resumen-tarjeta">
+                <strong class="mono">{{resumen.pendientes}}</strong>
+                <span>Pendiente de asignación</span>
+            </div>
+        </div>
 
-        <label for="subcategoria">Subcategorías:</label>
-        <select id="subcategoria" name="subcategoria" multiple>
-            {{#each subcategorias}}
-                <option value="{{id}}">{{categoria.nombre}} - {{nombre}}</option>
-            {{/each}}
-        </select>
+        <form class="filtros filtros-donante" action="/donante/donaciones" method="GET">
+            <div class="filtros-fila">
+                <div class="buscador">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>
+                    </svg>
+                    <input type="search" name="q" value="{{q}}" placeholder="Buscar por código, bien o categoría" aria-label="Buscar donaciones">
+                </div>
 
-        <button type="submit">Filtrar</button>
-        <a href="/donante/donaciones">Limpiar filtros</a>
-    </form>
+                <select name="estado" aria-label="Estado" onchange="this.form.submit()">
+                    {{#each estados}}
+                        <option value="{{this.valor}}" {{#if this.seleccionado}}selected{{/if}}>Estado: {{this.texto}}</option>
+                    {{/each}}
+                </select>
 
-    <table>
-        <thead>
-        <tr>
-            <th>Descripción</th>
-            <th>Categoría</th>
-            <th>Subcategoría</th>
-            <th>Estado</th>
-        </tr>
-        </thead>
-        <tbody>
-        {{#each donaciones}}
-            <tr>
-                <td>{{descripcion}}</td>
-                <td>{{subcategoria.categoria.nombre}}</td>
-                <td>{{subcategoria.nombre}}</td>
-                <td>{{estadoActual}}</td>
-            </tr>
-        {{else}}
-            <tr>
-                <td colspan="4">No hay donaciones con esos filtros.</td>
-            </tr>
-        {{/each}}
-        </tbody>
-    </table>
+                <select name="categoria" aria-label="Categoría" onchange="this.form.submit()">
+                    {{#each categorias}}
+                        <option value="{{this.valor}}" {{#if this.seleccionado}}selected{{/if}}>Categoría: {{this.texto}}</option>
+                    {{/each}}
+                </select>
+
+                <details class="desplegable-categorias">
+                    <summary class="{{#if subcategoriasElegidas}}con-seleccion{{/if}}">{{textoSubcategorias}}</summary>
+                    <div class="desplegable-panel">
+                        <div class="desplegable-opciones">
+                            {{#each gruposCategoria}}
+                                <fieldset class="grupo-categoria">
+                                    <legend>{{this.nombre}}</legend>
+                                    {{#each this.subcategorias}}
+                                        <label class="opcion-check">
+                                            <input type="checkbox" name="subcategoria" value="{{this.valor}}" {{#if this.seleccionado}}checked{{/if}}>
+                                            {{this.texto}}
+                                        </label>
+                                    {{/each}}
+                                </fieldset>
+                            {{/each}}
+                        </div>
+                        <div class="desplegable-acciones">
+                            <button type="submit" class="btn-primary">Aplicar</button>
+                        </div>
+                    </div>
+                </details>
+
+                {{#if hayFiltros}}
+                    <a href="/donante/donaciones" class="btn-link limpiar">Limpiar filtros</a>
+                {{/if}}
+                <noscript><button type="submit" class="btn-secondary">Filtrar</button></noscript>
+            </div>
+
+            {{#if hayFiltros}}
+                <div class="filtros-activos">
+                    <span>Filtros activos:</span>
+                    {{#each filtrosActivos}}
+                        <a href="{{this.urlQuitar}}" class="filtro-activo" title="Quitar filtro">
+                            {{this.texto}} <span aria-hidden="true">×</span>
+                        </a>
+                    {{/each}}
+                </div>
+            {{/if}}
+        </form>
+
+        <div class="tabla-scroll">
+            <table class="tabla">
+                <thead>
+                <tr>
+                    <th>Código</th>
+                    <th>Bien</th>
+                    <th>Categoría</th>
+                    <th>Estado</th>
+                </tr>
+                </thead>
+                <tbody>
+                {{#each donaciones}}
+                    <tr>
+                        <td class="mono codigo">{{this.codigo}}</td>
+                        <td>{{this.descripcion}}</td>
+                        <td>{{this.categoria}} <small>{{this.subcategoria}}</small></td>
+                        <td><span class="estado estado-{{this.estadoClave}}">{{this.estadoTexto}}</span></td>
+                    </tr>
+                {{else}}
+                    <tr>
+                        <td colspan="4" class="vacio">
+                            {{#if hayFiltros}}
+                                No hay donaciones que coincidan con los filtros.
+                            {{else}}
+                                Todavía no realizaste donaciones.
+                            {{/if}}
+                        </td>
+                    </tr>
+                {{/each}}
+                </tbody>
+            </table>
+
+            {{#if total}}
+                <div class="paginacion">
+                    <span>Mostrando {{desde}}–{{hasta}} de {{total}}</span>
+                    <div class="paginacion-botones">
+                        {{#if urlAnterior}}
+                            <a href="{{urlAnterior}}" class="btn-pagina">Anterior</a>
+                        {{else}}
+                            <span class="btn-pagina deshabilitado" aria-disabled="true">Anterior</span>
+                        {{/if}}
+                        {{#if urlSiguiente}}
+                            <a href="{{urlSiguiente}}" class="btn-pagina">Siguiente</a>
+                        {{else}}
+                            <span class="btn-pagina deshabilitado" aria-disabled="true">Siguiente</span>
+                        {{/if}}
+                    </div>
+                </div>
+            {{/if}}
+        </div>
+    </section>
 {{/partial}}
 
 {{> donaciones/partials/layout.hbs}}

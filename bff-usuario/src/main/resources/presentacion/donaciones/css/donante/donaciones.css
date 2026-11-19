@@ -1,0 +1,281 @@
+/* Mis donaciones (persona donante).
+   Reutiliza de admin/donaciones.css: pagina-admin, buscador, tabla, bienes y estado.
+   Acá va solo lo propio de esta pantalla. */
+
+.pagina-donante h1 {
+    margin-bottom: 28px;
+}
+
+/* =========================================
+   RESUMEN (tarjetas de totales)
+   ========================================= */
+.resumen-donaciones {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 28px;
+}
+
+.resumen-tarjeta {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 22px 22px 20px;
+    border-radius: 12px;
+    background: #EBE9DF;
+}
+
+.resumen-tarjeta strong {
+    font-size: 2.1rem;
+    font-weight: 700;
+    line-height: 1.1;
+    color: var(--accent-dark);
+}
+
+.resumen-tarjeta span {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+}
+
+@media (max-width: 900px) {
+    .resumen-donaciones {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* =========================================
+   PAGINACIÓN
+   ========================================= */
+.paginacion {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 24px;
+    border-top: 1px solid #EFECE6;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+.paginacion-botones {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-pagina,
+.btn-pagina:visited {
+    padding: 8px 16px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background: var(--white);
+    color: var(--accent-dark);
+    font-weight: 500;
+    text-decoration: none;
+}
+
+.btn-pagina:hover {
+    border-color: var(--accent-green);
+}
+
+.btn-pagina.deshabilitado {
+    color: #A8A69C;
+    cursor: default;
+}
+
+.btn-pagina.deshabilitado:hover {
+    border-color: var(--border-color);
+}
+
+/* =========================================
+   FILTROS
+   ========================================= */
+.filtros-donante {
+    flex-direction: column;
+    gap: 14px;
+    margin-bottom: 28px;
+    padding: 20px 24px;
+}
+
+.filtros-fila {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.filtros-donante select {
+    min-width: 180px;
+}
+
+.filtros-donante .limpiar {
+    margin-left: 8px;
+    white-space: nowrap;
+}
+
+.filtros-activos {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.88rem;
+    color: var(--text-muted);
+}
+
+.filtro-activo,
+.filtro-activo:visited {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 999px;
+    background: var(--primary-color);
+    color: var(--accent-dark);
+    font-size: 0.86rem;
+    text-decoration: none;
+}
+
+.filtro-activo span {
+    color: var(--text-muted);
+    font-size: 1rem;
+    line-height: 1;
+}
+
+.filtro-activo:hover {
+    border-color: #C62828;
+}
+
+.filtro-activo:hover span {
+    color: #C62828;
+}
+
+/* =========================================
+   DESPLEGABLE DE CATEGORÍAS
+   ========================================= */
+.desplegable-categorias {
+    position: relative;
+}
+
+.desplegable-categorias summary {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 16px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: var(--white);
+    font-size: 0.92rem;
+    white-space: nowrap;
+    cursor: pointer;
+    list-style: none;
+    user-select: none;
+}
+
+.desplegable-categorias summary::-webkit-details-marker {
+    display: none;
+}
+
+.desplegable-categorias summary::after {
+    content: "▾";
+    font-size: 0.75rem;
+}
+
+.desplegable-categorias summary.con-seleccion,
+.desplegable-categorias[open] summary {
+    border-color: var(--accent-green);
+    background: #E3EFEA;
+    color: var(--accent-green);
+    font-weight: 500;
+}
+
+.desplegable-panel {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    z-index: 20;
+    width: 380px;
+    padding: 14px;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    background: var(--white);
+    box-shadow: 0 12px 32px rgba(26, 26, 26, 0.12);
+}
+
+.desplegable-opciones {
+    max-height: 420px;
+    overflow-y: auto;
+    padding: 0 4px;
+}
+
+.grupo-categoria {
+    margin: 0 0 14px;
+    padding: 0;
+    border: none;
+}
+
+.grupo-categoria legend {
+    margin-bottom: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+}
+
+.opcion-check {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 0;
+    font-size: 0.95rem;
+    cursor: pointer;
+}
+
+.desplegable-panel input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    margin: 0;
+    accent-color: var(--accent-green);
+    cursor: pointer;
+}
+
+.desplegable-acciones {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 6px;
+    padding-top: 12px;
+    border-top: 1px solid #EFECE6;
+}
+
+.desplegable-acciones .btn-primary {
+    padding: 9px 18px;
+    border: none;
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+
+/* =========================================
+   ESTADOS que no aparecen en la vista de admin
+   ========================================= */
+.estado-lista_para_entregar { background: #E6F0F7; color: #2F5F8A; }
+.estado-en_traslado { background: #FDEBDD; color: #9A4A1E; }
+.estado-entrega_fallida { background: #FFEBEE; color: #C62828; }
+
+/* =========================================
+   RESPONSIVE
+   ========================================= */
+@media (max-width: 900px) {
+    .filtros-fila {
+        flex-wrap: wrap;
+    }
+
+    .filtros-fila .buscador {
+        flex-basis: 100%;
+    }
+}
+
+@media (max-width: 560px) {
+    .desplegable-panel {
+        right: auto;
+        left: 0;
+        width: min(380px, calc(100vw - 48px));
+    }
+}
