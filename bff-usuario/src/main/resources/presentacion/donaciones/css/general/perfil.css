@@ -1,0 +1,68 @@
+.perfil-page { width: 100%; max-width: 1320px; margin: 0 auto; padding: 32px 40px 80px; }
+.perfil-page .mono { font-family: ui-monospace, Menlo, Consolas, monospace; }
+
+/* Breadcrumb */
+.perfil-page .breadcrumb { margin-bottom: 24px; color: var(--text-muted, #8A857B); font-size: 0.85rem; }
+.perfil-page .breadcrumb a { color: var(--accent-green, #2F6B57); text-decoration: none; }
+.perfil-page .breadcrumb span { margin: 0 6px; }
+
+/* Layout de dos columnas */
+.perfil-grid { display: grid; grid-template-columns: 300px 1fr; gap: 24px; align-items: start; }
+.perfil-lateral, .perfil-principal { display: flex; flex-direction: column; gap: 24px; }
+
+/* Tarjetas */
+.perfil-page .tarjeta {
+    padding: 24px;
+    background: var(--white, #FFFFFF);
+    border: 1px solid var(--border-color, #E7E3DB);
+    border-radius: 12px;
+}
+.perfil-page .tarjeta h2 { margin-bottom: 20px; font-size: 1.1rem; font-weight: 700; }
+.tarjeta-cabecera { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 20px; }
+.perfil-page .tarjeta-cabecera h2 { margin: 0; }
+.enlace-suave { color: var(--accent-green, #2F6B57); font-size: 0.85rem; font-weight: 600; text-decoration: none; }
+.enlace-suave:hover { text-decoration: underline; }
+
+/* Avisos */
+.perfil-page .aviso-ok { margin-bottom: 16px; padding: 12px 16px; border-radius: 8px; background: #E3EFEA; color: var(--accent-green, #2F6B57); font-size: 0.9rem; font-weight: 500; }
+.perfil-page .aviso-error { margin-bottom: 16px; padding: 12px 16px; border-radius: 8px; background: #FFEBEE; color: #C62828; font-size: 0.9rem; font-weight: 500; }
+
+/* Tarjeta de cuenta */
+.avatar { display: flex; align-items: center; justify-content: center; width: 64px; height: 64px; margin-bottom: 16px; border-radius: 50%; background: #E3EFEA; color: var(--accent-green, #2F6B57); font-size: 1.4rem; font-weight: 700; }
+.perfil-cuenta h1 { margin-bottom: 8px; font-size: 1.4rem; font-weight: 700; }
+.etiquetas { display: flex; flex-wrap: wrap; gap: 6px; }
+.etiqueta { padding: 4px 8px; border-radius: 4px; background: #E3EFEA; color: var(--accent-green, #2F6B57); font-size: 0.7rem; font-weight: 700; letter-spacing: 0.04em; }
+.perfil-cuenta hr { margin: 20px 0; border: none; border-top: 1px solid #E7E3DB; }
+.cuenta-datos { margin-bottom: 24px; font-size: 0.9rem; }
+.cuenta-datos dt { margin-top: 12px; color: var(--text-muted, #8A857B); font-size: 0.85rem; }
+.cuenta-datos dd { margin: 4px 0 0; }
+.chip-permiso { display: inline-block; margin: 4px 4px 0 0; padding: 4px 8px; border: 1px solid var(--border-color, #E7E3DB); border-radius: 4px; font-size: 0.75rem; }
+
+/* Botón (se añadió margen superior para separar) */
+.perfil-cuenta .btn-ancho { display: block; margin-top: 24px; padding: 12px; border-radius: 8px; background: #1A1A1A; color: #FFFFFF; text-align: center; font-size: 0.92rem; font-weight: 600; text-decoration: none; border: none; }
+.perfil-cuenta .btn-ancho:hover { background: #333333; }
+
+/* Tarjeta destacada (última entrega) */
+.destacado .rotulo { color: var(--text-muted, #8A857B); font-size: 0.85rem; }
+.destacado-fecha { margin: 8px 0 12px; font-size: 1.5rem; font-weight: 700; }
+.destacado .pie { margin-top: 12px; color: var(--text-muted, #8A857B); font-size: 0.85rem; }
+
+/* Métricas */
+.metricas { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+.metrica { padding: 20px 16px; border-radius: 8px; background: var(--primary-color, #F2F0EA); }
+.metrica strong { display: block; font-size: 1.8rem; margin-bottom: 4px; }
+.metrica span { color: var(--text-muted, #8A857B); font-size: 0.85rem; }
+
+/* Datos personales */
+.campos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px 24px; }
+.campos dt { margin-bottom: 4px; color: var(--text-muted, #8A857B); font-size: 0.85rem; }
+.campos dd { margin: 0; font-size: 0.95rem; font-weight: 600; overflow-wrap: anywhere; }
+.texto-suave { color: var(--text-muted, #8A857B); font-size: 0.92rem; }
+
+/* Responsivo */
+@media (max-width: 900px) {
+    .perfil-page { padding: 24px 16px 60px; }
+    .perfil-grid { grid-template-columns: 1fr; }
+    .campos { grid-template-columns: 1fr 1fr; }
+    .metricas { grid-template-columns: repeat(2, 1fr); }
+}

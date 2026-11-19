@@ -87,6 +87,10 @@ public class Usuario {
     return tienePermiso(Permiso.ADMINISTRADOR);
   }
 
+  public void cambiarContrasena(String nueva) {
+    this.contraseña = hashear(nueva);
+  }
+
   //================== FUNCIONES AUXILIARES ===================
   private String hashear(String contraseña) {
     return Integridad.hashear(contraseña);

@@ -1,0 +1,43 @@
+{{#partial "nombre_pestaña"}}
+    Cambiar contraseña - DonaTrack
+{{/partial}}
+
+{{#partial "css_extra"}}
+    <link rel="stylesheet" href="/donaciones/css/formularios.css">
+{{/partial}}
+
+{{#partial "contenido_propio"}}
+    <section class="login-wrapper">
+        <div class="form-card login-card">
+            <h2>Cambiar contraseña</h2>
+            <p class="subtitulo">Mínimo 8 caracteres, con al menos un número.</p>
+
+            <form action="/perfil/contrasena" method="post">
+                <div class="form-group">
+                    <label for="actual">Contraseña actual</label>
+                    <input type="password" id="actual" name="actual" autocomplete="current-password" required>
+                </div>
+                <div class="form-group">
+                    <label for="nueva">Contraseña nueva</label>
+                    <input type="password" id="nueva" name="nueva" autocomplete="new-password" minlength="8" maxlength="72" required>
+                </div>
+                <div class="form-group">
+                    <label for="confirmar">Repetir contraseña nueva</label>
+                    <input type="password" id="confirmar" name="confirmar" autocomplete="new-password" required>
+                </div>
+
+                {{#if error}}
+                    <div class="alerta-error-login" role="alert">{{error}}</div>
+                {{/if}}
+
+                <button type="submit" class="btn-submit">Guardar contraseña</button>
+            </form>
+
+            <div class="login-footer">
+                <p><a href="/perfil">Volver a mi perfil</a></p>
+            </div>
+        </div>
+    </section>
+{{/partial}}
+
+{{> donaciones/partials/layout.hbs}}

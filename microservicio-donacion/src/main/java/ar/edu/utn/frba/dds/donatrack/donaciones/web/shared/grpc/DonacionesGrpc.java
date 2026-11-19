@@ -16,6 +16,9 @@ import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.donacion.EstadoDonacion;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.donacion.TipoEstadoDonacion;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.donante.Donante;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.donante.entrega.RegistroEntrega;
+import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.mediocontacto.CorreoDeContacto;
+import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.mediocontacto.SmsDeContacto;
+import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.mediocontacto.WhatsappDeContacto;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.segmentador.SegmentadorDonaciones;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.donante.documento.Documento;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.donante.documento.TipoDocumento;
@@ -49,6 +52,7 @@ import ar.edu.utn.frba.dds.donatrack.donaciones.web.shared.dto.contacto.Contacto
 import ar.edu.utn.frba.dds.donatrack.donaciones.web.shared.dto.necesidad.NecesidadRequest;
 import ar.edu.utn.frba.dds.donatrack.donaciones.web.shared.dto.necesidad.NecesidadResponse;
 import ar.edu.utn.frba.dds.donatrack.donaciones.web.shared.dto.vista.DonacionVistaMapper;
+import ar.edu.utn.frba.dds.donatrack.donaciones.web.shared.dto.vista.ResumenDonacionesMapper;
 import ar.edu.utn.frba.dds.donatrack.grpc.*;
 import ar.edu.utn.frba.dds.donatrack.shared.excepciones.BodyException;
 import ar.edu.utn.frba.dds.donatrack.shared.excepciones.CambioDeEstadoNoPermitidoException;
@@ -912,6 +916,92 @@ public class DonacionesGrpc extends DonacionesServiceGrpc.DonacionesServiceImplB
     }));
   }
 
+  @Override
+  public void obtenerPerfilDonante(DonanteIdRequest req, StreamObserver<PerfilDonanteResponse> out) {
+    responder(out, () -> withTransaction(() -> {
+      Donante donante = repoDonantes.buscarPorId(req.getId());
+      if (donante == null) {
+        throw new RecursoNoEncontradoException("No existe el donante con id: " + req.getId());
+      }
+
+      PerfilDonanteResponse.Builder builder = PerfilDonanteResponse.newBuilder()
+          .setTipoDocumento(donante.getDocumento().getTipoDocumento().name())
+          .setNumeroDocumento(donante.getDocumento().getDetalle());
+
+      donante.getContactos().forEach(c -> builder.addContactos(aContactoMsg(c)));
+      if (donante instanceof Humana h) {
+        builder.setTipoPersona("HUMANA")
+            .setNombre(nvl(h.getNombre()))
+            .setApellido(nvl(h.getApellido()))
+            .setFechaNacimiento(h.getFechaNacimiento() == null ? "" : h.getFechaNacimiento().toString())
+            .setGenero(h.getGenero() == null ? "" : h.getGenero().name())
+            .setDireccion(nvl(h.getDireccion()));
+      } else if (donante instanceof Juridica j) {
+        builder.setTipoPersona("JURIDICA")
+            .setNombre(nvl(j.getRazonSocial()))
+            .setTipoOrganizacion(j.getTipoOrganizacion() == null ? "" : j.getTipoOrganizacion().name())
+            .setRubro(nvl(j.getRubro()));
+        j.getRepresentantes().stream().findFirst().ifPresent(r ->
+            builder.setRepresentante(RepresentanteMsg.newBuilder()
+                .setNombre(nvl(r.getNombre()))
+                .setApellido(nvl(r.getApellido()))
+                .setTipoDocumento(r.getDocumento().getTipoDocumento().name())
+                .setNumeroDocumento(r.getDocumento().getDetalle())
+                .setDireccion(nvl(r.getDireccion()))
+                .build()));
+      }
+
+      builder.setResumen(ResumenDonacionesMapper.aMsg(
+          repoDonaciones.buscarTodasPorDonante(donante.getId())));
+
+      UltimaActividadMsg.Builder ultima = UltimaActividadMsg.newBuilder().setExiste(false);
+      repoRegistros.buscarUltimoPorDonante(donante.getId()).ifPresent(r -> ultima
+          .setExiste(true)
+          .setFecha(r.getFecha().toString())
+          .setDescripcion(nvl(r.getObservaciones()))
+          .setCantidadBienes(r.getBienes().size()));
+      builder.setUltimaEntrega(ultima.build());
+
+      return builder.build();
+    }));
+  }
+
+  @Override
+  public void obtenerPerfilBeneficiario(BeneficiarioIdRequest req,
+                                        StreamObserver<PerfilBeneficiarioResponse> out) {
+    responder(out, () -> withTransaction(() -> {
+      Beneficiario b = repoBeneficiarios.buscarPorId(req.getId());
+      if (b == null) {
+        throw new RecursoNoEncontradoException("No existe el beneficiario con id: " + req.getId());
+      }
+
+      List<Donacion> donaciones = b.getDonaciones();
+      int abiertas = (int) b.getNecesidades().stream()
+          .filter(n -> !n.estaSatisfecha())
+          .count();
+
+      PerfilBeneficiarioResponse.Builder builder = PerfilBeneficiarioResponse.newBuilder()
+          .setRazonSocial(nvl(b.getRazonSocial()))
+          .setDireccion(nvl(b.getDireccion()))
+          .setResumen(ResumenDonacionesMapper.aMsg(donaciones))
+          .setNecesidadesAbiertas(abiertas);
+
+      b.getContactos().forEach(c -> builder.addContactos(aContactoMsg(c)));
+
+      UltimaActividadMsg.Builder ultima = UltimaActividadMsg.newBuilder().setExiste(false);
+      donaciones.stream()
+          .filter(d -> !fechaAsignacionDe(d).isEmpty())
+          .max(Comparator.comparing(this::fechaAsignacionDe))
+          .ifPresent(d -> ultima.setExiste(true)
+              .setFecha(fechaAsignacionDe(d))
+              .setDescripcion(nvl(d.getDescripcion()))
+              .setEstado(d.getEstadoActual().name()));
+      builder.setUltimaDonacion(ultima.build());
+
+      return builder.build();
+    }));
+  }
+
   //================ FUNCIONES AUXILIARES ===============
 
   private String generarContraseniaTemporal() {
@@ -1138,5 +1228,17 @@ public class DonacionesGrpc extends DonacionesServiceGrpc.DonacionesServiceImplB
 
   private String nvlTexto(String valor) {
     return valor == null ? "" : valor;
+  }
+
+  private ContactoMsg aContactoMsg(MedioContacto c) {
+    String medio = c instanceof CorreoDeContacto ? "CORREO"
+        : c instanceof SmsDeContacto ? "SMS"
+          : c instanceof WhatsappDeContacto ? "WHATSAPP"
+            : "";
+    return ContactoMsg.newBuilder()
+        .setTipoContacto(medio)
+        .setValor(nvl(c.getDetalle()))
+        .setEsPrincipal(Boolean.TRUE.equals(c.getEsPrincipal()))
+        .build();
   }
 }

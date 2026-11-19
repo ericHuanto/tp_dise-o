@@ -70,7 +70,7 @@ public abstract class Donante {
 
   protected abstract List<MedioContacto> getContactosPrincipales();
 
-  protected abstract List<MedioContacto> getContactos();
+  public abstract List<MedioContacto> getContactos();
 
   protected void actualizarDatosBase(Documento documento) {
     checkDatos(documento);

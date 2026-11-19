@@ -75,4 +75,11 @@ public class DonacionRepository implements WithSimplePersistenceUnit {
         .getResultList();
   }
 
+  public List<Donacion> buscarTodasPorDonante(Long idDonante) {
+    return entityManager()
+        .createQuery("SELECT d FROM Donacion d JOIN d.donantes dn WHERE dn.id = :id", Donacion.class)
+        .setParameter("id", idDonante)
+        .getResultList();
+  }
+
 }

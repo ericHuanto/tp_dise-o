@@ -53,6 +53,11 @@ service DonacionesService {
   rpc ListarSubcategorias (Vacio) returns (ListaSubcategoriasResponse);
   rpc BuscarDonantes      (BuscarDonantesRequest) returns (ListaDonantesResumenResponse);
   rpc RegistrarEntrega    (RegistrarEntregaRequest) returns (RegistrarEntregaResponse);
+
+  //Mi Perfil
+  rpc ObtenerPerfilDonante      (DonanteIdRequest)      returns (PerfilDonanteResponse);
+  rpc ObtenerPerfilBeneficiario (BeneficiarioIdRequest) returns (PerfilBeneficiarioResponse);
+
 }
 
 
@@ -436,4 +441,57 @@ message ImportarCsvResponse {
   int32 cant_exitosa = 1;
   repeated DonanteImportadoUsuarioMsg usuarios_generados = 2;
   repeated FilaErrorMsg errores_encontrados = 3;
+}
+
+//Mi Perfil
+message DonanteIdRequest { int64 id = 1; }
+
+message ResumenDonacionesMsg {
+  int32 total = 1;
+  int32 entregadas = 2;
+  int32 en_curso = 3;
+  int32 fallidas = 4;
+  int32 vencidas = 5;
+}
+
+message UltimaActividadMsg {
+  bool existe = 1;
+  string fecha = 2;          //yyyy-MM-dd
+  string descripcion = 3;
+  int32 cantidad_bienes = 4; // lo usa la última entrega del donante
+  string estado = 5;         // lo usa la última donación del beneficiario
+}
+
+message RepresentanteMsg {
+  string nombre = 1;
+  string apellido = 2;
+  string tipo_documento = 3;
+  string numero_documento = 4;
+  string direccion = 5;
+}
+
+message PerfilDonanteResponse {
+  string tipo_persona = 1;       // HUMANA | JURIDICA
+  string nombre = 2;             // nombre de la persona o razón social
+  string apellido = 3;           // vacío si es jurídica
+  string tipo_documento = 4;
+  string numero_documento = 5;
+  string fecha_nacimiento = 6;   // solo humana
+  string genero = 7;             // solo humana
+  string direccion = 8;          // solo humana
+  string tipo_organizacion = 9;  // solo jurídica
+  string rubro = 10;             // solo jurídica
+  RepresentanteMsg representante = 11;
+  repeated ContactoMsg contactos = 12;
+  ResumenDonacionesMsg resumen = 13;
+  UltimaActividadMsg ultima_entrega = 14;
+}
+
+message PerfilBeneficiarioResponse {
+  string razon_social = 1;
+  string direccion = 2;
+  repeated ContactoMsg contactos = 3;
+  ResumenDonacionesMsg resumen = 4;
+  int32 necesidades_abiertas = 5;
+  UltimaActividadMsg ultima_donacion = 6;
 }

@@ -1,0 +1,89 @@
+{{#partial "nombre_pestaña"}}
+    Mi perfil - DonaTrack
+{{/partial}}
+
+{{#partial "css_extra"}}
+    <link rel="stylesheet" href="/donaciones/css/formularios.css">
+    <link rel="stylesheet" href="/donaciones/css/general/perfil.css">
+{{/partial}}
+
+{{#partial "contenido_propio"}}
+    <section class="perfil-page">
+        <nav class="breadcrumb"><a href="/">Inicio</a><span>›</span>Mi perfil</nav>
+
+        {{#if cambioOk}}
+            <p class="aviso-ok" role="status">La contraseña se actualizó correctamente.</p>
+        {{/if}}
+        {{#each perfil.avisos}}
+            <p class="aviso-error" role="alert">{{this}}</p>
+        {{/each}}
+
+        <div class="perfil-grid">
+            <aside class="perfil-lateral">
+                <div class="tarjeta perfil-cuenta">
+                    <div class="avatar" aria-hidden="true">{{perfil.iniciales}}</div>
+                    <h1>{{perfil.nombre}}</h1>
+                    <div class="etiquetas">
+                        {{#each perfil.etiquetas}}<span class="etiqueta">{{this}}</span>{{/each}}
+                    </div>
+                    <hr>
+                    <dl class="cuenta-datos">
+                        <dt>Usuario</dt>
+                        <dd class="mono">@{{usuario.nombreUsuario}}</dd>
+                        <dt>Permisos</dt>
+                        <dd>{{#each permisos}}<span class="chip-permiso mono">{{this}}</span>{{/each}}</dd>
+                    </dl>
+                    <a href="/perfil/contrasena" class="btn-primary btn-ancho">Cambiar contraseña</a>
+                </div>
+
+                {{#each perfil.destacados}}
+                    <div class="tarjeta destacado">
+                        <p class="rotulo">{{this.titulo}}</p>
+                        <p class="destacado-fecha">{{this.fecha}}</p>
+                        <p>{{this.descripcion}}</p>
+                        <p class="pie">{{this.pie}}</p>
+                    </div>
+                {{/each}}
+            </aside>
+
+            <div class="perfil-principal">
+                {{#each perfil.resumenes}}
+                    <section class="tarjeta">
+                        <div class="tarjeta-cabecera">
+                            <h2>{{this.titulo}}</h2>
+                        </div>
+                        <div class="metricas">
+                            {{#each this.items}}
+                                <div class="metrica">
+                                    <!-- Se eliminó la clase "mono" para coincidir con la fuente del diseño -->
+                                    <strong>{{this.valor}}</strong>
+                                    <span>{{this.texto}}</span>
+                                </div>
+                            {{/each}}
+                        </div>
+                    </section>
+                {{/each}}
+
+                {{#each perfil.secciones}}
+                    <section class="tarjeta">
+                        <h2>{{this.titulo}}</h2>
+                        <dl class="campos">
+                            {{#each this.campos}}
+                                <div><dt>{{this.etiqueta}}</dt><dd>{{this.valor}}</dd></div>
+                            {{/each}}
+                        </dl>
+                    </section>
+                {{/each}}
+
+                {{#unless perfil.tieneDatos}}
+                    <section class="tarjeta">
+                        <h2>Cuenta de administración</h2>
+                        <p class="texto-suave">Las acciones de gestión están en el menú superior.</p>
+                    </section>
+                {{/unless}}
+            </div>
+        </div>
+    </section>
+{{/partial}}
+
+{{> donaciones/partials/layout.hbs}}

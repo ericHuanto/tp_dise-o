@@ -16,6 +16,7 @@ import ar.edu.utn.frba.dds.donatrack.usuario.web.controllers.DonanteController;
 import ar.edu.utn.frba.dds.donatrack.usuario.web.controllers.EntregaController;
 import ar.edu.utn.frba.dds.donatrack.usuario.web.controllers.HomeController;
 import ar.edu.utn.frba.dds.donatrack.usuario.web.controllers.MapaController;
+import ar.edu.utn.frba.dds.donatrack.usuario.web.controllers.MiPerfilController;
 import ar.edu.utn.frba.dds.donatrack.usuario.web.controllers.NecesidadController;
 import ar.edu.utn.frba.dds.donatrack.usuario.web.controllers.PerfilController;
 import ar.edu.utn.frba.dds.donatrack.usuario.web.controllers.RegistroEntregaController;
@@ -30,6 +31,7 @@ import ar.edu.utn.frba.dds.donatrack.usuario.web.routes.DonanteRoutes;
 import ar.edu.utn.frba.dds.donatrack.usuario.web.routes.EntregaRoutes;
 import ar.edu.utn.frba.dds.donatrack.usuario.web.routes.HomeRoutes;
 import ar.edu.utn.frba.dds.donatrack.usuario.web.routes.MapaRoutes;
+import ar.edu.utn.frba.dds.donatrack.usuario.web.routes.MiPerfilRoutes;
 import ar.edu.utn.frba.dds.donatrack.usuario.web.routes.NecesidadRoutes;
 import ar.edu.utn.frba.dds.donatrack.usuario.web.routes.PerfilRoutes;
 import ar.edu.utn.frba.dds.donatrack.usuario.web.routes.RegistroEntregaRoutes;
@@ -85,6 +87,7 @@ public class App {
     AsignacionController asignacionController = new AsignacionController(grpcClients.getDonacionesStub());
     CsvController csvController = new CsvController(grpcClients.getDonacionesStub(), usuarioRepository);
     RegistroEntregaController registroEntregaController = new RegistroEntregaController(grpcClients.getDonacionesStub());
+    MiPerfilController miPerfilController = new MiPerfilController(grpcClients.getDonacionesStub(), usuarioRepository);
 
     //LOGISTICA
     CamionController camionController = new CamionController(grpcClients.getLogisticaStub());
@@ -125,6 +128,7 @@ public class App {
       AsignacionRoutes.registrar(config.routes, asignacionController);
       CsvRoutes.registrar(config.routes, csvController);
       RegistroEntregaRoutes.registrar(config.routes, registroEntregaController);
+      MiPerfilRoutes.registrar(config.routes, miPerfilController);
 
       CamionRoutes.registrar(config.routes, camionController);
       EntregaRoutes.registrar(config.routes, entregaController);
