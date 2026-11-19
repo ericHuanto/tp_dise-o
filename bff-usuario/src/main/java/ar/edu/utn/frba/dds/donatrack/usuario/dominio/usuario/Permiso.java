@@ -1,7 +1,19 @@
 package ar.edu.utn.frba.dds.donatrack.usuario.dominio.usuario;
 
-public enum Permiso {
+import io.javalin.security.RouteRole;
+
+public enum Permiso implements RouteRole {
+  //Autenticado
+  AUTENTICADO,
+  //Donante
+  VER_DONACIONES,
+  //Beneficiario
   SOLICITAR_AYUDA,
-  REALIZAR_DONACION,
+  //admin
+  CREAR_DONACION,
+  EDITAR_DONACION,
+  GESTIONAR_USUARIOS,
+  GESTIONAR_CAMIONES,
+  GESTIONAR_ENTREGAS,
   ADMINISTRADOR
 }

@@ -1,10 +1,10 @@
-package ar.edu.utn.frba.dds.donatrack.usuario.web.dto;
+package ar.edu.utn.frba.dds.donatrack.usuario.web.mappers;
 
 import ar.edu.utn.frba.dds.donatrack.grpc.BienFilaMsg;
 import ar.edu.utn.frba.dds.donatrack.grpc.DonacionAdminFilaMsg;
 import ar.edu.utn.frba.dds.donatrack.grpc.DonacionVistaMsg;
-import ar.edu.utn.frba.dds.donatrack.usuario.dominio.vista.DonacionDonanteFila;
-import ar.edu.utn.frba.dds.donatrack.usuario.dominio.vista.DonacionFila;
+import ar.edu.utn.frba.dds.donatrack.usuario.web.dto.DonacionDonanteFila;
+import ar.edu.utn.frba.dds.donatrack.usuario.web.dto.DonacionFila;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;

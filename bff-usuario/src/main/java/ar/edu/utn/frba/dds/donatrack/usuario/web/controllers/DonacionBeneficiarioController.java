@@ -9,7 +9,7 @@ import ar.edu.utn.frba.dds.donatrack.grpc.ListaDonacionesBeneficiarioResponse;
 import ar.edu.utn.frba.dds.donatrack.grpc.ListaNovedadesBeneficiarioResponse;
 import ar.edu.utn.frba.dds.donatrack.grpc.NovedadDonacionMsg;
 import ar.edu.utn.frba.dds.donatrack.usuario.dominio.usuario.Usuario;
-import ar.edu.utn.frba.dds.donatrack.usuario.web.dto.DonacionVistaMapper;
+import ar.edu.utn.frba.dds.donatrack.usuario.web.mappers.DonacionVistaMapper;
 import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
 import io.javalin.http.Context;

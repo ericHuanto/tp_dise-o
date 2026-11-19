@@ -36,9 +36,9 @@ public class Usuario {
   @Column(name = "permiso")
   private List<Permiso> permisos;
   @Column(name = "id_donante")
-  private Long idDonante; //No es común tener ID en las clases de dominio
+  private Long idDonante;
   @Column(name = "id_beneficiario")
-  private Long idBeneficiario;//No es común tener ID en las clases de dominio
+  private Long idBeneficiario;
 
   public Usuario(String nombreUsuario, String contraseña) {
     this.nombreUsuario = nombreUsuario;
@@ -50,7 +50,7 @@ public class Usuario {
 
   public void vincularDonante(Long idDonante) {
     this.idDonante = idDonante;
-    this.otorgarPermiso(Permiso.REALIZAR_DONACION);
+    this.otorgarPermiso(Permiso.VER_DONACIONES);
   }
 
   public void vincularBeneficiario(Long idBeneficiario) {
@@ -65,11 +65,14 @@ public class Usuario {
   }
 
   public boolean tienePermiso(Permiso permiso) {
-    return this.permisos != null && this.permisos.contains(permiso);
+    if (this.permisos.isEmpty() || permiso == null) {
+      return false;
+    }
+    return this.permisos.contains(Permiso.ADMINISTRADOR) || this.permisos.contains(permiso);
   }
 
   public boolean isDonante() {
-    return tienePermiso(Permiso.REALIZAR_DONACION);
+    return tienePermiso(Permiso.VER_DONACIONES);
   }
 
   public boolean isBeneficiario() {

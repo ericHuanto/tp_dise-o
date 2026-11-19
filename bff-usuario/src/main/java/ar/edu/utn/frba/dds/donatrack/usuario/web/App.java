@@ -20,6 +20,7 @@ import ar.edu.utn.frba.dds.donatrack.usuario.web.controllers.PerfilController;
 import ar.edu.utn.frba.dds.donatrack.usuario.web.controllers.RegistroEntregaController;
 import ar.edu.utn.frba.dds.donatrack.usuario.web.controllers.RutaController;
 import ar.edu.utn.frba.dds.donatrack.usuario.web.controllers.SesionController;
+import ar.edu.utn.frba.dds.donatrack.usuario.web.middleware.Middleware;
 import ar.edu.utn.frba.dds.donatrack.usuario.web.routes.AsignacionRoutes;
 import ar.edu.utn.frba.dds.donatrack.usuario.web.routes.CamionRoutes;
 import ar.edu.utn.frba.dds.donatrack.usuario.web.routes.CsvRoutes;
@@ -93,8 +94,11 @@ public class App {
       }
       config.fileRenderer(new JavalinHandlebars(motorHandlebars));
 
-      config.routes.get("/health", ctx -> ctx.json("BFF Usuario funcionando"));
+      //middleware
+      config.routes.beforeMatched(Middleware::verificarPermisos);
 
+      //RUTAS
+      config.routes.get("/health", ctx -> ctx.json("BFF Usuario funcionando"));
       //Rutas de gateway/bff
       HomeRoutes.registrar(config.routes, homeController);
       SesionRoutes.registrar(config.routes, sesionController);

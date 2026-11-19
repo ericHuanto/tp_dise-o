@@ -1,6 +1,6 @@
 package ar.edu.utn.frba.dds.donatrack.usuario.web.controllers;
 
-import ar.edu.utn.frba.dds.donatrack.usuario.dominio.vista.Opcion;
+import ar.edu.utn.frba.dds.donatrack.usuario.web.dto.Opcion;
 import ar.edu.utn.frba.dds.donatrack.grpc.*;
 import ar.edu.utn.frba.dds.donatrack.grpc.DonacionesServiceGrpc.DonacionesServiceBlockingStub;
 import ar.edu.utn.frba.dds.donatrack.usuario.dominio.usuario.Usuario;

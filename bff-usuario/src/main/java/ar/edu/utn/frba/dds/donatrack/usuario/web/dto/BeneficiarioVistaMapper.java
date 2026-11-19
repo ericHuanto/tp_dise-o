@@ -2,8 +2,8 @@ package ar.edu.utn.frba.dds.donatrack.usuario.web.dto;
 
 import ar.edu.utn.frba.dds.donatrack.grpc.BeneficiarioDetalleMsg;
 import ar.edu.utn.frba.dds.donatrack.grpc.NecesidadVistaMsg;
-import ar.edu.utn.frba.dds.donatrack.usuario.dominio.vista.BeneficiarioTarjeta;
-import ar.edu.utn.frba.dds.donatrack.usuario.dominio.vista.NecesidadFila;
+import ar.edu.utn.frba.dds.donatrack.usuario.web.mappers.DonacionVistaMapper;
+
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
