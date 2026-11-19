@@ -8,12 +8,16 @@ import ar.edu.utn.frba.dds.donatrack.grpc.GuardarNecesidadRequest;
 import ar.edu.utn.frba.dds.donatrack.grpc.ListarNecesidadesRequest;
 import ar.edu.utn.frba.dds.donatrack.grpc.ListarNecesidadesResponse;
 import ar.edu.utn.frba.dds.donatrack.grpc.NecesidadIdRequest;
+import ar.edu.utn.frba.dds.donatrack.grpc.NecesidadResponseMsg;
 import ar.edu.utn.frba.dds.donatrack.grpc.Vacio;
 import ar.edu.utn.frba.dds.donatrack.usuario.dominio.usuario.Usuario;
 import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
 import io.javalin.http.Context;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class NecesidadController {
@@ -51,10 +55,29 @@ public class NecesidadController {
 
       ListarNecesidadesResponse response = donacionesStub.listarNecesidades(request);
 
+      DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+      List<NecesidadResponseMsg> necesidades = response.getNecesidadesList()
+          .stream()
+          .map(necesidad -> {
+            String fecha = necesidad.getFechaRegistrada();
+
+            if (fecha.isBlank()) {
+              return necesidad;
+            }
+
+            String fechaFormateada = LocalDate.parse(fecha).format(formato);
+
+            return necesidad.toBuilder()
+                .setFechaRegistrada(fechaFormateada)
+                .build();
+          })
+          .toList();
+
       Map<String, Object> modelo = new HashMap<>();
       modelo.put("usuario", usuarioActual);
       modelo.put("esAdmin", usuarioActual.isAdmin());
-      modelo.put("necesidades", response.getNecesidadesList());
+      modelo.put("necesidades", necesidades);
 
       context.render("donaciones/views/beneficiario/necesidades.hbs", modelo);
     } catch (StatusRuntimeException e) {

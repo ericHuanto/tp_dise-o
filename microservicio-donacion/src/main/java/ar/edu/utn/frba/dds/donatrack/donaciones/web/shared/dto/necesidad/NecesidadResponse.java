@@ -1,5 +1,6 @@
 package ar.edu.utn.frba.dds.donatrack.donaciones.web.shared.dto.necesidad;
 
+import java.time.LocalDate;
 import lombok.Builder;
 
 @Builder
@@ -14,5 +15,6 @@ public record NecesidadResponse(
     Boolean estaSatisfecha,
     Integer cantidadPorPeriodo,
     String periodo,
-    Integer cantidadRequerida
+    Integer cantidadRequerida,
+    LocalDate fechaRegistrada
 ) { }

@@ -4,6 +4,7 @@ import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.bien.Subcategoria;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.bien.UnidadMedida;
 import ar.edu.utn.frba.dds.donatrack.shared.excepciones.DominioException;
 
+import java.time.LocalDate;
 import javax.persistence.*;
 
 import lombok.Getter;
@@ -39,6 +40,8 @@ public class Necesidad {
   @Column(name = "frecuencia")
   @Enumerated(EnumType.STRING)
   private Frecuencia frecuencia;
+  @Column(name = "fecha_registrada")
+  private LocalDate fechaRegistrada;
 
   private Necesidad(String descripcion, TipoNecesidad tipo, Subcategoria subcategoria, UnidadMedida unidadMedida,
                    Integer cantidadRequerida, Frecuencia frecuencia) {
@@ -50,6 +53,7 @@ public class Necesidad {
     this.cantidadRecibida = 0;
     this.cantidadRequerida = cantidadRequerida;
     this.frecuencia = frecuencia;
+    this.fechaRegistrada = LocalDate.now();
   }
 
   private void checkDatosBase(String descripcion, Subcategoria subcategoria, UnidadMedida unidadMedida, Integer cantidadRequerida) {

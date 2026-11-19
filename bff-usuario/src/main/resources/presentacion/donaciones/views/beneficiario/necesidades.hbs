@@ -36,6 +36,7 @@
                         <th>Cantidad</th>
                         <th>Cubierto</th>
                         <th>Tipo</th>
+                        <th>Registrada</th>
 
                         {{#if esAdmin}}
                             <th>Acciones</th>
@@ -89,6 +90,13 @@
                                 <span class="etiqueta-tipo">
                                     {{tipo}}
                                 </span>
+                            </td>
+                            <td>
+                                {{#if fechaRegistrada}}
+                                    {{fechaRegistrada}}
+                                {{else}}
+                                    Sin fecha
+                                {{/if}}
                             </td>
 
                             {{#if ../esAdmin}}

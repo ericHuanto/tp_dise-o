@@ -44,7 +44,8 @@ public class NecesidadMapper {
         .categoria(necesidad.getSubcategoria().getCategoria().getNombre())
         .subcategoria(necesidad.getSubcategoria().getNombre())
         .cantidadRecibida(necesidad.getCantidadRecibida())
-        .estaSatisfecha(necesidad.estaSatisfecha());
+        .estaSatisfecha(necesidad.estaSatisfecha())
+        .fechaRegistrada(necesidad.getFechaRegistrada());
 
     switch (necesidad.getTipo()) {
       case RECURRENTE -> {

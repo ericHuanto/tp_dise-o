@@ -289,6 +289,7 @@ message NecesidadResponseMsg {
   int32 cantidad_por_periodo = 9; // Vale 0 si es EXTRAORDINARIA
   string periodo = 10;
   int32 cantidad_requerida = 11;
+  string fecha_registrada = 12;
 }
 
 message ListarNecesidadesResponse {

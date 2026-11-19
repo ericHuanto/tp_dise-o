@@ -452,6 +452,7 @@ public class DonacionesGrpc extends DonacionesServiceGrpc.DonacionesServiceImplB
             .setCantidadPorPeriodo(dto.cantidadPorPeriodo() != null ? dto.cantidadPorPeriodo() : 0)
             .setPeriodo(dto.periodo() != null ? dto.periodo() : "")
             .setCantidadRequerida(dto.cantidadRequerida() != null ? dto.cantidadRequerida() : 0)
+            .setFechaRegistrada(dto.fechaRegistrada() != null ? dto.fechaRegistrada().toString() : "")
             .build());
       }
 
