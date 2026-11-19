@@ -9,7 +9,7 @@ public enum Permiso implements RouteRole {
   VER_DONACIONES,
   //Beneficiario
   SOLICITAR_AYUDA,
-  //admin
+  //Admin
   CREAR_DONACION,
   EDITAR_DONACION,
   GESTIONAR_USUARIOS,
