@@ -11,8 +11,14 @@
 
     {{#if usuario}}
         {{> donaciones/partials/navbar.hbs}}
-        <span class="usuario-actual">@{{usuario.nombreUsuario}}</span>
         <div class="header-right">
+            <a href="/perfil" class="usuario-actual" title="Ver mi perfil">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <circle cx="12" cy="8" r="4"/>
+                    <path d="M4 20c0-4 4-6 8-6s8 2 8 6"/>
+                </svg>
+                <span>@{{usuario.nombreUsuario}}</span>
+            </a>
             <form action="/logout" method="POST">
                 <button type="submit" class="btn-secondary">Cerrar Sesión</button>
             </form>
@@ -28,7 +34,7 @@
 <!-- Marca como "activo" la pestaña actual -->
 <script>
     const ruta = window.location.pathname;
-    const links = [...document.querySelectorAll('.header-left a.nav-tab, .nav-links a')];
+    const links = [...document.querySelectorAll('.header-left a.nav-tab, .nav-links a, .header-right a.usuario-actual')];
     const coincide = l => {
         const h = l.getAttribute('href');
         return h === ruta || (h !== '/' && ruta.startsWith(h + '/'));
