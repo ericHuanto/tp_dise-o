@@ -41,6 +41,11 @@ public class MiPerfilController implements WithSimplePersistenceUnit {
 
   public void mostrarPerfil(Context context) {
     Usuario usuario = context.sessionAttribute("usuario_actual");   // el id sale de la sesión, nunca de la URL
+
+    if(usuario == null) {
+      context.redirect("/login");
+      return;
+    }
     PerfilVista perfil = new PerfilVista();
 
     if (usuario.getIdDonante() != null) cargarDonante(usuario.getIdDonante(), perfil);
@@ -53,11 +58,17 @@ public class MiPerfilController implements WithSimplePersistenceUnit {
     modelo.put("perfil", perfil);
     modelo.put("permisos", usuario.getPermisos().stream().map(Enum::name).toList());
     modelo.put("cambioOk", "ok".equals(context.queryParam("cambio")));
-    context.render("donaciones/views/perfil/mi_perfil.hbs", modelo);
+    context.render("comun/views/perfil/perfil.hbs", modelo);
   }
 
   public void mostrarFormularioContrasena(Context context) {
-    context.render("donaciones/views/perfil/cambiar_contrasena.hbs",
+    Usuario usuario = context.sessionAttribute("usuario_actual");
+
+    if(usuario == null) {
+      context.redirect("/login");
+      return;
+    }
+    context.render("comun/views/perfil/cambiar_contrasena.hbs",
         Map.of("usuario", context.sessionAttribute("usuario_actual")));
   }
 
@@ -82,7 +93,7 @@ public class MiPerfilController implements WithSimplePersistenceUnit {
       Map<String, Object> modelo = new HashMap<>();
       modelo.put("usuario", sesion);
       modelo.put("error", error);
-      context.status(400).render("donaciones/views/perfil/cambiar_contrasena.hbs", modelo);
+      context.status(400).render("comun/views/perfil/cambiar_contrasena.hbs", modelo);
       return;
     }
 
