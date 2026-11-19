@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Set;
 import lombok.Getter;
 
-/** Totales de las tarjetas de "Mis donaciones", a partir del estado de cada donación. */
 @Getter
 public class ResumenDonaciones {
   private static final Set<String> EN_CURSO = Set.of("ASIGNACION_REALIZADA", "LISTA_PARA_ENTREGAR", "EN_TRASLADO");

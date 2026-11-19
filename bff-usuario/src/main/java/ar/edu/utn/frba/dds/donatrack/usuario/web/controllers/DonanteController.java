@@ -2,11 +2,14 @@ package ar.edu.utn.frba.dds.donatrack.usuario.web.controllers;
 
 import ar.edu.utn.frba.dds.donatrack.grpc.*;
 import ar.edu.utn.frba.dds.donatrack.usuario.dominio.usuario.Usuario;
+import ar.edu.utn.frba.dds.donatrack.usuario.dominio.vista.BeneficiarioTarjeta;
 import ar.edu.utn.frba.dds.donatrack.usuario.dominio.vista.DonacionDonanteFila;
 import ar.edu.utn.frba.dds.donatrack.usuario.dominio.vista.FiltroActivo;
 import ar.edu.utn.frba.dds.donatrack.usuario.dominio.vista.GrupoCategoria;
+import ar.edu.utn.frba.dds.donatrack.usuario.dominio.vista.NecesidadFila;
 import ar.edu.utn.frba.dds.donatrack.usuario.dominio.vista.Opcion;
 import ar.edu.utn.frba.dds.donatrack.usuario.dominio.vista.ResumenDonaciones;
+import ar.edu.utn.frba.dds.donatrack.usuario.web.dto.BeneficiarioVistaMapper;
 import ar.edu.utn.frba.dds.donatrack.usuario.web.dto.DonacionVistaMapper;
 import io.grpc.StatusRuntimeException;
 import io.javalin.http.Context;
@@ -62,7 +65,6 @@ public class DonanteController {
           .setIdCategoria(idCategoria != null ? idCategoria : 0L)
           .addAllIdsSubcategorias(idsSubcategorias)
           .build());
-      // Las tarjetas muestran siempre el total del donante: si hay filtros, se piden todas aparte
       sinFiltros = filtraEnMicroservicio
           ? donacionesStub.obtenerVistaDonacionesDonante(FiltroDonacionesDonanteRequest.newBuilder()
               .setIdDonante(idDonante)
@@ -120,13 +122,30 @@ public class DonanteController {
       return;
     }
 
-    ListaBeneficiariosParaDonanteResponse response = donacionesStub.listarBeneficiariosParaDonante(
-        Vacio.getDefaultInstance()
-    );
+    String q = limpio(context.queryParam("q"));
+
+    ListaBeneficiariosParaDonanteResponse response;
+    try {
+      response = donacionesStub.listarBeneficiariosParaDonante(Vacio.getDefaultInstance());
+    } catch (StatusRuntimeException e) {
+      context.redirect("/");
+      return;
+    }
+
+    String buscado = q.toLowerCase();
+    List<BeneficiarioTarjeta> beneficiarios = response.getBeneficiariosList().stream()
+        .filter(b -> buscado.isEmpty()
+            || b.getRazonSocial().toLowerCase().contains(buscado)
+            || b.getDireccion().toLowerCase().contains(buscado))
+        .map(BeneficiarioVistaMapper::aTarjeta)
+        .toList();
 
     Map<String, Object> modelo = new HashMap<>();
     modelo.put("usuario", context.sessionAttribute("usuario_actual"));
-    modelo.put("beneficiarios", response.getBeneficiariosList());
+    modelo.put("beneficiarios", beneficiarios);
+    modelo.put("q", q);
+    modelo.put("total", response.getBeneficiariosCount());
+    modelo.put("encontradas", beneficiarios.size());
 
     context.render("donaciones/views/donante/beneficiarios.hbs", modelo);
   }
@@ -144,9 +163,13 @@ public class DonanteController {
       return;
     }
 
-    DetalleBeneficiarioResponse response = donacionesStub.obtenerDetalleBeneficiario(
-        BeneficiarioIdRequest.newBuilder().setId(id).build()
-    );
+    DetalleBeneficiarioResponse response;
+    try {
+      response = donacionesStub.obtenerDetalleBeneficiario(BeneficiarioIdRequest.newBuilder().setId(id).build());
+    } catch (StatusRuntimeException e) {
+      context.redirect("/donante/beneficiarios");
+      return;
+    }
 
     if (!response.getEncontrado()) {
       context.redirect("/donante/beneficiarios");
@@ -154,16 +177,14 @@ public class DonanteController {
     }
 
     BeneficiarioDetalleMsg b = response.getBeneficiario();
-    Map<String, Object> beneficiarioVista = Map.of(
-        "id", b.getId(),
-        "razonSocial", b.getRazonSocial(),
-        "direccion", b.getDireccion(),
-        "necesidades", b.getNecesidadesList()
-    );
+    List<NecesidadFila> necesidades = b.getNecesidadesList().stream()
+        .map(BeneficiarioVistaMapper::aFila)
+        .toList();
 
     Map<String, Object> modelo = new HashMap<>();
     modelo.put("usuario", context.sessionAttribute("usuario_actual"));
-    modelo.put("beneficiario", beneficiarioVista);
+    modelo.put("beneficiario", BeneficiarioVistaMapper.aTarjeta(b));
+    modelo.put("necesidades", necesidades);
 
     context.render("donaciones/views/donante/detalle_beneficiario.hbs", modelo);
   }
@@ -185,7 +206,6 @@ public class DonanteController {
     return opciones;
   }
 
-  // Si hay una categoría elegida, solo se ofrece su grupo de subcategorías
   private List<GrupoCategoria> gruposCategoria(VistaDonacionesDonanteResponse response,
                                                Long idCategoria, List<Long> idsSubcategorias) {
     return response.getCategoriasList().stream()
@@ -224,7 +244,6 @@ public class DonanteController {
     return filtros;
   }
 
-  // Búsqueda de texto sobre lo que ya se muestra en la tabla (código, bien, categoría y subcategoría)
   private boolean coincideBusqueda(DonacionDonanteFila fila, String q) {
     if (q.isEmpty()) return true;
     String buscado = q.toLowerCase();
@@ -234,8 +253,6 @@ public class DonanteController {
         || fila.getSubcategoria().toLowerCase().contains(buscado);
   }
 
-  // URL de esta pantalla con los mismos filtros, sin el valor indicado (o sin todo el parámetro si valor es null).
-  // Siempre vuelve a la primera página.
   private String urlSin(Context context, String parametro, String valor) {
     Map<String, List<String>> params = new LinkedHashMap<>(context.queryParamMap());
     params.remove("pagina");

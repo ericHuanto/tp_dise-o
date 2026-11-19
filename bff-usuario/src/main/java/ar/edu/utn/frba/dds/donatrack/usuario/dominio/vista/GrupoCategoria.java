@@ -4,7 +4,6 @@ import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-/** Una categoría con sus subcategorías, para el desplegable de filtros. */
 @Getter
 @AllArgsConstructor
 public class GrupoCategoria {

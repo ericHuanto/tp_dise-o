@@ -1,14 +1,7 @@
-/* Mis donaciones (persona donante).
-   Reutiliza de admin/donaciones.css: pagina-admin, buscador, tabla, bienes y estado.
-   Acá va solo lo propio de esta pantalla. */
-
 .pagina-donante h1 {
     margin-bottom: 28px;
 }
 
-/* =========================================
-   RESUMEN (tarjetas de totales)
-   ========================================= */
 .resumen-donaciones {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -43,9 +36,6 @@
     }
 }
 
-/* =========================================
-   PAGINACIÓN
-   ========================================= */
 .paginacion {
     display: flex;
     justify-content: space-between;
@@ -85,9 +75,6 @@
     border-color: var(--border-color);
 }
 
-/* =========================================
-   FILTROS
-   ========================================= */
 .filtros-donante {
     flex-direction: column;
     gap: 14px;
@@ -147,9 +134,6 @@
     color: #C62828;
 }
 
-/* =========================================
-   DESPLEGABLE DE CATEGORÍAS
-   ========================================= */
 .desplegable-categorias {
     position: relative;
 }
@@ -252,16 +236,10 @@
     cursor: pointer;
 }
 
-/* =========================================
-   ESTADOS que no aparecen en la vista de admin
-   ========================================= */
 .estado-lista_para_entregar { background: #E6F0F7; color: #2F5F8A; }
 .estado-en_traslado { background: #FDEBDD; color: #9A4A1E; }
 .estado-entrega_fallida { background: #FFEBEE; color: #C62828; }
 
-/* =========================================
-   RESPONSIVE
-   ========================================= */
 @media (max-width: 900px) {
     .filtros-fila {
         flex-wrap: wrap;
