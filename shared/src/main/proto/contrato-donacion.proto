@@ -59,9 +59,9 @@ service DonacionesService {
   rpc ObtenerPerfilDonante      (DonanteIdRequest)      returns (PerfilDonanteResponse);
   rpc ObtenerPerfilBeneficiario (BeneficiarioIdRequest) returns (PerfilBeneficiarioResponse);
 
+  //Notificar Mensaje a beneficiario y donante
+  rpc EnviarPinRecuperacion (NotificacionPinRequest) returns (Resultado);
 }
-
-
 
 message Vacio {}
 message DonacionId { int64 id = 1; }
@@ -521,4 +521,9 @@ message PerfilBeneficiarioResponse {
   ResumenDonacionesMsg resumen = 4;
   int32 necesidades_abiertas = 5;
   UltimaActividadMsg ultima_donacion = 6;
+}
+message NotificacionPinRequest {
+  int64 id_beneficiario = 1;
+  int64 id_donante = 2;
+  string pin = 3;
 }

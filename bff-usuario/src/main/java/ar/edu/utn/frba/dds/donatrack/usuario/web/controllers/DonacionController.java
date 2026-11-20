@@ -8,7 +8,7 @@ import ar.edu.utn.frba.dds.donatrack.grpc.TipoEstadoDonacionProto;
 import ar.edu.utn.frba.dds.donatrack.usuario.dominio.usuario.Usuario;
 import ar.edu.utn.frba.dds.donatrack.usuario.web.dto.DonacionFila;
 import ar.edu.utn.frba.dds.donatrack.usuario.web.dto.Opcion;
-import ar.edu.utn.frba.dds.donatrack.usuario.web.dto.DonacionVistaMapper;
+import ar.edu.utn.frba.dds.donatrack.usuario.web.mappers.DonacionVistaMapper;
 import io.grpc.StatusRuntimeException;
 import io.javalin.http.Context;
 import java.time.LocalDate;

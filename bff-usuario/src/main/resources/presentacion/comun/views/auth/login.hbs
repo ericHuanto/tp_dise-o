@@ -15,43 +15,37 @@
             <p class="subtitulo">Un único acceso para personas donantes, entidades beneficiarias y administración.</p>
 
             <form action="/login" method="post">
+                {{#if mensajeExito}}
+                    <div class="alerta-exito" style="color: green; background-color: #e6f4ea; padding: 10px; border-radius: 5px; margin-bottom: 15px;">
+                        {{mensajeExito}}
+                    </div>
+                {{/if}}
+
                 <div class="form-group">
                     <label for="nombre_usuario">Usuario</label>
-                    <input type="text" id="nombre_usuario" name="name" class="input-mono" placeholder="lfernandez" required>
+                    <input type="text" id="nombre_usuario" name="name" class="input-mono" placeholder="eric ..." value="{{nombreEscritoAnteriormente}}" required>
                 </div>
 
                 <div class="form-group">
                     <div class="label-row">
                         <label for="contrasenia">Contraseña</label>
-                        <a href="#" class="link-olvido" tabindex="-1">¿La olvidaste?</a>
+                        <button type="submit" formaction="/solicitacion-pin" formnovalidate class="link-olvido btn-link" tabindex="-1"> ¿Olvidaste la contraseña? </button>
                     </div>
                     <input type="password" id="contrasenia" name="password" required>
                 </div>
 
-                <div id="alerta-login" class="alerta-error-login {{#unless error}}oculto{{/unless}}">
-                    {{#if error}}{{error}}{{else}}Usuario o contraseña incorrectos.{{/if}}
-                </div>
+                {{#if mensajeError}}
+                    <div class="alerta-error-login"> {{mensajeError}} </div>
+                {{/if}}
 
-                <button type="submit" class="btn-submit btn-login">Ingresar</button>
+                <button type="submit" class="btn-submit">Ingresar</button>
             </form>
 
             <div class="login-footer">
-                <p>¿No tenés cuenta? <a href="/perfil/donante-humana">Registrate</a></p>
+                <p>¿No tienes cuenta? <a href="/perfil/donante-humana">Registrate</a></p>
             </div>
         </div>
     </section>
-{{/partial}}
-
-{{#partial "scripts"}}
-    <script>
-        // Si el backend redirige con ?error=... por query param, mostramos el banner
-        const params = new URLSearchParams(window.location.search);
-        if (params.has('error')) {
-            const alerta = document.getElementById('alerta-login');
-            alerta.textContent = params.get('error').replaceAll('_', ' ');
-            alerta.classList.remove('oculto');
-        }
-    </script>
 {{/partial}}
 
 {{> comun/partials/layout.hbs}}

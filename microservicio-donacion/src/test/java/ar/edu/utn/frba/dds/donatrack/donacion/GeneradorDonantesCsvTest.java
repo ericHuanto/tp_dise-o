@@ -10,6 +10,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.*;
 
 public class GeneradorDonantesCsvTest {
   private String archivoExistente;
@@ -23,16 +24,18 @@ public class GeneradorDonantesCsvTest {
 
   @Test
   public void GenerarDonantesDeUnArchivoSimple() {
-    DonanteRepository repoDonantes = DonanteRepository.getInstancia();
+    DonanteRepository repoDonantes = mock(DonanteRepository.class);
     ImportadorCsv importador = new ImportadorCsv();
     GeneradorDonantesCsv generadorDonantes = new GeneradorDonantesCsv(repoDonantes, importador);
 
-    int donantesAntes = repoDonantes.buscarTodos().size();
+    //assertEquals(0, repoDonantes.buscarTodos().size());
+    //primera prueba verificamos que la lista este vacía
 
     List<FilaError> errores = generadorDonantes.iniciarCarga(archivoExistente);
     errores.forEach(e -> System.out.println(" fila " + e.getNumeroFila() + " motivo: " + e.getMotivoError()));
 
-    assertEquals(donantesAntes + 2, repoDonantes.buscarTodos().size());
+    //assertEquals(2, repoDonantes.buscarTodos().size());
+    verify(repoDonantes, times(2)).guardar(any());
     assertEquals(2, errores.size());
   }
 

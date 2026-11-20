@@ -11,13 +11,13 @@
 
             <!-- opción 1: DB real, forma desplegada: Ahora se obtiene del .env, a través de ConfiguracionPersistencia.java -->
 
-            <!-- opción 2: DB real, forma Local
+            <!-- opción 2: DB real, forma Local -->
             <property name="hibernate.connection.driver_class" value="com.mysql.cj.jdbc.Driver"/>
             <property name="hibernate.connection.url" value="jdbc:mysql://localhost:3306/donaciones?serverTimezone=UTC"/>
             <property name="hibernate.connection.username" value="root"/>
             <property name="hibernate.connection.password" value=""/>
             <property name="hibernate.dialect" value="org.hibernate.dialect.MySQL8Dialect"/>
-            -->
+            <!-- -->
 
             <!-- opción 3: DB falso, solo para test -->
             <property name="hibernate.connection.driver_class" value="org.hsqldb.jdbcDriver"/>

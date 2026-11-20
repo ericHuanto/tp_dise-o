@@ -1,7 +1,10 @@
-package ar.edu.utn.frba.dds.donatrack.usuario.web.dto;
+package ar.edu.utn.frba.dds.donatrack.usuario.web.mappers;
 
 import ar.edu.utn.frba.dds.donatrack.grpc.BienFilaMsg;
 import ar.edu.utn.frba.dds.donatrack.grpc.DonacionAdminFilaMsg;
+import ar.edu.utn.frba.dds.donatrack.grpc.DonacionVistaMsg;
+import ar.edu.utn.frba.dds.donatrack.usuario.web.dto.DonacionDonanteFila;
+import ar.edu.utn.frba.dds.donatrack.usuario.web.dto.DonacionFila;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -22,6 +25,17 @@ public final class DonacionVistaMapper {
 
   public static String capitalizar(String texto) {
     return texto == null || texto.isEmpty() ? texto : Character.toUpperCase(texto.charAt(0)) + texto.substring(1);
+  }
+
+  public static DonacionDonanteFila aFilaDonante(DonacionVistaMsg msg) {
+    return DonacionDonanteFila.builder()
+        .codigo(codigo(msg.getId()))
+        .descripcion(msg.getDescripcion())
+        .categoria(capitalizar(msg.getSubcategoria().getCategoria().getNombre()))
+        .subcategoria(capitalizar(msg.getSubcategoria().getNombre()))
+        .estadoClave(estadoClave(msg.getEstadoActual()))
+        .estadoTexto(estadoTexto(msg.getEstadoActual()))
+        .build();
   }
 
   public static DonacionFila aFila(DonacionAdminFilaMsg msg, LocalDate hoy) {

@@ -23,6 +23,7 @@ import ar.edu.utn.frba.dds.donatrack.usuario.web.controllers.PerfilController;
 import ar.edu.utn.frba.dds.donatrack.usuario.web.controllers.RegistroEntregaController;
 import ar.edu.utn.frba.dds.donatrack.usuario.web.controllers.RutaController;
 import ar.edu.utn.frba.dds.donatrack.usuario.web.controllers.SesionController;
+import ar.edu.utn.frba.dds.donatrack.usuario.web.middleware.Middleware;
 import ar.edu.utn.frba.dds.donatrack.usuario.web.routes.AsignacionRoutes;
 import ar.edu.utn.frba.dds.donatrack.usuario.web.routes.CamionRoutes;
 import ar.edu.utn.frba.dds.donatrack.usuario.web.routes.CsvRoutes;
@@ -78,11 +79,11 @@ public class App {
 
     //DONACIONES
     HomeController homeController = new HomeController();
-    SesionController sesionController = new SesionController(usuarioRepository);
+    SesionController sesionController = new SesionController(grpcClients.getDonacionesStub(), usuarioRepository);
     PerfilController perfilController = new PerfilController(grpcClients.getDonacionesStub(), usuarioRepository);
     MapaController mapaController = new MapaController(grpcClients.getDonacionesStub());
     DonacionController donacionController = new DonacionController(grpcClients.getDonacionesStub());
-    DonanteController donanteController = new DonanteController(grpcClients.getDonacionesStub());
+    DonanteController donanteController = new DonanteController(grpcClients.getDonacionesStub(), grpcClients.getLogisticaStub());
     NecesidadController necesidadController = new NecesidadController(grpcClients.getDonacionesStub());
     DonacionBeneficiarioController donacionBeneficiarioController = new DonacionBeneficiarioController(grpcClients.getDonacionesStub());
     AsignacionController asignacionController = new AsignacionController(grpcClients.getDonacionesStub());
@@ -90,7 +91,7 @@ public class App {
     RegistroEntregaController registroEntregaController = new RegistroEntregaController(grpcClients.getDonacionesStub());
     MiPerfilController miPerfilController = new MiPerfilController(grpcClients.getDonacionesStub(), usuarioRepository);
 
-    //LOGISTICA
+    //LOGÍSTICA
     CamionController camionController = new CamionController(grpcClients.getLogisticaStub());
     EntregaController entregaController = new EntregaController(grpcClients.getLogisticaStub());
     RutaController rutaController = new RutaController(grpcClients.getLogisticaStub());
@@ -116,12 +117,17 @@ public class App {
       }
       config.fileRenderer(new JavalinHandlebars(motorHandlebars));
 
-      config.routes.get("/health", ctx -> ctx.json("BFF Usuario funcionando"));
+      //middleware
+      config.routes.beforeMatched(Middleware::verificarPermisos);
 
+      //RUTAS
+      config.routes.get("/health", ctx -> ctx.json("BFF Usuario funcionando"));
+      //Rutas de gateway/bff
       HomeRoutes.registrar(config.routes, homeController);
       SesionRoutes.registrar(config.routes, sesionController);
       PerfilRoutes.registrar(config.routes, perfilController);
       MapaRoutes.registrar(config.routes, mapaController);
+      //Rutas de donaciones
       DonacionRoutes.registrar(config.routes, donacionController);
       DonanteRoutes.registrar(config.routes, donanteController);
       NecesidadRoutes.registrar(config.routes, necesidadController);
@@ -131,19 +137,13 @@ public class App {
       RegistroEntregaRoutes.registrar(config.routes, registroEntregaController);
       MiPerfilRoutes.registrar(config.routes, miPerfilController);
 
+      //Rutas de logística
       CamionRoutes.registrar(config.routes, camionController);
       EntregaRoutes.registrar(config.routes, entregaController);
       RutaRoutes.registrar(config.routes, rutaController);
 
       ManejadorErrores.registrar(config.routes);
 
-      config.routes.after(ctx -> {
-        var acceso = WithSimplePersistenceUnit.PER_THREAD_ENTITY_MANAGER_ACCESS;
-        if (acceso.isAttached() && acceso.get().getTransaction().isActive()) {
-          acceso.get().getTransaction().rollback();
-        }
-        WithSimplePersistenceUnit.dispose();
-      });
     });
   }
 }

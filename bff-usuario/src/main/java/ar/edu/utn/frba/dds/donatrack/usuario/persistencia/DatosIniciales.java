@@ -7,43 +7,41 @@ import io.github.flbulgarelli.jpa.extras.simple.WithSimplePersistenceUnit;
 
 public class DatosIniciales implements WithSimplePersistenceUnit {
   private final UsuarioRepository repoUsuarios = UsuarioRepository.getInstancia();
+  private final ConfiguracionEntorno cfg = ConfiguracionEntorno.getInstance();
 
   public static void init() {
     new DatosIniciales().comenzar();
   }
 
   public void comenzar() {
-    ConfiguracionEntorno cfg = ConfiguracionEntorno.getInstance();
-    String nombreAdmin = cfg.adminUsuario("admin");
-    String claveAdmin = cfg.adminPassword("admin");
+    //Usuarios
+    Usuario comedorAmerica = new Usuario("comedorA", "beneficiario");
+    Usuario comedorPibes = new Usuario("comedorP", "beneficiario");
+    Usuario juan = new Usuario("juan", "donante");
+    Usuario juana = new Usuario("juana", "donante");
+    Usuario duenio = new Usuario(cfg.adminUsuario("admin"), cfg.adminPassword("admin"));
+    Usuario encargadoDeposito = new Usuario("deposito", "deposito");
 
-    if (repoUsuarios.buscarPorCredenciales(nombreAdmin) != null) {
-      return;
-    }
-
-    //Se complementa con el DatosIniciales de Donacion (los IDs coinciden con los de esa base)
-    Usuario usuarioBeneficiario = new Usuario("comedorA", "beneficiario");
-    usuarioBeneficiario.vincularBeneficiario(1L); // ID 1: Comedor america
-
-    Usuario usuarioBeneficiario2 = new Usuario("comedorP", "beneficiario");
-    usuarioBeneficiario2.vincularBeneficiario(2L); // ID 2: Comedor Los Pibes
-
-    Usuario usuarioDonante = new Usuario("juan", "donante");
-    usuarioDonante.vincularDonante(1L); // ID 1: Juan Perez
-
-    Usuario usuarioDonante2 = new Usuario("juana", "donante");
-    usuarioDonante2.vincularDonante(2L); // ID 2: Juana Perez
-
-    Usuario admin = new Usuario(nombreAdmin, claveAdmin);
-    admin.otorgarPermiso(Permiso.ADMINISTRADOR);
+    //Acciones
+    comedorAmerica.vincularBeneficiario(1L); // ID 1: Comedor america
+    comedorPibes.vincularBeneficiario(2L); // ID 2: Comedor Los Pibes
+    juan.vincularDonante(1L); // ID 1: Juan Perez
+    juana.vincularDonante(2L); // ID 2: Juana Perez
+    comedorAmerica.otorgarPermiso(Permiso.AUTENTICADO);
+    comedorPibes.otorgarPermiso(Permiso.AUTENTICADO);
+    juan.otorgarPermiso(Permiso.AUTENTICADO);
+    juana.otorgarPermiso(Permiso.AUTENTICADO);
+    duenio.otorgarPermiso(Permiso.ADMINISTRADOR);
+    encargadoDeposito.otorgarPermiso(Permiso.CREAR_DONACION);
 
     try {
       beginTransaction();
-      repoUsuarios.guardar(admin);
-      repoUsuarios.guardar(usuarioDonante);
-      repoUsuarios.guardar(usuarioDonante2);
-      repoUsuarios.guardar(usuarioBeneficiario);
-      repoUsuarios.guardar(usuarioBeneficiario2);
+      repoUsuarios.guardar(duenio);
+      repoUsuarios.guardar(encargadoDeposito);
+      repoUsuarios.guardar(juan);
+      repoUsuarios.guardar(juana);
+      repoUsuarios.guardar(comedorAmerica);
+      repoUsuarios.guardar(comedorPibes);
       commitTransaction();
       System.out.println("Usuarios iniciales cargados en BFF con éxito.");
     } catch (Exception e) {

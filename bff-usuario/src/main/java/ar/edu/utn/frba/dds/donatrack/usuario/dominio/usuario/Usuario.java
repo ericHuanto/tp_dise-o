@@ -23,27 +23,20 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "usuarios")
 public class Usuario {
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "id_usuario")
   private Long id;
-
   @Column(name = "nombre_usuario", unique = true)
   private String nombreUsuario;
-
   @Column(name = "contraseña_hasheada")
   private String contraseña;
-
   @ElementCollection(fetch = FetchType.EAGER)
   @Enumerated(EnumType.STRING)
   @CollectionTable(name = "usuario_permiso", joinColumns = @JoinColumn(name = "id_usuario"))
   @Column(name = "permiso")
   private List<Permiso> permisos;
-
-  // Referencias por ID hacia el microservicio de donaciones (NULL para Admin)
   @Column(name = "id_donante")
   private Long idDonante;
-
   @Column(name = "id_beneficiario")
   private Long idBeneficiario;
 
@@ -57,7 +50,7 @@ public class Usuario {
 
   public void vincularDonante(Long idDonante) {
     this.idDonante = idDonante;
-    this.otorgarPermiso(Permiso.REALIZAR_DONACION);
+    this.otorgarPermiso(Permiso.VER_DONACIONES);
   }
 
   public void vincularBeneficiario(Long idBeneficiario) {
@@ -72,11 +65,14 @@ public class Usuario {
   }
 
   public boolean tienePermiso(Permiso permiso) {
-    return this.permisos != null && this.permisos.contains(permiso);
+    if (this.permisos.isEmpty() || permiso == null) {
+      return false;
+    }
+    return this.permisos.contains(Permiso.ADMINISTRADOR) || this.permisos.contains(permiso);
   }
 
   public boolean isDonante() {
-    return tienePermiso(Permiso.REALIZAR_DONACION);
+    return tienePermiso(Permiso.VER_DONACIONES);
   }
 
   public boolean isBeneficiario() {
@@ -89,6 +85,10 @@ public class Usuario {
 
   public void cambiarContrasena(String nueva) {
     this.contraseña = hashear(nueva);
+  }
+
+  public void actualizarContraseña(String contraseña) {
+    this.contraseña = hashear(contraseña);
   }
 
   //================== FUNCIONES AUXILIARES ===================

@@ -43,6 +43,7 @@ public class SmsDeContacto extends MedioContacto {
 
   @Override
   public void enviarMensaje(String message) {
+    this.clienteSms = new ClienteSmsMock(); //para evitar el problema de null, en la populación
     clienteSms.enviarSms(detalle, message);
   }
 

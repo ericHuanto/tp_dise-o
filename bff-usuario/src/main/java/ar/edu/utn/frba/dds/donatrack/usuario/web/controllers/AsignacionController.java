@@ -9,7 +9,7 @@ import ar.edu.utn.frba.dds.donatrack.grpc.RankingDetalleResponse;
 import ar.edu.utn.frba.dds.donatrack.grpc.RankingIdRequest;
 import ar.edu.utn.frba.dds.donatrack.grpc.RankingVistaMsg;
 import ar.edu.utn.frba.dds.donatrack.grpc.Vacio;
-import ar.edu.utn.frba.dds.donatrack.usuario.web.dto.DonacionVistaMapper;
+import ar.edu.utn.frba.dds.donatrack.usuario.web.mappers.DonacionVistaMapper;
 import io.grpc.StatusRuntimeException;
 import io.javalin.http.Context;
 import java.time.LocalDate;

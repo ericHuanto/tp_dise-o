@@ -2,33 +2,73 @@
     Entidades beneficiarias - DonaTrack
 {{/partial}}
 
-{{#partial "breadcrumbs"}}
-    <a href="/">Inicio</a> &gt; <span>Entidades beneficiarias</span>
+{{#partial "css_extra"}}
+    <link rel="stylesheet" href="/comun/css/formularios.css">
+    <link rel="stylesheet" href="/donaciones/css/admin/donaciones.css">
+    <link rel="stylesheet" href="/donaciones/css/donante/beneficiarios.css">
 {{/partial}}
 
 {{#partial "contenido_propio"}}
-    <h1>Entidades beneficiarias</h1>
+    <section class="pagina-admin pagina-entidades">
+        <nav class="breadcrumb"><a href="/">Inicio</a><span>›</span>Entidades</nav>
 
-    <table>
-        <thead>
-            <tr>
-                <th>Razón social</th>
-                <th>Dirección</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            {{#each beneficiarios}}
-                <tr>
-                    <td>{{razonSocial}}</td>
-                    <td>{{direccion}}</td>
-                    <td><a href="/donante/beneficiarios/{{id}}">Ver más</a></td>
-                </tr>
+        <h1>Entidades beneficiarias</h1>
+        <p class="subtitulo">
+            {{#if q}}
+                {{encontradas}} de {{total}} entidades coinciden con la búsqueda.
             {{else}}
-                <tr><td colspan="3">No hay entidades registradas.</td></tr>
+                {{total}} {{#if (eq total 1)}}entidad registrada{{else}}entidades registradas{{/if}}.
+            {{/if}}
+        </p>
+
+        <form class="filtros" action="/donante/beneficiarios" method="GET">
+            <div class="buscador">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>
+                </svg>
+                <input type="search" name="q" value="{{q}}" placeholder="Buscar entidad por nombre o dirección" aria-label="Buscar entidad">
+            </div>
+            {{#if q}}
+                <a href="/donante/beneficiarios" class="btn-link limpiar">Limpiar búsqueda</a>
+            {{/if}}
+        </form>
+
+        <div class="grilla-entidades">
+            {{#each beneficiarios}}
+                <article class="tarjeta-entidad">
+                    <div class="tarjeta-entidad-cabecera">
+                        <span class="avatar-entidad">{{this.iniciales}}</span>
+                        <div>
+                            <h2>{{this.razonSocial}}</h2>
+                            <p>{{this.direccion}}</p>
+                        </div>
+                    </div>
+
+                    <div class="necesidad-urgente">
+                        <span>Necesidad más urgente</span>
+                        {{#if this.necesidadUrgente}}
+                            <strong>{{this.necesidadUrgente}}</strong>
+                        {{else}}
+                            <strong class="sin-necesidad">Sin necesidades pendientes</strong>
+                        {{/if}}
+                    </div>
+
+                    <div class="tarjeta-entidad-pie">
+                        <span>{{this.necesidadesActivas}} {{#if (eq this.necesidadesActivas 1)}}necesidad activa{{else}}necesidades activas{{/if}}</span>
+                        <a href="/donante/beneficiarios/{{this.id}}" class="btn-link">Ver detalle →</a>
+                    </div>
+                </article>
+            {{else}}
+                <p class="vacio-entidades">
+                    {{#if q}}
+                        No hay entidades que coincidan con “{{q}}”.
+                    {{else}}
+                        Todavía no hay entidades registradas.
+                    {{/if}}
+                </p>
             {{/each}}
-        </tbody>
-    </table>
+        </div>
+    </section>
 {{/partial}}
 
 {{> comun/partials/layout.hbs}}

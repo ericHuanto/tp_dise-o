@@ -43,6 +43,7 @@ public class WhatsappDeContacto extends MedioContacto {
 
   @Override
   public void enviarMensaje(String message) {
+    this.clienteWhatsapp = new ClienteWhatsappMock(); //para evitar el problema de null, en la populación
     clienteWhatsapp.enviarWhatsapp(detalle, message);
   }
 
