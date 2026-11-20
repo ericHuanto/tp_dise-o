@@ -22,7 +22,6 @@ public class DatosIniciales implements WithSimplePersistenceUnit {
     Usuario comedorAmerica = new Usuario("comedorA", "beneficiario");
     Usuario juan = new Usuario("juan", "donante");
     Usuario duenio = new Usuario(cfg.adminUsuario("admin"), cfg.adminPassword("admin"));
-    Usuario encargadoDeposito = new Usuario("deposito", "deposito");
 
     // Usuarios adicionales para probar todos los camiones y rutas
     Usuario juana = new Usuario("juana", "donante");
@@ -53,12 +52,10 @@ public class DatosIniciales implements WithSimplePersistenceUnit {
     juana.otorgarPermiso(Permiso.VER_BENEFICIARIOS);
 
     duenio.otorgarPermiso(Permiso.ADMINISTRADOR);
-    encargadoDeposito.otorgarPermiso(Permiso.CREAR_DONACION);
 
     try {
       beginTransaction();
       repoUsuarios.guardar(duenio);
-      repoUsuarios.guardar(encargadoDeposito);
       repoUsuarios.guardar(juan);
       repoUsuarios.guardar(juana);
       repoUsuarios.guardar(comedorAmerica);
