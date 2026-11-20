@@ -2,7 +2,7 @@
 
 ## Diagrama de despliegue:
 
-![](docs/cuartaEntrega/diagrama_de_despliegue_nube.png)
+![](docs/entregaFinal/diagrama_de_despliegue_bff.png)
 
 ## Diagrama de clases logistica: 
 
