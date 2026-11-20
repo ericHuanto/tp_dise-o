@@ -360,6 +360,9 @@ public class LogisticaGrpc extends LogisticaServiceGrpc.LogisticaServiceImplBase
     return EntregaVistaMsg.newBuilder()
         .setId(entrega.getId())
         .setEstadoActual(entrega.getEstadoActual() != null ? entrega.getEstadoActual().name() : "")
+        .setPatenteCamion(entrega.getCamionAsignado() != null
+            ? entrega.getCamionAsignado().getPatente()
+            : "")
         .build();
   }
 

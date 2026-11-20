@@ -1,20 +1,209 @@
+
 {{#partial "nombre_pestaña"}}
     Confirmar recepción
 {{/partial}}
 
-{{#partial "contenido_propio"}}
-    <h1>Confirmar recepción de entrega</h1>
-    <p> <strong>Entrega:</strong> #{{entrega.id}} </p>
-    <p> <strong>Estado actual:</strong> {{entrega.estadoActual}} </p>
-    <form action="/mis-entregas/{{entrega.id}}/confirmar" method="post" enctype="multipart/form-data">
-        <div>
-            <label for="fotos">Fotografías de la recepción:</label>
-            <input type="file" id="fotos" name="fotos" accept="image/*" multiple required>
-        </div>
-        <button type="submit"> Confirmar recepción </button>
-    </form>
-
-    <a href="/mis-entregas">Volver a mis entregas</a>
+{{#partial "css_extra"}}
+    <link rel="stylesheet" href="/logistica/css/confirmar_recepcion.css">
 {{/partial}}
 
+{{#partial "contenido_propio"}}
+
+    <div class="confirmacion-page">
+
+        <div class="confirmacion-encabezado">
+            <p class="confirmacion-breadcrumb">
+                Logística &rsaquo; Recepciones &rsaquo; Confirmar recepción
+            </p>
+
+            <h1>Confirmar recepción</h1>
+
+            <p class="confirmacion-descripcion">
+                Revisá los datos de la entrega y adjuntá fotografías
+                para dejar constancia de su recepción.
+            </p>
+        </div>
+
+        <div class="confirmacion-grid">
+
+            <!-- COLUMNA IZQUIERDA -->
+            <section class="confirmacion-card">
+
+                <div class="confirmacion-card-header">
+                    <h2>Información de la entrega</h2>
+                </div>
+
+                <div class="confirmacion-dato">
+                    <span>Número de entrega</span>
+                    <strong>#{{entrega.id}}</strong>
+                </div>
+
+                <div class="confirmacion-dato">
+                    <span>Estado actual</span>
+                    <span class="confirmacion-estado">
+                        {{entrega.estadoActual}}
+                    </span>
+                </div>
+                <div class="confirmacion-dato">
+                    <span>Camión asignado</span>
+
+                    {{#if entrega.patenteCamion}}
+                        <strong>{{entrega.patenteCamion}}</strong>
+                    {{else}}
+                        <strong>Sin camión asignado</strong>
+                    {{/if}}
+                </div>
+
+                <div class="confirmacion-aviso">
+                    <strong>Antes de confirmar</strong>
+                    <p>
+                        Verificá que las donaciones hayan sido recibidas
+                        correctamente. Adjuntá fotografías que permitan
+                        acreditar la entrega.
+                    </p>
+                </div>
+
+            </section>
+
+            <!-- COLUMNA DERECHA -->
+            <section class="confirmacion-card">
+
+                <div class="confirmacion-card-header">
+                    <h2>Registrar recepción</h2>
+                    <p>
+                        Adjuntá las fotografías correspondientes
+                        a esta entrega.
+                    </p>
+                </div>
+
+                <form
+                        action="/mis-entregas/{{entrega.id}}/confirmar"
+                        method="post"
+                        enctype="multipart/form-data"
+                        class="confirmacion-form"
+                >
+
+                    <div class="confirmacion-campo">
+                        <label for="fotos">
+                            Fotografías de la recepción
+                            <span class="campo-obligatorio">*</span>
+                        </label>
+
+                        <label for="fotos" class="confirmacion-upload">
+                            <span class="upload-icono">📷</span>
+                            <strong>Seleccionar fotografías</strong>
+                            <span>
+                                Podés seleccionar varias imágenes
+                            </span>
+                            <small>JPG, PNG o WEBP</small>
+                        </label>
+
+                        <input
+                                type="file"
+                                id="fotos"
+                                name="fotos"
+                                accept="image/jpeg,image/png,image/webp"
+                                multiple
+                                required
+                                class="confirmacion-input-file"
+                        >
+
+                        <div id="vista-previa" class="confirmacion-preview"></div>
+                    </div>
+
+                    <div class="confirmacion-acciones">
+                        <button type="submit" class="confirmacion-btn">
+                            Confirmar recepción
+                        </button>
+
+                        <a href="/mis-entregas" class="confirmacion-volver">
+                            Volver a mis entregas
+                        </a>
+                    </div>
+
+                </form>
+
+            </section>
+
+        </div>
+
+    </div>
+
+{{/partial}}
+
+{{#partial "scripts"}}
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const inputFotos = document.getElementById("fotos");
+            const vistaPrevia = document.getElementById("vista-previa");
+
+            let fotosSeleccionadas = [];
+
+            function actualizarInput() {
+                const transferencia = new DataTransfer();
+
+                fotosSeleccionadas.forEach(foto => {
+                    transferencia.items.add(foto);
+                });
+
+                inputFotos.files = transferencia.files;
+            }
+
+            function mostrarFotos() {
+                vistaPrevia.innerHTML = "";
+
+                fotosSeleccionadas.forEach((foto, indice) => {
+                    const contenedor = document.createElement("div");
+                    contenedor.className = "foto-preview-item";
+
+                    const imagen = document.createElement("img");
+                    const url = URL.createObjectURL(foto);
+
+                    imagen.src = url;
+                    imagen.alt = foto.name;
+
+                    imagen.addEventListener("load", function () {
+                        URL.revokeObjectURL(url);
+                    });
+
+                    const botonEliminar = document.createElement("button");
+                    botonEliminar.type = "button";
+                    botonEliminar.className = "foto-preview-eliminar";
+                    botonEliminar.textContent = "×";
+                    botonEliminar.title = "Eliminar fotografía";
+                    botonEliminar.setAttribute("aria-label", "Eliminar " + foto.name);
+
+                    botonEliminar.addEventListener("click", function () {
+                        fotosSeleccionadas.splice(indice, 1);
+                        actualizarInput();
+                        mostrarFotos();
+                    });
+
+                    contenedor.appendChild(imagen);
+                    contenedor.appendChild(botonEliminar);
+                    vistaPrevia.appendChild(contenedor);
+                });
+            }
+
+            inputFotos.addEventListener("change", function () {
+                const nuevasFotos = Array.from(inputFotos.files);
+
+                nuevasFotos.forEach(foto => {
+                    const tiposPermitidos = [
+                        "image/jpeg",
+                        "image/png",
+                        "image/webp"
+                    ];
+
+                    if (tiposPermitidos.includes(foto.type)) {
+                        fotosSeleccionadas.push(foto);
+                    }
+                });
+
+                actualizarInput();
+                mostrarFotos();
+            });
+        });
+    </script>
+{{/partial}}
 {{> comun/partials/layout.hbs}}

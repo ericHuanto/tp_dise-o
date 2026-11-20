@@ -1,0 +1,242 @@
+
+.confirmacion-page {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 36px 24px 80px;
+}
+
+.confirmacion-breadcrumb {
+    font-size: 14px;
+    color: #77736c;
+    margin-bottom: 24px;
+}
+
+.confirmacion-encabezado h1 {
+    font-size: 34px;
+    color: #242424;
+    margin-bottom: 10px;
+}
+
+.confirmacion-descripcion {
+    color: #77736c;
+    margin-bottom: 32px;
+}
+
+.confirmacion-grid {
+    display: grid;
+    grid-template-columns: 35% 1fr;
+    gap: 24px;
+    align-items: start;
+}
+
+.confirmacion-card {
+    background: #ffffff;
+    border: 1px solid #e5e0d7;
+    border-radius: 12px;
+    padding: 28px;
+}
+
+.confirmacion-card-header {
+    margin-bottom: 28px;
+}
+
+.confirmacion-card-header h2 {
+    font-size: 21px;
+    color: #242424;
+    margin-bottom: 8px;
+}
+
+.confirmacion-card-header p {
+    color: #77736c;
+    font-size: 14px;
+}
+
+.confirmacion-dato {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 18px 0;
+    border-bottom: 1px solid #eee9e2;
+}
+
+.confirmacion-dato > span:first-child {
+    color: #77736c;
+    font-size: 14px;
+}
+
+.confirmacion-dato strong {
+    font-size: 16px;
+}
+
+.confirmacion-estado {
+    background: #dceaf0;
+    color: #245c72;
+    border-radius: 6px;
+    padding: 7px 12px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.confirmacion-aviso {
+    background: #f4f7f3;
+    border: 1px solid #e0e9de;
+    border-radius: 8px;
+    padding: 20px;
+    margin-top: 28px;
+}
+
+.confirmacion-aviso strong {
+    color: #356f58;
+}
+
+.confirmacion-aviso p {
+    color: #626b63;
+    font-size: 14px;
+    line-height: 1.6;
+    margin-top: 8px;
+}
+
+.confirmacion-form {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.confirmacion-campo > label:first-child {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 12px;
+}
+
+.campo-obligatorio {
+    color: #c44b4b;
+}
+
+.confirmacion-upload {
+    border: 2px dashed #c9d4c8;
+    border-radius: 10px;
+    padding: 32px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    text-align: center;
+    cursor: pointer;
+    background: #fafcf9;
+    transition: border-color 0.2s;
+}
+
+.confirmacion-upload:hover {
+    border-color: #356f58;
+}
+
+.upload-icono {
+    font-size: 32px;
+}
+
+.confirmacion-upload strong {
+    color: #356f58;
+}
+
+.confirmacion-upload span,
+.confirmacion-upload small {
+    color: #77736c;
+    font-size: 13px;
+}
+
+.confirmacion-input-file {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+}
+
+.confirmacion-preview {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-top: 16px;
+}
+
+.confirmacion-preview img {
+    width: 100%;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid #e5e0d7;
+}
+
+.confirmacion-acciones {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.confirmacion-btn {
+    width: 100%;
+    padding: 14px 20px;
+    background: #356f58;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+.confirmacion-btn:hover {
+    background: #285541;
+}
+
+.confirmacion-volver {
+    color: #626b63;
+    text-align: center;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.confirmacion-volver:hover {
+    text-decoration: underline;
+}
+
+@media (max-width: 800px) {
+    .confirmacion-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .confirmacion-card {
+        padding: 20px;
+    }
+
+    .confirmacion-page {
+        padding: 24px 16px 60px;
+    }
+}
+/* Tarjeta de información de la entrega más compacta */
+
+.confirmacion-grid > .confirmacion-card:first-child {
+    padding: 20px 24px;
+}
+
+.confirmacion-grid > .confirmacion-card:first-child .confirmacion-card-header {
+    margin-bottom: 12px;
+}
+
+.confirmacion-grid > .confirmacion-card:first-child .confirmacion-card-header h2 {
+    font-size: 18px;
+}
+
+.confirmacion-grid > .confirmacion-card:first-child .confirmacion-dato {
+    padding: 10px 0;
+}
+
+.confirmacion-grid > .confirmacion-card:first-child .confirmacion-aviso {
+    margin-top: 16px;
+    padding: 14px;
+}
+
+.confirmacion-grid > .confirmacion-card:first-child .confirmacion-aviso p {
+    margin-top: 4px;
+    font-size: 13px;
+}

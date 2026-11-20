@@ -78,6 +78,7 @@ message DatosEdicionCamionResponse {
 message EntregaVistaMsg {
   int64 id = 1;
   string estado_actual = 2;
+  string patente_camion = 3;
 }
 
 message ListaEntregasResponse {

@@ -1,0 +1,111 @@
+
+.recepciones-page {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 36px 24px 80px;
+}
+
+.recepciones-breadcrumb {
+    color: #77736c;
+    font-size: 14px;
+    margin-bottom: 24px;
+}
+
+.recepciones-encabezado h1 {
+    font-size: 34px;
+    font-weight: 700;
+    color: #242424;
+    margin-bottom: 10px;
+}
+
+.recepciones-descripcion {
+    color: #77736c;
+    font-size: 15px;
+    margin-bottom: 32px;
+}
+
+.recepciones-lista {
+    display: grid;
+    gap: 16px;
+}
+
+.recepcion-card {
+    background: #ffffff;
+    border: 1px solid #e5e0d7;
+    border-radius: 12px;
+    padding: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+}
+
+.recepcion-card-info {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.recepcion-card-info h2 {
+    font-size: 20px;
+    font-weight: 600;
+    margin: 0;
+}
+
+.recepcion-estado {
+    display: inline-block;
+    width: fit-content;
+    padding: 7px 12px;
+    border-radius: 6px;
+    background: #dceaf0;
+    color: #245c72;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+.recepcion-boton {
+    display: inline-block;
+    padding: 12px 20px;
+    background: #242424;
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    transition: background 0.2s;
+}
+
+.recepcion-boton:hover {
+    background: #356f58;
+    color: white;
+}
+
+.recepciones-vacio {
+    padding: 48px 24px;
+    text-align: center;
+    background: white;
+    border: 1px solid #e5e0d7;
+    border-radius: 12px;
+}
+
+.recepciones-vacio h2 {
+    font-size: 20px;
+    margin-bottom: 10px;
+}
+
+.recepciones-vacio p {
+    color: #77736c;
+}
+
+@media (max-width: 650px) {
+    .recepcion-card {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .recepcion-boton {
+        display: block;
+        text-align: center;
+    }
+}

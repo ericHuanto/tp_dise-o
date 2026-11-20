@@ -1,23 +1,59 @@
+
 {{#partial "nombre_pestaña"}}
     Mis entregas
 {{/partial}}
-
+{{#partial "css_extra"}}
+    <link rel="stylesheet" href="/logistica/css/mis_entregas.css">
+{{/partial}}
 {{#partial "contenido_propio"}}
-    <h1>Mis entregas</h1>
+    <main class="recepciones-page">
 
-    {{#if entregas}}
-        <div class="lista-entregas">
-            {{#each entregas}}
-                <article class="entrega-card">
-                    <h2>Entrega #{{id}}</h2>
-                    <p> <strong>Estado:</strong> {{estadoActual}} </p>
-                    <a href="/mis-entregas/{{id}}/confirmar">Confirmar recepción</a>
-                </article>
-            {{/each}}
+        <div class="recepciones-encabezado">
+            <p class="recepciones-breadcrumb">
+                Logística &rsaquo; Recepciones
+            </p>
+
+            <h1>Mis entregas</h1>
+            <p class="recepciones-descripcion">
+                Consultá las entregas en traslado y confirmá su recepción
+                cuando recibas las donaciones.
+            </p>
         </div>
-    {{else}}
-        <p>No tenés entregas disponibles.</p>
-    {{/if}}
+
+        {{#if entregas}}
+            <div class="recepciones-lista">
+                {{#each entregas}}
+                    <article class="recepcion-card">
+
+                        <div class="recepcion-card-info">
+                            <h2>Entrega #{{id}}</h2>
+
+                            <span class="recepcion-estado">
+                                {{estadoActual}}
+                            </span>
+                        </div>
+
+                        <div class="recepcion-card-acciones">
+                            <a href="/mis-entregas/{{id}}/confirmar"
+                               class="recepcion-boton">
+                                Confirmar recepción
+                            </a>
+                        </div>
+
+                    </article>
+                {{/each}}
+            </div>
+        {{else}}
+            <div class="recepciones-vacio">
+                <h2>No hay entregas disponibles</h2>
+                <p>
+                    Cuando tengas entregas pendientes de recepción,
+                    aparecerán en esta sección.
+                </p>
+            </div>
+        {{/if}}
+
+    </main>
 {{/partial}}
 
 {{> comun/partials/layout.hbs}}
