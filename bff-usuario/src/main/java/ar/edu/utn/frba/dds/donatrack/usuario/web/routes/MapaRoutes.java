@@ -9,6 +9,6 @@ public class MapaRoutes {
   private MapaRoutes() { }
 
   public static void registrar(RoutesConfig ruta, MapaController controller) {
-    ruta.get("/beneficiarios/donaciones/recibidas", controller::mostrarDonacionesRecibidas, Permiso.AUTENTICADO);
+    ruta.get("/donaciones/recibidas", controller::mostrarDonacionesRecibidas);
   }
 }
