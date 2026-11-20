@@ -1,5 +1,6 @@
 package ar.edu.utn.frba.dds.donatrack.usuario.web.controllers;
 
+import ar.edu.utn.frba.dds.donatrack.grpc.DonacionAdminFilaMsg;
 import ar.edu.utn.frba.dds.donatrack.grpc.DonacionId;
 import ar.edu.utn.frba.dds.donatrack.grpc.DonacionesServiceGrpc.DonacionesServiceBlockingStub;
 import ar.edu.utn.frba.dds.donatrack.grpc.FiltroDonacionesAdminRequest;
@@ -47,6 +48,7 @@ public class DonacionController {
     int paginaSolicitada = parsearPagina(context.queryParam("page"));
 
     ListaDonacionesAdminResponse response;
+    ListaDonacionesAdminResponse responseGlobal;
     try {
       response = donacionesStub.listarDonacionesAdmin(FiltroDonacionesAdminRequest.newBuilder()
           .setQ(q)
@@ -54,6 +56,14 @@ public class DonacionController {
           .setEstado(estado)
           .setVencimiento(vencimiento)
           .build());
+
+      boolean hayFiltros = !q.isEmpty() || !categoria.isEmpty() || !estado.isEmpty()
+          || !VENCIMIENTO_POR_DEFECTO.equals(vencimiento);
+      responseGlobal = hayFiltros
+          ? donacionesStub.listarDonacionesAdmin(FiltroDonacionesAdminRequest.newBuilder()
+                                                 .setVencimiento(VENCIMIENTO_POR_DEFECTO)
+                                                 .build())
+          : response;
     } catch (StatusRuntimeException e) {
       responderError(context, e);
       return;
@@ -75,6 +85,7 @@ public class DonacionController {
 
     Map<String, Object> modelo = new HashMap<>();
     modelo.put("usuario", usuarioActual);
+    modelo.put("resumen", calcularResumen(responseGlobal.getDonacionesList()));
     modelo.put("donaciones", filasPagina);
     modelo.put("total", total);
     modelo.put("desde", total == 0 ? 0 : desdeIdx + 1);
@@ -111,6 +122,24 @@ public class DonacionController {
   }
 
   //============= FUNCIONES AUXILIARES =====================
+
+  private Map<String, Long> calcularResumen(List<DonacionAdminFilaMsg> donaciones) {
+    Map<String, Long> resumen = new HashMap<>();
+    resumen.put("pendientes", contarEstado(donaciones, "EN_DEPOSITO"));
+    resumen.put("asignadas", contarEstado(donaciones, "ASIGNACION_REALIZADA"));
+    resumen.put("listasParaEntregar", contarEstado(donaciones, "LISTA_PARA_ENTREGAR"));
+    resumen.put("enTraslado", contarEstado(donaciones, "EN_TRASLADO"));
+    resumen.put("entregadas", contarEstado(donaciones, "ENTREGADA"));
+    resumen.put("entregaFallida", contarEstado(donaciones, "ENTREGA_FALLIDA"));
+    resumen.put("vencidas", contarEstado(donaciones, "VENCIDA"));
+    return resumen;
+  }
+
+  private long contarEstado(List<DonacionAdminFilaMsg> donaciones, String estado) {
+    return donaciones.stream()
+        .filter(d -> estado.equals(d.getEstadoActual()))
+        .count();
+  }
 
   private int parsearPagina(String valor) {
     if (valor == null || valor.isBlank()) return 1;

@@ -19,6 +19,37 @@
             <a href="/registros-entrega/nueva" class="btn-primary">+ Registrar entrega</a>
         </div>
 
+        <div class="resumen-donaciones resumen-estados">
+            <div class="resumen-tarjeta">
+                <strong class="mono">{{resumen.pendientes}}</strong>
+                <span>Pendiente de asignación</span>
+            </div>
+            <div class="resumen-tarjeta">
+                <strong class="mono">{{resumen.asignadas}}</strong>
+                <span>Asignada</span>
+            </div>
+            <div class="resumen-tarjeta">
+                <strong class="mono">{{resumen.listasParaEntregar}}</strong>
+                <span>Lista para entregar</span>
+            </div>
+            <div class="resumen-tarjeta">
+                <strong class="mono">{{resumen.enTraslado}}</strong>
+                <span>En traslado</span>
+            </div>
+            <div class="resumen-tarjeta">
+                <strong class="mono">{{resumen.entregadas}}</strong>
+                <span>Entregada</span>
+            </div>
+            <div class="resumen-tarjeta">
+                <strong class="mono">{{resumen.entregaFallida}}</strong>
+                <span>Entrega fallida</span>
+            </div>
+            <div class="resumen-tarjeta">
+                <strong class="mono">{{resumen.vencidas}}</strong>
+                <span>Vencida</span>
+            </div>
+        </div>
+
         {{#if vencidaCodigo}}
             <p class="aviso-ok" role="status">La donación {{vencidaCodigo}} quedó marcada como vencida.</p>
         {{/if}}

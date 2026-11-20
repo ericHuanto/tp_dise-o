@@ -43,6 +43,42 @@
     white-space: nowrap;
 }
 
+/* =========================================
+   RESUMEN DE DONACIONES
+   ========================================= */
+.resumen-donaciones {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 28px;
+}
+
+.resumen-donaciones.resumen-estados {
+    grid-template-columns: repeat(7, 1fr);
+    gap: 12px;
+}
+
+.resumen-tarjeta {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 20px 18px 18px;
+    border-radius: 12px;
+    background: #EBE9DF;
+}
+
+.resumen-tarjeta strong {
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1.1;
+    color: var(--accent-dark);
+}
+
+.resumen-tarjeta span {
+    font-size: 0.88rem;
+    color: var(--text-muted);
+}
+
 .mono {
     font-family: ui-monospace, Menlo, Consolas, monospace;
     font-size: 0.92em;
@@ -514,9 +550,17 @@
 /* =========================================
    RESPONSIVE
    ========================================= */
+@media (max-width: 1100px) {
+    .resumen-donaciones.resumen-estados {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
 @media (max-width: 800px) {
     .pagina-admin { padding: 24px 16px 60px; }
     .pagina-cabecera { flex-direction: column; align-items: flex-start; }
+    .resumen-donaciones,
+    .resumen-donaciones.resumen-estados { grid-template-columns: repeat(2, 1fr); }
     .asignar-grid { grid-template-columns: 1fr; }
     .barra-seleccion { flex-direction: column; align-items: stretch; }
 }
