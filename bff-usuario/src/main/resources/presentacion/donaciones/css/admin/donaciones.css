@@ -194,6 +194,48 @@
 }
 
 /* =========================================
+   PAGINACIÓN
+   ========================================= */
+.paginacion {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 24px;
+    border-top: 1px solid #EFECE6;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+.paginacion-botones {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-pagina,
+.btn-pagina:visited {
+    padding: 8px 16px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background: var(--white);
+    color: var(--accent-dark);
+    font-weight: 500;
+    text-decoration: none;
+}
+
+.btn-pagina:hover {
+    border-color: var(--accent-green);
+}
+
+.btn-pagina.deshabilitado {
+    color: #A8A69C;
+    cursor: default;
+}
+
+.btn-pagina.deshabilitado:hover {
+    border-color: var(--border-color);
+}
+
+/* =========================================
    VENCIMIENTO
    ========================================= */
 .venc {
@@ -208,9 +250,6 @@
     font-size: 0.85rem;
 }
 
-/* =========================================
-   ESTADO (píldora con punto)
-   ========================================= */
 /* =========================================
    ESTADO (píldora con punto)
    ========================================= */
@@ -269,6 +308,7 @@
     background: #FDEBDD;
     color: #9A4A1E;
 }
+
 /* =========================================
    BOTONES Y ENLACES
    ========================================= */

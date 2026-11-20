@@ -119,6 +119,24 @@
                 {{/each}}
                 </tbody>
             </table>
+
+            {{#if total}}
+                <div class="paginacion">
+                    <span>Mostrando {{desde}}–{{hasta}} de {{total}}</span>
+                    <div class="paginacion-botones">
+                        {{#if urlAnterior}}
+                            <a href="{{urlAnterior}}" class="btn-pagina">Anterior</a>
+                        {{else}}
+                            <span class="btn-pagina deshabilitado" aria-disabled="true">Anterior</span>
+                        {{/if}}
+                        {{#if urlSiguiente}}
+                            <a href="{{urlSiguiente}}" class="btn-pagina">Siguiente</a>
+                        {{else}}
+                            <span class="btn-pagina deshabilitado" aria-disabled="true">Siguiente</span>
+                        {{/if}}
+                    </div>
+                </div>
+            {{/if}}
         </div>
     </section>
 {{/partial}}

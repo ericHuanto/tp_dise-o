@@ -11,13 +11,15 @@ import ar.edu.utn.frba.dds.donatrack.usuario.web.dto.Opcion;
 import ar.edu.utn.frba.dds.donatrack.usuario.web.mappers.DonacionVistaMapper;
 import io.grpc.StatusRuntimeException;
 import io.javalin.http.Context;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 public class DonacionController {
+  private static final int TAMANO_PAGINA = 10;
   private static final String VENCIMIENTO_POR_DEFECTO = "todos";
   private static final List<Opcion> VENCIMIENTOS = List.of(
       new Opcion("7_dias", "Próximos 7 días"),
@@ -42,6 +44,7 @@ public class DonacionController {
     if (vencimiento.isEmpty()) {
       vencimiento = VENCIMIENTO_POR_DEFECTO;
     }
+    int paginaSolicitada = parsearPagina(context.queryParam("page"));
 
     ListaDonacionesAdminResponse response;
     try {
@@ -57,14 +60,27 @@ public class DonacionController {
     }
 
     LocalDate hoy = LocalDate.now();
-    List<DonacionFila> filas = response.getDonacionesList().stream()
+    List<DonacionFila> todas = response.getDonacionesList().stream()
         .map(d -> DonacionVistaMapper.aFila(d, hoy))
         .toList();
 
+    int total = todas.size();
+    int totalPaginas = Math.max(1, (int) Math.ceil((double) total / TAMANO_PAGINA));
+    int paginaActual = Math.min(paginaSolicitada, totalPaginas);
+
+    int desdeIdx = (paginaActual - 1) * TAMANO_PAGINA;
+    int hastaIdx = Math.min(desdeIdx + TAMANO_PAGINA, total);
+
+    List<DonacionFila> filasPagina = total == 0 ? List.of() : todas.subList(desdeIdx, hastaIdx);
+
     Map<String, Object> modelo = new HashMap<>();
     modelo.put("usuario", usuarioActual);
-    modelo.put("donaciones", filas);
-    modelo.put("total", filas.size());
+    modelo.put("donaciones", filasPagina);
+    modelo.put("total", total);
+    modelo.put("desde", total == 0 ? 0 : desdeIdx + 1);
+    modelo.put("hasta", hastaIdx);
+    modelo.put("urlAnterior", paginaActual > 1 ? urlPagina(q, categoria, estado, vencimiento, paginaActual - 1) : null);
+    modelo.put("urlSiguiente", paginaActual < totalPaginas ? urlPagina(q, categoria, estado, vencimiento, paginaActual + 1) : null);
     modelo.put("q", q);
     modelo.put("categorias", opcionesCategoria(response.getCategoriasList(), categoria));
     modelo.put("estados", opcionesEstado(estado));
@@ -95,6 +111,24 @@ public class DonacionController {
   }
 
   //============= FUNCIONES AUXILIARES =====================
+
+  private int parsearPagina(String valor) {
+    if (valor == null || valor.isBlank()) return 1;
+    try {
+      return Math.max(1, Integer.parseInt(valor.trim()));
+    } catch (NumberFormatException e) {
+      return 1;
+    }
+  }
+
+  private String urlPagina(String q, String categoria, String estado, String vencimiento, int page) {
+    StringBuilder url = new StringBuilder("/donaciones?page=").append(page);
+    if (!q.isEmpty()) url.append("&q=").append(URLEncoder.encode(q, StandardCharsets.UTF_8));
+    if (!categoria.isEmpty()) url.append("&categoria=").append(URLEncoder.encode(categoria, StandardCharsets.UTF_8));
+    if (!estado.isEmpty()) url.append("&estado=").append(URLEncoder.encode(estado, StandardCharsets.UTF_8));
+    if (!vencimiento.isEmpty()) url.append("&vencimiento=").append(URLEncoder.encode(vencimiento, StandardCharsets.UTF_8));
+    return url.toString();
+  }
 
   /** Traduce el Status gRPC que devuelve el microservicio al código HTTP equivalente. */
   private void responderError(Context context, StatusRuntimeException e) {
