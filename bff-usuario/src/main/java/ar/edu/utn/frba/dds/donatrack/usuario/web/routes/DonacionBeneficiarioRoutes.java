@@ -9,8 +9,8 @@ public class DonacionBeneficiarioRoutes {
   private DonacionBeneficiarioRoutes() {}
 
   public static void registrar(RoutesConfig ruta, DonacionBeneficiarioController controller) {
-    ruta.get("/mis-donaciones", controller::listar, Permiso.VER_DONACIONES);
-    ruta.get("/mis-donaciones/{id}", controller::verDetalle, Permiso.VER_DONACIONES);
-    ruta.get("/notificaciones", controller::mostrarNovedades, Permiso.VER_DONACIONES);
+    ruta.get("/mis-donaciones", controller::listar, Permiso.SOLICITAR_AYUDA);
+    ruta.get("/mis-donaciones/{id}", controller::verDetalle, Permiso.SOLICITAR_AYUDA);
+    ruta.get("/notificaciones", controller::mostrarNovedades, Permiso.SOLICITAR_AYUDA);
   }
 }

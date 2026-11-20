@@ -9,7 +9,7 @@ public class DonacionRoutes {
   public DonacionRoutes() { }
 
   public static void registrar(RoutesConfig ruta, DonacionController controller) {
-    ruta.get("/donaciones", controller::mostrarDonaciones, Permiso.VER_DONACIONES);
+    ruta.get("/donaciones", controller::mostrarDonaciones, Permiso.ADMINISTRADOR);
     ruta.post("/donaciones/{id}/vencido", controller::marcarComoVencida, Permiso.EDITAR_DONACION);
   }
 
