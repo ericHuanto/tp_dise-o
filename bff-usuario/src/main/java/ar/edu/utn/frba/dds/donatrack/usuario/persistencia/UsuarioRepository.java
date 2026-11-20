@@ -26,7 +26,7 @@ public class UsuarioRepository implements WithSimplePersistenceUnit {
   }
 
   public Usuario buscarPorCredenciales(String nombreUsuario) {
-    return entityManager().createQuery("SELECT u FROM Usuario u WHERE u.nombreUsuario = :nombre", Usuario.class)
+    return entityManager().createQuery("SELECT u FROM Usuario u LEFT JOIN FETCH u.permisos WHERE u.nombreUsuario = :nombre", Usuario.class)
         .setParameter("nombre", nombreUsuario)
         .getResultStream().findFirst().orElse(null);
   }

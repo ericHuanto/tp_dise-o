@@ -124,8 +124,8 @@ public class App {
       config.routes.get("/health", ctx -> ctx.json("BFF Usuario funcionando"));
       //Rutas de gateway/bff
       HomeRoutes.registrar(config.routes, homeController);
-      SesionRoutes.registrar(config.routes, sesionController);
       PerfilRoutes.registrar(config.routes, perfilController);
+      SesionRoutes.registrar(config.routes, sesionController);
       MapaRoutes.registrar(config.routes, mapaController);
       //Rutas de donaciones
       DonacionRoutes.registrar(config.routes, donacionController);

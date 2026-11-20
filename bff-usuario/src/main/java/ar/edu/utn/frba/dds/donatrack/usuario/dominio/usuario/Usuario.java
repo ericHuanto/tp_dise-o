@@ -100,9 +100,4 @@ public class Usuario {
     return Integridad.hashear(contraseña);
   }
 
-  public void inicializarPermisos() {
-    if (this.permisos != null) {
-      this.permisos = new ArrayList<>(this.permisos);
-    }
-  }
 }

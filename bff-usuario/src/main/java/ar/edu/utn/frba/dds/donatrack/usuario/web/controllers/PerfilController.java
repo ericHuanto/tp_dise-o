@@ -6,6 +6,7 @@ import ar.edu.utn.frba.dds.donatrack.grpc.RegistrarBeneficiarioRequest;
 import ar.edu.utn.frba.dds.donatrack.grpc.RegistrarHumanaRequest;
 import ar.edu.utn.frba.dds.donatrack.grpc.RegistrarJuridicaRequest;
 import ar.edu.utn.frba.dds.donatrack.grpc.RegistroActorResponse;
+import ar.edu.utn.frba.dds.donatrack.usuario.dominio.usuario.Permiso;
 import ar.edu.utn.frba.dds.donatrack.usuario.dominio.usuario.Usuario;
 import ar.edu.utn.frba.dds.donatrack.usuario.persistencia.UsuarioRepository;
 import io.github.flbulgarelli.jpa.extras.simple.WithSimplePersistenceUnit;
@@ -49,6 +50,7 @@ public class PerfilController implements WithSimplePersistenceUnit {
     if (nuevoUsuario == null) return;
 
     try {
+      nuevoUsuario.otorgarPermiso(Permiso.AUTENTICADO);
       RegistrarBeneficiarioRequest request = RegistrarBeneficiarioRequest.newBuilder()
           .setRazonSocial(context.formParam("razonSocial"))
           .setDireccion(context.formParam("direccion"))
@@ -60,13 +62,13 @@ public class PerfilController implements WithSimplePersistenceUnit {
 
       // 2. Guardamos el Usuario en el BFF vinculado al id_beneficiario devuelto
       nuevoUsuario.vincularBeneficiario(response.getIdCreado());
+      nuevoUsuario.otorgarPermiso(Permiso.SOLICITAR_AYUDA);
       beginTransaction();
       repoUsuarios.guardar(nuevoUsuario);
       commitTransaction();
 
-      nuevoUsuario.inicializarPermisos();
       context.sessionAttribute("usuario_actual", nuevoUsuario);
-      context.redirect("/");
+      context.redirect("/home");
     } catch (StatusRuntimeException e) {
       rollbackSiActiva();
       String motivo = e.getStatus().getDescription() != null ? e.getStatus().getDescription() : "Error_en_datos";
@@ -83,6 +85,7 @@ public class PerfilController implements WithSimplePersistenceUnit {
     if (nuevoUsuario == null) return;
 
     try {
+      nuevoUsuario.otorgarPermiso(Permiso.AUTENTICADO);
       RegistrarHumanaRequest request = RegistrarHumanaRequest.newBuilder()
           .setNombre(context.formParam("nombre"))
           .setApellido(context.formParam("apellidos"))
@@ -97,13 +100,14 @@ public class PerfilController implements WithSimplePersistenceUnit {
       RegistroActorResponse response = donacionesStub.registrarDonanteHumana(request);
 
       nuevoUsuario.vincularDonante(response.getIdCreado());
+      nuevoUsuario.otorgarPermiso(Permiso.VER_DONACIONES);
+      nuevoUsuario.otorgarPermiso(Permiso.VER_BENEFICIARIOS);
       beginTransaction();
       repoUsuarios.guardar(nuevoUsuario);
       commitTransaction();
 
-      nuevoUsuario.inicializarPermisos();
       context.sessionAttribute("usuario_actual", nuevoUsuario);
-      context.redirect("/");
+      context.redirect("/home");
     } catch (StatusRuntimeException e) {
       rollbackSiActiva();
       String motivo = e.getStatus().getDescription() != null ? e.getStatus().getDescription() : "Error_en_datos";
@@ -120,6 +124,7 @@ public class PerfilController implements WithSimplePersistenceUnit {
     if (nuevoUsuario == null) return;
 
     try {
+      nuevoUsuario.otorgarPermiso(Permiso.AUTENTICADO);
       RegistrarJuridicaRequest request = RegistrarJuridicaRequest.newBuilder()
           .setRazonSocial(context.formParam("razonSocial"))
           .setTipoDocumento(context.formParam("tipoDocumento"))
@@ -137,13 +142,14 @@ public class PerfilController implements WithSimplePersistenceUnit {
       RegistroActorResponse response = donacionesStub.registrarDonanteJuridica(request);
 
       nuevoUsuario.vincularDonante(response.getIdCreado());
+      nuevoUsuario.otorgarPermiso(Permiso.VER_DONACIONES);
+      nuevoUsuario.otorgarPermiso(Permiso.VER_BENEFICIARIOS);
       beginTransaction();
       repoUsuarios.guardar(nuevoUsuario);
       commitTransaction();
 
-      nuevoUsuario.inicializarPermisos();
       context.sessionAttribute("usuario_actual", nuevoUsuario);
-      context.redirect("/");
+      context.redirect("/home");
     } catch (StatusRuntimeException e) {
       rollbackSiActiva();
       String motivo = e.getStatus().getDescription() != null ? e.getStatus().getDescription() : "Error_en_datos";
