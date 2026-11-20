@@ -272,9 +272,7 @@ public class DatosIniciales implements WithSimplePersistenceUnit {
       repoSubcategorias.guardar(lavandina);
       repoSubcategorias.guardar(detergente);
       repoSubcategorias.guardar(desinfectantes);
-      repoDonaciones.guardar(donacion15);
-      repoRankings.guardar(ranking1);
-      repoRankings.guardar(ranking2);
+
       repoBeneficiarios.guardar(hogarSantaRita);
       repoBeneficiarios.guardar(merenderoRayito);
       repoBeneficiarios.guardar(fundacionAbrazo);
@@ -295,6 +293,10 @@ public class DatosIniciales implements WithSimplePersistenceUnit {
       repoDonaciones.guardar(donacion12); // ID 12L -> ENTREGADA (histórica)
       repoDonaciones.guardar(donacion13); // ID 13L -> ENTREGADA (histórica)
       repoDonaciones.guardar(donacion14); // ID 14L -> ENTREGADA (histórica)
+      repoDonaciones.guardar(donacion15); // ID 15L -> EN_DEPOSITO (Perecedero para probar marcar vencida)
+
+      repoRankings.guardar(ranking1);
+      repoRankings.guardar(ranking2);
       commitTransaction();
       System.out.println("Datos iniciales cargados con éxito.");
     } catch (Exception e) {
