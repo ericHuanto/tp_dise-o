@@ -41,9 +41,9 @@
 
                     <div class="form-row">
                         <div class="form-group col-medio">
-                            <label for="tipoDocumento">Tipo de documento</label>
-                            <select id="tipoDocumento" name="tipoDocumento" required>
-                                {{#each tiposDocumento}}
+                            <label for="tiposDocumentoJuridica">Tipo de documento</label>
+                            <select id="tiposDocumentoJuridica" name="tiposDocumentoJuridica" required>
+                                {{#each tiposDocumentoJuridica}}
                                     <option value="{{this}}">{{this}}</option>
                                 {{/each}}
                             </select>
@@ -86,9 +86,9 @@
 
                     <div class="form-row">
                         <div class="form-group col-medio">
-                            <label for="tipoDocumentoRepresentante">Tipo de documento</label>
-                            <select id="tipoDocumentoRepresentante" name="tipoDocumentoRepresentante" required>
-                                {{#each tiposDocumentoRepresentante}}
+                            <label for="tiposDocumentoHumana">Tipo de documento</label>
+                            <select id="tiposDocumentoHumana" name="tiposDocumentoHumana" required>
+                                {{#each tiposDocumentoHumana}}
                                     <option value="{{this}}">{{this}}</option>
                                 {{/each}}
                             </select>
