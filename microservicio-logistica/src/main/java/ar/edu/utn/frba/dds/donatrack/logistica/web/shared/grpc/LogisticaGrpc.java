@@ -19,6 +19,7 @@ import ar.edu.utn.frba.dds.donatrack.logistica.web.shared.dto.camion.ActualizarC
 import ar.edu.utn.frba.dds.donatrack.logistica.web.shared.dto.camion.CamionResponse;
 import ar.edu.utn.frba.dds.donatrack.logistica.web.shared.integracion.microserviciosdonaciones.ConectorDonaciones;
 import ar.edu.utn.frba.dds.donatrack.logistica.web.shared.integracion.microserviciosdonaciones.ConectorDonacionesGrpc;
+import ar.edu.utn.frba.dds.donatrack.shared.excepciones.DominioException;
 import ar.edu.utn.frba.dds.donatrack.shared.excepciones.ServicioExternoException;
 import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
@@ -111,33 +112,50 @@ public class LogisticaGrpc extends LogisticaServiceGrpc.LogisticaServiceImplBase
   @Override
   public void crearCamion(GuardarCamionRequest req, StreamObserver<CrearCamionResponse> out) {
     responder(out, () -> {
-      // Si la patente ya existe, avisamos al BFF para que redirija con ?error=la_patente_ya_existe
-      if (repoCamiones.buscarPorPatente(req.getPatente()) != null) {
+      Camion existente = repoCamiones.buscarPorPatente(req.getPatente());
+
+      // Solo rechazamos si existe Y sigue activo
+      if (existente != null && existente.estaActivo()) { // ajustá al getter de tu atributo (ej. isActivo())
         return CrearCamionResponse.newBuilder().setPatenteDuplicada(true).build();
       }
 
       withTransaction(() -> {
-        Camion nuevoCamion = new Camion(
-            req.getPatente(),
-            req.getCapacidadVolumen(),
-            req.getAltura(),
-            req.getCapacidadCarga()
-        );
+        Camion camion = (existente != null)
+            ? existente
+            : new Camion(req.getPatente(), req.getCapacidadVolumen(), req.getAltura(), req.getCapacidadCarga());
+
+        if (existente != null) {
+          camion.darDeAlta();
+          // Actualizamos sus capacidades con los valores nuevos del formulario
+          ActualizarCamionRequest datosNuevos = new ActualizarCamionRequest(
+              req.getCapacidadVolumen(),
+              req.getAltura(),
+              req.getCapacidadCarga(),
+              req.getImeiGps()
+          );
+          CamionMapper.actualizarDesdeRequest(camion, null, datosNuevos);
+        }
 
         String imeiGps = req.getImeiGps();
         if (imeiGps != null && !imeiGps.trim().isEmpty()) {
           Gps gpsAsignado = repoGps.buscarPorId(imeiGps);
           Camion otroCamion = repoCamiones.buscarPorGps(imeiGps);
-          if (otroCamion != null) {
+          if (otroCamion != null && !otroCamion.getPatente().equalsIgnoreCase(camion.getPatente())) {
+            validarCamionNoEnRuta(otroCamion, imeiGps);
             otroCamion.quitarGps();
             repoCamiones.actualizar(otroCamion);
           }
-          nuevoCamion.agregarGps(gpsAsignado);
+          camion.agregarGps(gpsAsignado);
         } else {
-          nuevoCamion.agregarGps(null);
+          camion.agregarGps(null);
         }
 
-        repoCamiones.guardar(nuevoCamion);
+        if (existente != null) {
+          repoCamiones.actualizar(camion);
+        } else {
+          repoCamiones.guardar(camion);
+        }
+        entityManager().flush();
       });
 
       return CrearCamionResponse.newBuilder().setPatenteDuplicada(false).build();
@@ -179,11 +197,20 @@ public class LogisticaGrpc extends LogisticaServiceGrpc.LogisticaServiceImplBase
             imeiGps
         );
 
+        boolean camionActualEnRuta = estaEnRuta(camion);
+
+        if ((imeiGps == null || imeiGps.trim().isEmpty()) && camionActualEnRuta) {
+          throw new DominioException("No se puede quitar el GPS de un camión que se encuentra en ruta");
+        }
+
         Gps gpsAsignado = null;
         if (imeiGps != null && !imeiGps.trim().isEmpty()) {
           gpsAsignado = repoGps.buscarPorId(imeiGps);
           Camion otroCamion = repoCamiones.buscarPorGps(imeiGps);
           if (otroCamion != null && !otroCamion.getPatente().equals(camion.getPatente())) {
+            if (estaEnRuta(otroCamion)) {
+              throw new DominioException("No se puede asignar el GPS " + imeiGps.trim() + " porque está asignado a un camión en ruta");
+            }
             otroCamion.quitarGps();
             repoCamiones.actualizar(otroCamion);
           }
@@ -200,15 +227,25 @@ public class LogisticaGrpc extends LogisticaServiceGrpc.LogisticaServiceImplBase
   //CamionController.eliminar()
   @Override
   public void eliminarCamion(PatenteCamionRequest req, StreamObserver<ResultadoLogistica> out) {
-    responder(out, () -> {
-      withTransaction(() -> {
-        Camion camion = repoCamiones.buscarPorPatente(req.getPatente());
-        if (camion != null) {
-          repoCamiones.eliminar(camion);
-        }
-      });
-      return ResultadoLogistica.newBuilder().setMensaje("Camión eliminado").build();
-    });
+    responder(out, () -> withTransaction(() -> {
+      Camion camion = repoCamiones.buscarPorPatente(req.getPatente());
+      if (camion == null) {
+        throw new IllegalArgumentException("No se encontró el camión con patente " + req.getPatente());
+      }
+
+      boolean tieneRutasAsignadas = repoRutas.buscarTodas().stream()
+          .anyMatch(r -> r.getCamion() != null
+              && req.getPatente().equalsIgnoreCase(r.getCamion().getPatente()));
+
+      if (tieneRutasAsignadas) {
+        throw new IllegalStateException("Este camión está asignado a una ruta");
+      }
+
+      repoCamiones.eliminar(camion);
+      return ResultadoLogistica.newBuilder()
+          .setMensaje("Camión eliminado")
+          .build();
+    }));
   }
 
   //ENTREGAS
@@ -476,5 +513,18 @@ public class LogisticaGrpc extends LogisticaServiceGrpc.LogisticaServiceImplBase
           .withDescription("La entrega no pertenece al beneficiario")
           .asRuntimeException();
     }
+  }
+
+  private void validarCamionNoEnRuta(Camion otroCamion, String imeiGps) {
+    if (estaEnRuta(otroCamion)) {
+      throw new DominioException("No se puede asignar el GPS " + imeiGps.trim() + " porque está asignado a un camión en ruta");
+    }
+  }
+
+  private boolean estaEnRuta(Camion camion) {
+    return camion != null && repoRutas.buscarTodas().stream()
+        .anyMatch(r -> r.getCamion() != null
+            && camion.getPatente().equalsIgnoreCase(r.getCamion().getPatente())
+            && r.isEstaIniciada());
   }
 }

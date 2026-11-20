@@ -10,12 +10,18 @@
     <div class="camiones-pagina camiones-pagina--formulario">
         <nav class="breadcrumb breadcrumb-camion-alta"><a href="/home">Inicio</a><span>›</span><a href="/camiones">Camiones</a><span>›</span>Nuevo camión</nav>
 
-
         <section class="camion-tarjeta-alta">
             <div class="camion-alta-cabecera">
                 <h2>Registrar Nuevo Camión</h2>
                 <p>Ingrese los datos técnicos del vehículo</p>
             </div>
+
+            {{#if error}}
+                <div class="aviso-error" role="alert" style="background:#fdecea;color:#8a1f17;border:1px solid #f5c2c7;padding:12px 16px;border-radius:8px;margin-bottom:16px;">
+                    {{error}}
+                </div>
+            {{/if}}
+
             <form action="/camiones" method="POST" class="camion-form">
                 <div>
                     <label for="patente" class="camion-label">Patente <span class="obligatorio">*</span></label>

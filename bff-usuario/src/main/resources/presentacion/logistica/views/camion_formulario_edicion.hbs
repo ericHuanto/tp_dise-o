@@ -25,6 +25,12 @@
                     <span class="camion-edicion-patente">{{camion.patente}}</span>
                 </div>
 
+                {{#if error}}
+                    <div class="aviso-error" role="alert" style="background:#fdecea;color:#8a1f17;border:1px solid #f5c2c7;padding:12px 16px;border-radius:8px;margin-bottom:16px;">
+                        {{error}}
+                    </div>
+                {{/if}}
+
                 <form action="/camiones/{{camion.patente}}/edicion" method="POST" class="camion-form">
                     <div>
                         <label for="patente" class="camion-label">Patente (No modificable)</label>

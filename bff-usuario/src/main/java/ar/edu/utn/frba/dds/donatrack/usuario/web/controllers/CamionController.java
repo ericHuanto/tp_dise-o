@@ -29,15 +29,24 @@ public class CamionController {
     modelo.put("camionesSinGps", response.getCamionesSinGps());
     modelo.put("camionesEnRuta", response.getCamionesEnRuta());
 
+    String errorCamiones = context.consumeSessionAttribute("error_camiones");
+    modelo.put("error", errorCamiones);
     context.render("logistica/views/camion.hbs", modelo);
   }
 
   public void mostrarFormularioCreacion(Context context) {
     ListaGpsResponse response = logisticaStub.listarGpsDisponibles(VacioLogistica.getDefaultInstance());
 
+    String errorQuery = context.queryParam("error");
+    String errorSession = context.consumeSessionAttribute("error_camion_form");
+    String errorFinal = "la_patente_ya_existe".equals(errorQuery)
+        ? "Ya existe un camión registrado con esa patente"
+        : errorSession;
+
     Map<String, Object> modelo = new HashMap<>();
     modelo.put("usuario", context.sessionAttribute("usuario_actual"));
     modelo.put("gpsDisponibles", response.getGpsDisponiblesList());
+    modelo.put("error", errorFinal);
 
     context.render("logistica/views/camion_formulario_creacion.hbs", modelo);
   }
@@ -57,6 +66,13 @@ public class CamionController {
       }
 
       context.redirect("/camiones");
+    } catch (io.grpc.StatusRuntimeException e) {
+      String detalle = limpiarMensajeLogistica(
+          e,
+          "No se puede asignar un GPS que pertenece a un camión en ruta"
+      );
+      context.sessionAttribute("error_camion_form", detalle);
+      context.redirect("/camiones/nuevo");
     } catch (Exception e) {
       e.printStackTrace();
       context.redirect("/pagina-errores");
@@ -74,6 +90,7 @@ public class CamionController {
     modelo.put("usuario", context.sessionAttribute("usuario_actual"));
     modelo.put("camion", response.getCamion());
     modelo.put("gpsDisponibles", response.getGpsDisponiblesList());
+    modelo.put("error", context.consumeSessionAttribute("error_camion_form"));
 
     context.render("logistica/views/camion_formulario_edicion.hbs", modelo);
   }
@@ -84,6 +101,13 @@ public class CamionController {
       GuardarCamionRequest request = armarGuardarRequest(patente, context);
       logisticaStub.actualizarCamion(request);
       context.redirect("/camiones");
+    } catch (io.grpc.StatusRuntimeException e) {
+      String detalle = limpiarMensajeLogistica(
+          e,
+          "No se puede asignar un GPS que pertenece a un camión en ruta"
+      );
+      context.sessionAttribute("error_camion_form", detalle);
+      context.redirect("/camiones/" + patente + "/edicion");
     } catch (Exception e) {
       e.printStackTrace();
       context.redirect("/pagina-errores");
@@ -92,10 +116,19 @@ public class CamionController {
 
   public void eliminar(Context context) {
     String patente = context.pathParam("patente");
-    logisticaStub.eliminarCamion(
-        PatenteCamionRequest.newBuilder().setPatente(patente).build()
-    );
-    context.redirect("/camiones");
+    try {
+      logisticaStub.eliminarCamion(
+          PatenteCamionRequest.newBuilder().setPatente(patente).build()
+      );
+      context.redirect("/camiones");
+    } catch (io.grpc.StatusRuntimeException e) {
+      String descripcion = e.getStatus().getDescription();
+      String detalle = (descripcion != null && !descripcion.isBlank())
+          ? descripcion.replaceFirst("(?i)^Error en log[íi]stica:\\s*", "")
+          : "Este camión está asignado a una ruta";
+      context.sessionAttribute("error_camiones", detalle);
+      context.redirect("/camiones");
+    }
   }
 
   //====================== FUNCIONES AUXILIARES ============================
@@ -112,5 +145,13 @@ public class CamionController {
         .setCapacidadCarga(carga)
         .setImeiGps(imeiGps != null ? imeiGps : "")
         .build();
+  }
+
+  private String limpiarMensajeLogistica(io.grpc.StatusRuntimeException e, String fallback) {
+    String descripcion = e.getStatus().getDescription();
+    if (descripcion != null && !descripcion.isBlank()) {
+      return descripcion.replaceFirst("(?i)^Error en log[íi]stica:\\s*", "");
+    }
+    return fallback;
   }
 }

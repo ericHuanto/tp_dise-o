@@ -107,6 +107,9 @@ public class Camion {
     this.gps = gps;
   }
 
+  public void darDeAlta() {
+    this.activo = true; //
+  }
   //======================= FUNCIONES AUXILIARES =======================
   private void validarPatente(String patente) {
     if (patente == null || patente.isBlank()) {
