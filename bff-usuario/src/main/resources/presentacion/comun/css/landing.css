@@ -187,3 +187,21 @@ main {
     color: var(--text-muted);
     line-height: 1.6;
 }
+
+/* Link al mapa público, debajo de "Últimas entregas" */
+.link-ver-mapa,
+.link-ver-mapa:visited {
+    display: inline-block;
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border-color);
+    width: 100%;
+    color: var(--accent-green);
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.link-ver-mapa:hover {
+    text-decoration: underline;
+}
