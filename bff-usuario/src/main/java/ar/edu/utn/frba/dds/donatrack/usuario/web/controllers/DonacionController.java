@@ -1,10 +1,15 @@
 package ar.edu.utn.frba.dds.donatrack.usuario.web.controllers;
 
+import ar.edu.utn.frba.dds.donatrack.grpc.BeneficiarioIdRequest;
 import ar.edu.utn.frba.dds.donatrack.grpc.DonacionId;
 import ar.edu.utn.frba.dds.donatrack.grpc.DonacionesServiceGrpc.DonacionesServiceBlockingStub;
 import ar.edu.utn.frba.dds.donatrack.grpc.FiltroDonacionesAdminRequest;
+import ar.edu.utn.frba.dds.donatrack.grpc.FiltroDonacionesDonanteRequest;
 import ar.edu.utn.frba.dds.donatrack.grpc.ListaDonacionesAdminResponse;
+import ar.edu.utn.frba.dds.donatrack.grpc.ListaDonacionesBeneficiarioResponse;
 import ar.edu.utn.frba.dds.donatrack.grpc.TipoEstadoDonacionProto;
+import ar.edu.utn.frba.dds.donatrack.grpc.VistaDonacionesDonanteResponse;
+import ar.edu.utn.frba.dds.donatrack.usuario.dominio.usuario.Permiso;
 import ar.edu.utn.frba.dds.donatrack.usuario.dominio.usuario.Usuario;
 import ar.edu.utn.frba.dds.donatrack.usuario.web.dto.DonacionFila;
 import ar.edu.utn.frba.dds.donatrack.usuario.web.dto.Opcion;
@@ -35,6 +40,12 @@ public class DonacionController {
 
   public void mostrarDonaciones(Context context) {
     Usuario usuarioActual = context.sessionAttribute("usuario_actual");
+    assert usuarioActual != null;
+
+    boolean esAdmin = usuarioActual.tienePermiso(Permiso.ADMINISTRADOR);
+    boolean esDonante = usuarioActual.tienePermiso(Permiso.REALIZAR_DONACION);
+    boolean esBeneficiario = usuarioActual.tienePermiso(Permiso.SOLICITAR_AYUDA);
+
     String q = limpio(context.queryParam("q"));
     String categoria = limpio(context.queryParam("categoria"));
     String estado = limpio(context.queryParam("estado"));
@@ -43,30 +54,54 @@ public class DonacionController {
       vencimiento = VENCIMIENTO_POR_DEFECTO;
     }
 
-    ListaDonacionesAdminResponse response;
+    List<DonacionFila> filas = new ArrayList<>();
+    LocalDate hoy = LocalDate.now();
+
     try {
-      response = donacionesStub.listarDonacionesAdmin(FiltroDonacionesAdminRequest.newBuilder()
-          .setQ(q)
-          .setCategoria(categoria)
-          .setEstado(estado)
-          .setVencimiento(vencimiento)
-          .build());
+      if (usuarioActual.isAdmin()) {
+        ListaDonacionesAdminResponse response = donacionesStub.listarDonacionesAdmin(
+            FiltroDonacionesAdminRequest.newBuilder()
+                .setQ(q)
+                .setCategoria(categoria)
+                .setEstado(estado)
+                .setVencimiento(vencimiento)
+                .build()
+        );
+        filas = response.getDonacionesList().stream()
+            .map(d -> DonacionVistaMapper.aFila(d, hoy)).toList();
+
+      } else if (usuarioActual.isDonante()) {
+        VistaDonacionesDonanteResponse response = donacionesStub.obtenerVistaDonacionesDonante(
+            FiltroDonacionesDonanteRequest.newBuilder()
+                .setIdDonante(usuarioActual.getIdDonante()) // ← Usa el ID específico del donante
+                .build()
+        );
+        filas = response.getDonacionesList().stream()
+            .map(DonacionVistaMapper::aFila).toList();
+
+      } else if (usuarioActual.isBeneficiario()) {
+        ListaDonacionesBeneficiarioResponse response = donacionesStub.listarDonacionesPorBeneficiario(
+            BeneficiarioIdRequest.newBuilder()
+                .setId(usuarioActual.getIdBeneficiario()) // ← Usa el ID específico del beneficiario
+                .build()
+        );
+        filas = response.getDonacionesList().stream()
+            .map(DonacionVistaMapper::aFila).toList();
+      }
     } catch (StatusRuntimeException e) {
       responderError(context, e);
       return;
     }
 
-    LocalDate hoy = LocalDate.now();
-    List<DonacionFila> filas = response.getDonacionesList().stream()
-        .map(d -> DonacionVistaMapper.aFila(d, hoy))
-        .toList();
-
     Map<String, Object> modelo = new HashMap<>();
     modelo.put("usuario", usuarioActual);
+    modelo.put("esAdmin", usuarioActual.isAdmin());
+    modelo.put("esDonante", usuarioActual.isDonante());
     modelo.put("donaciones", filas);
     modelo.put("total", filas.size());
+
     modelo.put("q", q);
-    modelo.put("categorias", opcionesCategoria(response.getCategoriasList(), categoria));
+    modelo.put("categorias", opcionesCategoria(new ArrayList<>(), categoria));
     modelo.put("estados", opcionesEstado(estado));
     modelo.put("vencimientos", seleccionar(VENCIMIENTOS, vencimiento));
     modelo.put("vencidaCodigo", context.queryParam("vencida_codigo"));

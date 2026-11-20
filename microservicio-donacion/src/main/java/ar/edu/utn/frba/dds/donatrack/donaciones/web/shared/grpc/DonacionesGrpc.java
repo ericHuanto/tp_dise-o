@@ -7,6 +7,7 @@ import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.bien.Bien;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.bien.BienFactory;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.bien.Subcategoria;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.bien.UnidadMedida;
+import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.bien.tipobien.Perecedero;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.comunicaciones.DispatcherEventos;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.comunicaciones.eventos.EventoEntregaExitosa;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.comunicaciones.eventos.EventoEntregaFallida;
@@ -66,6 +67,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.SecureRandom;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
@@ -324,10 +326,33 @@ public class DonacionesGrpc extends DonacionesServiceGrpc.DonacionesServiceImplB
       for (Donacion d : donaciones) {
         DonacionVistaMsg.Builder dMsg = DonacionVistaMsg.newBuilder()
             .setId(d.getId())
-            .setDescripcion(d.getDescripcion() != null ? d.getDescripcion() : "")
             .setEstadoActual(d.getEstadoActual() != null ? d.getEstadoActual().name() : "");
-        if(d.getSubcategoria() != null) {
-          dMsg.setSubcategoria(aSubcategoriaMsg(d.getSubcategoria()));
+
+        // 1. Extraer beneficiario asignado y fecha
+        if (d.getBeneficiario() != null) {
+          dMsg.setBeneficiarioAsignado(d.getBeneficiario().getRazonSocial());
+        }
+
+        // Extraer la fecha inicial (ingreso) desde el historial de estados
+        if (d.getHistorialEstados() != null && !d.getHistorialEstados().isEmpty()) {
+          LocalDateTime fechaIngreso = d.getHistorialEstados().get(0).getFecha();
+
+          dMsg.setFechaIngreso(fechaIngreso != null ? fechaIngreso.toLocalDate().toString() : "");
+        }
+
+        // 2. Extraer datos del bien
+        if (d.getBienes() != null && !d.getBienes().isEmpty()) {
+          Bien bien = d.getBienes().get(0);
+          dMsg.setDescripcion(bien.getDescripcion() != null ? bien.getDescripcion() : "")
+              .setCantidad(String.valueOf(bien.getCantidad()))
+              .setUnidadMedida(bien.getUnidadMedida() != null ? bien.getUnidadMedida().name() : "");
+
+          if(bien.getSubcategoria() != null) {
+            dMsg.setSubcategoria(aSubcategoriaMsg(bien.getSubcategoria()));
+          }
+          if (bien instanceof Perecedero perecedero && perecedero.getFechaVencimiento() != null) {
+            dMsg.setVencimiento(perecedero.getFechaVencimiento().toString());
+          }
         }
         builder.addDonaciones(dMsg.build());
       }
@@ -1152,9 +1177,43 @@ public class DonacionesGrpc extends DonacionesServiceGrpc.DonacionesServiceImplB
   private DonacionBeneficiarioMsg aDonacionBeneficiarioMsg(Donacion d) {
     DonacionBeneficiarioMsg.Builder builder = DonacionBeneficiarioMsg.newBuilder()
         .setId(d.getId())
-        .setDescripcion(d.getDescripcion() != null ? d.getDescripcion() : "")
         .setEstadoActual(d.getEstadoActual() != null ? d.getEstadoActual().name() : "")
         .setFechaAsignacion(fechaAsignacionDe(d));
+
+    // 1. Extraer nombre del donante evaluando si es Humana o Juridica
+    String nombreDonante = "Sin donante";
+    if (d.getDonantes() != null && !d.getDonantes().isEmpty()) {
+      Donante donante = d.getDonantes().get(0);
+
+      if (donante instanceof Humana humana) {
+        nombreDonante = humana.getNombre() + " " + humana.getApellido();
+      } else if (donante instanceof Juridica juridica) {
+        nombreDonante = juridica.getRazonSocial();
+      }
+    }
+    builder.setNombreDonante(nombreDonante);
+
+    // 2. Extraer datos del bien (igual que en el paso anterior)
+    if (d.getBienes() != null && !d.getBienes().isEmpty()) {
+      Bien bien = d.getBienes().get(0);
+
+      builder.setDescripcion(bien.getDescripcion() != null ? bien.getDescripcion() : "")
+          .setCantidad(String.valueOf(bien.getCantidad()))
+          .setUnidadMedida(bien.getUnidadMedida() != null ? bien.getUnidadMedida().name() : "");
+
+      if (bien.getSubcategoria() != null) {
+        builder.setSubcategoria(bien.getSubcategoria().getNombre());
+
+        if (bien.getSubcategoria().getCategoria() != null) {
+          builder.setCategoria(bien.getSubcategoria().getCategoria().getNombre());
+        }
+      }
+      if (bien instanceof Perecedero perecedero && perecedero.getFechaVencimiento() != null) {
+        builder.setVencimiento(perecedero.getFechaVencimiento().toString());
+      }
+    } else {
+      builder.setDescripcion(d.getDescripcion() != null ? d.getDescripcion() : "");
+    }
 
     return builder.build();
   }

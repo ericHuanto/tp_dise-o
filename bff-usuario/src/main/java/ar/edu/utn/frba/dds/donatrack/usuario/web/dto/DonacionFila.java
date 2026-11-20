@@ -10,6 +10,7 @@ public class DonacionFila {
   private final Long id;
   private final String codigo;
   private final List<String> donantes;
+  private final String beneficiario;
   private final String fechaIngreso;
   private final List<BienFila> bienes;
   private final String vencimiento;        // null si no es perecedero

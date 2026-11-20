@@ -205,8 +205,13 @@ message FiltroDonacionesDonanteRequest {
 message DonacionVistaMsg {
   int64 id = 1;
   string descripcion = 2;
-  SubcategoriaMsg subcategoria =3;
+  SubcategoriaMsg subcategoria = 3;
   string estado_actual = 4;
+  string beneficiario_asignado = 5;
+  string fecha_ingreso = 6;
+  string cantidad = 7;
+  string unidad_medida = 8;
+  string vencimiento = 9;
 }
 
 message VistaDonacionesDonanteResponse {
@@ -360,6 +365,12 @@ message DonacionBeneficiarioMsg {
   string descripcion = 2;
   string estado_actual = 3;
   string fecha_asignacion = 4;
+  string nombre_donante = 5;
+  string categoria = 6;
+  string subcategoria = 7;
+  string cantidad = 8;
+  string unidad_medida = 9;
+  string vencimiento = 10;
 }
 
 message ListaDonacionesBeneficiarioResponse {
