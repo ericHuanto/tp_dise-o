@@ -186,6 +186,40 @@ textarea:focus {
     margin-bottom: 20px;
 }
 
+.ayuda-input {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    margin-top: -8px;
+    margin-bottom: 20px;
+}
+
+.password-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.password-wrapper input {
+    width: 100%;
+    padding-right: 42px;
+}
+
+.btn-ojito {
+    position: absolute;
+    right: 10px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    padding: 4px;
+}
+
+.btn-ojito:hover {
+    color: var(--accent-dark);
+}
+
 /* =========================================
    CONTACTOS ADICIONALES Y PIE DE REGISTRO
    ========================================= */
