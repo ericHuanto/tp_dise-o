@@ -96,7 +96,7 @@ public class DonacionController {
     modelo.put("categorias", opcionesCategoria(response.getCategoriasList(), categoria));
     modelo.put("estados", opcionesEstado(estado));
     modelo.put("vencimientos", seleccionar(VENCIMIENTOS, vencimiento));
-    modelo.put("vencidaCodigo", context.queryParam("vencida_codigo"));
+    modelo.put("vencidaCodigo", context.consumeSessionAttribute("vencida_codigo"));
     modelo.put("creadas", context.queryParam("creadas"));
 
     context.render("donaciones/views/admin/donaciones.hbs", modelo);
@@ -118,7 +118,8 @@ public class DonacionController {
       return;
     }
 
-    context.redirect("/donaciones?vencida_codigo=" + DonacionVistaMapper.codigo(idDonacion));
+    context.sessionAttribute("vencida_codigo", DonacionVistaMapper.codigo(idDonacion));
+    context.redirect("/donaciones");
   }
 
   //============= FUNCIONES AUXILIARES =====================
