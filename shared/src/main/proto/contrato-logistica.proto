@@ -13,7 +13,7 @@ service LogisticaService {
   rpc EliminarCamion            (PatenteCamionRequest)        returns (ResultadoLogistica);
 
   //Entregas
-  rpc ListarEntregasEnTraslado (VacioLogistica)            returns (ListaEntregasResponse);
+  rpc ListarEntregasEnTraslado (BeneficiarioEntregaRequest) returns (ListaEntregasResponse);
   rpc ObtenerEntregaPorId      (EntregaIdRequest)          returns (EntregaVistaMsg);
   rpc ConfirmarRecepcion       (ConfirmarRecepcionRequest) returns (ResultadoLogistica);
 
@@ -79,6 +79,7 @@ message EntregaVistaMsg {
   int64 id = 1;
   string estado_actual = 2;
   string patente_camion = 3;
+  repeated int64 ids_donaciones = 4;
 }
 
 message ListaEntregasResponse {
@@ -87,6 +88,7 @@ message ListaEntregasResponse {
 
 message EntregaIdRequest {
   int64 id = 1;
+  int64 id_beneficiario = 2;
 }
 
 message FotoRecepcionMsg {
@@ -97,6 +99,10 @@ message FotoRecepcionMsg {
 message ConfirmarRecepcionRequest {
   int64 id_entrega = 1;
   repeated FotoRecepcionMsg fotos = 2;
+  int64 id_beneficiario = 3;
+}
+message BeneficiarioEntregaRequest {
+  int64 id_beneficiario = 1;
 }
 
 //RUTA

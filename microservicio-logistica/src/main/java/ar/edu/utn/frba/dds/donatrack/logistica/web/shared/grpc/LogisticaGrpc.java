@@ -213,22 +213,36 @@ public class LogisticaGrpc extends LogisticaServiceGrpc.LogisticaServiceImplBase
 
   //ENTREGAS
   @Override
-  public void listarEntregasEnTraslado(VacioLogistica req, StreamObserver<ListaEntregasResponse> out){
+  public void listarEntregasEnTraslado(
+      BeneficiarioEntregaRequest req,
+      StreamObserver<ListaEntregasResponse> out) {
+
     responder(out, () -> withTransaction(() -> {
-      List<Entrega> entregas = repoEntregas.buscarPorEstadoActual(TipoEstadoEntrega.EN_TRASLADO);
+
+      Long idBeneficiario = req.getIdBeneficiario();
+
+      List<Entrega> entregas =
+          repoEntregas.buscarPorEstadoActual(TipoEstadoEntrega.EN_TRASLADO);
+
       ListaEntregasResponse.Builder builder = ListaEntregasResponse.newBuilder();
 
       for (Entrega e : entregas) {
-        builder.addEntregas(aEntregaVistaMsg(e));
+        if (e.getDestino().getId().equals(idBeneficiario)) {
+          builder.addEntregas(aEntregaVistaMsg(e));
+        }
       }
+
       return builder.build();
     }));
   }
-
   @Override
-  public void obtenerEntregaPorId(EntregaIdRequest req, StreamObserver<EntregaVistaMsg> out){
+  public void obtenerEntregaPorId(EntregaIdRequest req, StreamObserver<EntregaVistaMsg> out) {
     responder(out, () -> withTransaction(() -> {
+
       Entrega entrega = buscarEntregaPorId(req.getId());
+
+      validarBeneficiarioEntrega(entrega, req.getIdBeneficiario());
+
       return aEntregaVistaMsg(entrega);
     }));
   }
@@ -243,6 +257,8 @@ public class LogisticaGrpc extends LogisticaServiceGrpc.LogisticaServiceImplBase
       List<Long> idsDonaciones = withTransaction(() -> {
 
         Entrega entrega = buscarEntregaPorId(req.getIdEntrega());
+
+        validarBeneficiarioEntrega(entrega, req.getIdBeneficiario());
 
         entrega.confirmarRecepcion();
 
@@ -407,30 +423,58 @@ public class LogisticaGrpc extends LogisticaServiceGrpc.LogisticaServiceImplBase
     try {
       out.onNext(accion.get());
       out.onCompleted();
+
     } catch (Throwable e) {
       e.printStackTrace();
-      out.onError(Status.INTERNAL.withDescription("Error en logística: " + e.getMessage()).asRuntimeException());
+
+      if (e instanceof io.grpc.StatusRuntimeException) {
+        out.onError(e);
+      } else {
+        out.onError(Status.INTERNAL
+            .withDescription("Error en logística: " + e.getMessage())
+            .asRuntimeException());
+      }
+
     } finally {
       WithLogisticaPersistenceUnit.dispose();
     }
   }
-
   //ENTREGAS
-  private EntregaVistaMsg aEntregaVistaMsg (Entrega entrega) {
+  private EntregaVistaMsg aEntregaVistaMsg(Entrega entrega) {
+
+    List<Long> idsDonaciones = entrega.getDonaciones().stream()
+        .map(DonacionEnTransito::getId)
+        .toList();
+
     return EntregaVistaMsg.newBuilder()
         .setId(entrega.getId())
-        .setEstadoActual(entrega.getEstadoActual() != null ? entrega.getEstadoActual().name() : "")
+        .setEstadoActual(entrega.getEstadoActual() != null
+            ? entrega.getEstadoActual().name()
+            : "")
         .setPatenteCamion(entrega.getCamionAsignado() != null
             ? entrega.getCamionAsignado().getPatente()
             : "")
+        .addAllIdsDonaciones(idsDonaciones)
         .build();
   }
-
   private Entrega buscarEntregaPorId (Long id) {
     Entrega entrega = repoEntregas.buscarPorId(id);
     if(entrega == null){
       throw new RuntimeException("Entrega no encontrada: " + id);
     }
     return entrega;
+  }
+
+  private void validarBeneficiarioEntrega(
+      Entrega entrega,
+      Long idBeneficiario
+  ) {
+    if (entrega.getDestino() == null ||
+        !entrega.getDestino().getId().equals(idBeneficiario)) {
+
+      throw Status.PERMISSION_DENIED
+          .withDescription("La entrega no pertenece al beneficiario")
+          .asRuntimeException();
+    }
   }
 }

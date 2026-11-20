@@ -26,11 +26,28 @@
                     <article class="recepcion-card">
 
                         <div class="recepcion-card-info">
+
                             <h2>Entrega #{{id}}</h2>
 
                             <span class="recepcion-estado">
                                 {{estadoActual}}
                             </span>
+
+                            <div class="recepcion-donaciones">
+                                <h3>Donaciones incluidas</h3>
+
+                                {{#each donaciones}}
+                                    <div class="recepcion-donacion">
+                                        <p>
+                                            <strong>Donación #{{id}}</strong>
+                                        </p>
+
+                                        <p>{{descripcion}}</p>
+                                    </div>
+                                {{/each}}
+
+                            </div>
+
                         </div>
 
                         <div class="recepcion-card-acciones">
