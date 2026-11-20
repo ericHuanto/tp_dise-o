@@ -67,38 +67,6 @@
     color: var(--text-muted);
 }
 
-.pagina-beneficiario button.filtro-activo {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 5px 12px;
-    border: 1px solid var(--border-color);
-    border-radius: 999px;
-    background: var(--primary-color);
-    color: var(--accent-dark);
-    font-size: 0.86rem;
-    cursor: pointer;
-}
-
-.pagina-beneficiario button.filtro-activo span {
-    color: var(--text-muted);
-    font-size: 1rem;
-    line-height: 1;
-}
-
-.pagina-beneficiario button.filtro-activo:hover {
-    border-color: #C62828;
-}
-
-.pagina-beneficiario button.filtro-activo:hover span {
-    color: #C62828;
-}
-
-/* Ajustes de tabla y estados */
-.tabla-donaciones tr[hidden] {
-    display: none;
-}
-
 .codigo-donacion {
     font-weight: 600;
 }
@@ -106,37 +74,6 @@
 .descripcion-donacion {
     max-width: 420px;
     line-height: 1.5;
-}
-
-.estado-donacion.estado-ASIGNACION_REALIZADA {
-    background: #EBE8F7;
-    color: #4B3F8F;
-}
-
-.estado-donacion.estado-LISTA_PARA_ENTREGAR {
-    background: #E6F0F7;
-    color: #2F5F8A;
-}
-
-.estado-donacion.estado-EN_TRASLADO {
-    background: #FDEBDD;
-    color: #9A4A1E;
-}
-
-.estado-donacion.estado-ENTREGADA {
-    background: #E3EFEA;
-    color: var(--accent-green);
-}
-
-.estado-donacion.estado-ENTREGA_FALLIDA,
-.estado-donacion.estado-VENCIDA {
-    background: #FFEBEE;
-    color: #C62828;
-}
-
-.estado-donacion.estado-EN_DEPOSITO {
-    background: #FCF3DC;
-    color: #8A6A2F;
 }
 
 .accion-detalle {

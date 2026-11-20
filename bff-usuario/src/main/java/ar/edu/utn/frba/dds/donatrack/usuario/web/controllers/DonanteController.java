@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 
 public class DonanteController {
   private static final String RUTA_DONACIONES = "/donante/donaciones";
-  private static final int DONACIONES_POR_PAGINA = 8;
+  private static final int DONACIONES_POR_PAGINA = 10;
 
   private final DonacionesServiceGrpc.DonacionesServiceBlockingStub donacionesStub;
   private final LogisticaServiceGrpc.LogisticaServiceBlockingStub logisticaStub;

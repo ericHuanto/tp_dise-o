@@ -1,5 +1,5 @@
 {{#partial "nombre_pestaña"}}
-    Donaciones asignadas - DonaTrack
+    Entregas asignadas - DonaTrack
 {{/partial}}
 
 {{#partial "css_extra"}}
@@ -11,55 +11,51 @@
 
 {{#partial "contenido_propio"}}
     <section class="pagina-admin pagina-donante pagina-beneficiario">
-        <nav class="breadcrumb"><a href="/home">Inicio</a><span>›</span>Donaciones asignadas</nav>
+        <nav class="breadcrumb"><a href="/home">Inicio</a><span>›</span>Entregas asignadas</nav>
 
-        <h1>Donaciones asignadas</h1>
-        <p class="subtitulo">Consultá el estado de las donaciones asignadas a tu organización.</p>
+        <h1>Entregas asignadas</h1>
+        <p class="subtitulo">Consultá el estado de las entregas asignadas a tu organización.</p>
 
         <div class="resumen-donaciones">
             <div class="resumen-tarjeta">
-                <strong class="mono" id="resumen-total">0</strong>
+                <strong class="mono">{{resumen.total}}</strong>
                 <span>Asignadas</span>
             </div>
             <div class="resumen-tarjeta">
-                <strong class="mono" id="resumen-entregadas">0</strong>
+                <strong class="mono">{{resumen.entregadas}}</strong>
                 <span>Entregadas</span>
             </div>
             <div class="resumen-tarjeta">
-                <strong class="mono" id="resumen-en-curso">0</strong>
+                <strong class="mono">{{resumen.enCurso}}</strong>
                 <span>En curso</span>
             </div>
             <div class="resumen-tarjeta">
-                <strong class="mono" id="resumen-fallidas">0</strong>
+                <strong class="mono">{{resumen.fallidas}}</strong>
                 <span>Entrega fallida</span>
             </div>
         </div>
 
-        <div class="filtros filtros-donante" role="region" aria-label="Filtrar donaciones asignadas">
+        <form class="filtros filtros-donante" method="GET">
             <div class="filtros-fila">
                 <div class="buscador">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                         <circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>
                     </svg>
-                    <input type="search" id="buscador-donaciones" placeholder="Buscar por código, bien o fecha" aria-label="Buscar donaciones asignadas">
+                    <input type="search" name="q" value="{{q}}" placeholder="Buscar por código, bien o fecha" aria-label="Buscar entregas asignadas">
                 </div>
 
-                <select id="filtro-estado" aria-label="Estado">
-                    <option value="TODAS">Estado: Todas</option>
-                    <option value="ASIGNACION_REALIZADA">Estado: Asignada</option>
-                    <option value="LISTA_PARA_ENTREGAR">Estado: Preparando entrega</option>
-                    <option value="EN_TRASLADO">Estado: En traslado</option>
-                    <option value="ENTREGADA">Estado: Entregada</option>
-                    <option value="ENTREGA_FALLIDA">Estado: Entrega fallida</option>
-                    <option value="EN_DEPOSITO">Estado: En depósito</option>
-                    <option value="VENCIDA">Estado: Vencida</option>
+                <select name="estado" aria-label="Estado" onchange="this.form.submit()">
+                    {{#each estados}}
+                        <option value="{{this.valor}}" {{#if this.seleccionado}}selected{{/if}}>Estado: {{this.texto}}</option>
+                    {{/each}}
                 </select>
 
-                <button type="button" id="limpiar-filtros" class="btn-link limpiar" hidden>Limpiar filtros</button>
+                {{#if hayFiltros}}
+                    <a href="{{urlLimpiar}}" class="btn-link limpiar">Limpiar filtros</a>
+                {{/if}}
+                <noscript><button type="submit" class="btn-secondary">Filtrar</button></noscript>
             </div>
-
-            <div id="filtros-activos" class="filtros-activos" hidden></div>
-        </div>
+        </form>
 
         <div class="tabla-scroll">
             <table class="tabla tabla-donaciones">
@@ -74,175 +70,54 @@
                 </thead>
                 <tbody>
                 {{#each donaciones}}
-                    <tr class="fila-donacion"
-                        data-estado="{{estadoActual}}"
-                        data-busqueda="#{{id}} {{id}} {{fechaAsignacion}} {{descripcion}}">
-                        <td class="mono codigo codigo-donacion">#{{id}}</td>
-                        <td>{{fechaAsignacion}}</td>
-                        <td class="descripcion-donacion">{{descripcion}}</td>
+                    <tr>
+                        <td class="mono codigo codigo-donacion">{{this.codigo}}</td>
+                        <td>{{this.fechaAsignacion}}</td>
+                        <td class="descripcion-donacion">{{this.descripcion}}</td>
                         <td>
-                            <span class="estado estado-donacion estado-{{estadoActual}}" data-estado="{{estadoActual}}">
-                                {{estadoActual}}
+                            <span class="estado estado-{{this.estadoClave}}">
+                                {{this.estadoTexto}}
                             </span>
                         </td>
                         <td class="celda-accion">
-                            <a href="/mis-donaciones/{{id}}" class="btn-link accion-detalle">
+                            <a href="/mis-donaciones/{{this.id}}" class="btn-link accion-detalle">
                                 Ver detalle
                             </a>
                         </td>
                     </tr>
                 {{else}}
-                    <tr class="fila-vacia-inicial">
+                    <tr>
                         <td colspan="5" class="vacio">
-                            Todavía no tenés donaciones asignadas.
+                            {{#if hayFiltros}}
+                                No hay entregas que coincidan con los filtros.
+                            {{else}}
+                                Todavía no tenés entregas asignadas.
+                            {{/if}}
                         </td>
                     </tr>
                 {{/each}}
-                <tr class="fila-sin-resultados" hidden>
-                    <td colspan="5" class="vacio mensaje-sin-resultados">
-                        No hay donaciones que coincidan con los filtros.
-                    </td>
-                </tr>
                 </tbody>
             </table>
+
+            {{#if total}}
+                <div class="paginacion">
+                    <span>Mostrando {{desde}}–{{hasta}} de {{total}} entregas</span>
+                    <div class="paginacion-botones">
+                        {{#if urlAnterior}}
+                            <a href="{{urlAnterior}}" class="btn-pagina">Anterior</a>
+                        {{else}}
+                            <span class="btn-pagina deshabilitado" aria-disabled="true">Anterior</span>
+                        {{/if}}
+                        {{#if urlSiguiente}}
+                            <a href="{{urlSiguiente}}" class="btn-pagina">Siguiente</a>
+                        {{else}}
+                            <span class="btn-pagina deshabilitado" aria-disabled="true">Siguiente</span>
+                        {{/if}}
+                    </div>
+                </div>
+            {{/if}}
         </div>
     </section>
-{{/partial}}
-
-{{#partial "scripts"}}
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const selectEstado = document.getElementById("filtro-estado");
-            const inputBusqueda = document.getElementById("buscador-donaciones");
-            const btnLimpiar = document.getElementById("limpiar-filtros");
-            const contenedorActivos = document.getElementById("filtros-activos");
-            const filas = Array.from(document.querySelectorAll(".fila-donacion"));
-            const filaSinResultados = document.querySelector(".fila-sin-resultados");
-
-            const nombresEstados = {
-                ASIGNACION_REALIZADA: "Asignada",
-                LISTA_PARA_ENTREGAR: "Preparando entrega",
-                EN_TRASLADO: "En traslado",
-                ENTREGADA: "Entregada",
-                ENTREGA_FALLIDA: "Entrega fallida",
-                EN_DEPOSITO: "En depósito",
-                VENCIDA: "Vencida"
-            };
-
-            const estadosEnCurso = new Set([
-                "ASIGNACION_REALIZADA",
-                "LISTA_PARA_ENTREGAR",
-                "EN_TRASLADO",
-                "EN_DEPOSITO"
-            ]);
-
-            document.querySelectorAll(".estado-donacion").forEach(etiqueta => {
-                const estado = etiqueta.dataset.estado;
-                etiqueta.textContent = nombresEstados[estado] || estado;
-            });
-
-            function actualizarResumen() {
-                let entregadas = 0;
-                let enCurso = 0;
-                let fallidas = 0;
-
-                filas.forEach(fila => {
-                    const estado = fila.dataset.estado;
-                    if (estado === "ENTREGADA") {
-                        entregadas++;
-                    } else if (estado === "ENTREGA_FALLIDA") {
-                        fallidas++;
-                    } else if (estadosEnCurso.has(estado)) {
-                        enCurso++;
-                    }
-                });
-
-                document.getElementById("resumen-total").textContent = filas.length;
-                document.getElementById("resumen-entregadas").textContent = entregadas;
-                document.getElementById("resumen-en-curso").textContent = enCurso;
-                document.getElementById("resumen-fallidas").textContent = fallidas;
-            }
-
-            function renderizarFiltrosActivos(estadoSeleccionado, textoBusqueda) {
-                const chips = [];
-
-                if (estadoSeleccionado !== "TODAS") {
-                    const nombreEstado = nombresEstados[estadoSeleccionado] || estadoSeleccionado;
-                    chips.push({
-                        tipo: "estado",
-                        etiqueta: `Estado: ${nombreEstado}`
-                    });
-                }
-
-                if (textoBusqueda.trim() !== "") {
-                    chips.push({
-                        tipo: "busqueda",
-                        etiqueta: `Búsqueda: "${textoBusqueda.trim()}"`
-                    });
-                }
-
-                btnLimpiar.hidden = chips.length === 0;
-                contenedorActivos.hidden = chips.length === 0;
-
-                if (chips.length === 0) {
-                    contenedorActivos.innerHTML = "";
-                    return;
-                }
-
-                contenedorActivos.innerHTML = `<span>Filtros activos:</span>` + chips.map(chip => `
-                    <button type="button" class="filtro-activo" data-quitar="${chip.tipo}" title="Quitar filtro">
-                        ${chip.etiqueta} <span aria-hidden="true">×</span>
-                    </button>
-                `).join("");
-
-                contenedorActivos.querySelectorAll(".filtro-activo").forEach(btn => {
-                    btn.addEventListener("click", () => {
-                        if (btn.dataset.quitar === "estado") {
-                            selectEstado.value = "TODAS";
-                        } else if (btn.dataset.quitar === "busqueda") {
-                            inputBusqueda.value = "";
-                        }
-                        aplicarFiltros();
-                    });
-                });
-            }
-
-            function aplicarFiltros() {
-                const estadoSeleccionado = selectEstado.value;
-                const termino = inputBusqueda.value.trim().toLowerCase();
-
-                let visibles = 0;
-
-                filas.forEach(fila => {
-                    const coincideEstado = estadoSeleccionado === "TODAS" || fila.dataset.estado === estadoSeleccionado;
-                    const textoFila = (fila.dataset.busqueda || "").toLowerCase();
-                    const coincideTexto = termino === "" || textoFila.includes(termino);
-
-                    const mostrar = coincideEstado && coincideTexto;
-                    fila.hidden = !mostrar;
-                    if (mostrar) visibles++;
-                });
-
-                if (filaSinResultados) {
-                    filaSinResultados.hidden = !(filas.length > 0 && visibles === 0);
-                }
-
-                renderizarFiltrosActivos(estadoSeleccionado, inputBusqueda.value);
-            }
-
-            selectEstado.addEventListener("change", aplicarFiltros);
-            inputBusqueda.addEventListener("input", aplicarFiltros);
-
-            btnLimpiar.addEventListener("click", () => {
-                selectEstado.value = "TODAS";
-                inputBusqueda.value = "";
-                aplicarFiltros();
-            });
-
-            actualizarResumen();
-            aplicarFiltros();
-        });
-    </script>
 {{/partial}}
 
 {{> comun/partials/layout.hbs}}
