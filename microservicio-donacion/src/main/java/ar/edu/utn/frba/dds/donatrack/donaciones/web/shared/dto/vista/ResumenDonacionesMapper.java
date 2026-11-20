@@ -14,7 +14,8 @@ public final class ResumenDonacionesMapper {
         case ENTREGADA -> entregadas++;
         case ENTREGA_FALLIDA -> fallidas++;
         case VENCIDA -> vencidas++;
-        default -> enCurso++;
+        case EN_TRASLADO, ASIGNACION_REALIZADA, LISTA_PARA_ENTREGAR -> enCurso++;
+        default -> { }
       }
     }
     return ResumenDonacionesMsg.newBuilder()

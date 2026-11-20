@@ -32,8 +32,12 @@
 
                 <div class="form-group">
                     <label for="new_password">Nueva contraseña</label>
-                    <input type="password" id="new_password" name="new_password" required>
+                    <input type="password" id="new_password" name="new_password" required
+                           minlength="8" maxlength="72" pattern=".*\d.*"
+                           title="Mínimo 8 caracteres, con al menos un número">
+                    <p class="ayuda-input">Mínimo 8 caracteres, con al menos un número.</p>
                 </div>
+                <p class="ayuda-input">Mínimo 8 caracteres, con al menos un número.</p>
 
                 <button type="submit" class="btn-submit">Guardar contraseña</button>
             </form>

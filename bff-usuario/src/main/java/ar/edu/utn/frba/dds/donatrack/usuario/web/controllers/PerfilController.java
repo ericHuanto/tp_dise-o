@@ -7,6 +7,7 @@ import ar.edu.utn.frba.dds.donatrack.grpc.RegistrarHumanaRequest;
 import ar.edu.utn.frba.dds.donatrack.grpc.RegistrarJuridicaRequest;
 import ar.edu.utn.frba.dds.donatrack.grpc.RegistroActorResponse;
 import ar.edu.utn.frba.dds.donatrack.usuario.dominio.usuario.Permiso;
+import ar.edu.utn.frba.dds.donatrack.usuario.dominio.usuario.PoliticaContrasena;
 import ar.edu.utn.frba.dds.donatrack.usuario.dominio.usuario.Usuario;
 import ar.edu.utn.frba.dds.donatrack.usuario.persistencia.UsuarioRepository;
 import io.github.flbulgarelli.jpa.extras.simple.WithSimplePersistenceUnit;
@@ -171,6 +172,13 @@ public class PerfilController implements WithSimplePersistenceUnit {
       context.redirect(rutaFormulario + "?error=Las_contraseñas_no_coinciden");
       return null;
     }
+
+    String errorPolitica = PoliticaContrasena.validar(password);
+    if (errorPolitica != null) {
+      context.redirect(rutaFormulario + "?error=" + errorPolitica.replace(' ', '_'));
+      return null;
+    }
+
     if (repoUsuarios.buscarPorCredenciales(nombreUsuario) != null) {
       context.redirect(rutaFormulario + "?error=El_nombre_de_usuario_ya_esta_en_uso");
       return null;
