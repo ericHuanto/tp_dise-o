@@ -3,19 +3,15 @@
     Detalle de donación
 {{/partial}}
 
-{{#partial "breadcrumbs"}}
-    <span>Inicio</span>
-    <span>Donaciones asignadas</span>
-    <span>Detalle de donación</span>
-{{/partial}}
-
 {{#partial "css_extra"}}
     <link rel="stylesheet" href="/donaciones/css/beneficiario/detalle_donacion.css">
 {{/partial}}
 
 {{#partial "contenido_propio"}}
 
-    <main class="detalle-donacion">
+    <div class="detalle-donacion">
+
+        <nav class="breadcrumb"><a href="/home">Inicio</a><span>›</span><a href="/mis-donaciones">Donaciones asignadas</a><span>›</span>Detalle</nav>
 
         <div class="detalle-encabezado">
             <div>
@@ -68,7 +64,7 @@
 
         </section>
 
-    </main>
+    </div>
 
 {{/partial}}
 

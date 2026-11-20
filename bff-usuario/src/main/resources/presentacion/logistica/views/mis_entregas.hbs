@@ -2,16 +2,16 @@
 {{#partial "nombre_pestaña"}}
     Mis entregas
 {{/partial}}
+
 {{#partial "css_extra"}}
     <link rel="stylesheet" href="/logistica/css/mis_entregas.css">
 {{/partial}}
+
 {{#partial "contenido_propio"}}
-    <main class="recepciones-page">
+    <div class="recepciones-page">
 
         <div class="recepciones-encabezado">
-            <p class="recepciones-breadcrumb">
-                Logística &rsaquo; Recepciones
-            </p>
+            <nav class="breadcrumb"><a href="/home">Inicio</a><span>›</span>Recepciones</nav>
 
             <h1>Mis entregas</h1>
             <p class="recepciones-descripcion">
@@ -70,7 +70,7 @@
             </div>
         {{/if}}
 
-    </main>
+    </div>
 {{/partial}}
 
 {{> comun/partials/layout.hbs}}

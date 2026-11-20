@@ -5,12 +5,6 @@
     padding: 36px 24px 80px;
 }
 
-.recepciones-breadcrumb {
-    color: #77736c;
-    font-size: 14px;
-    margin-bottom: 24px;
-}
-
 .recepciones-encabezado h1 {
     font-size: 34px;
     font-weight: 700;
@@ -95,6 +89,40 @@
 }
 
 .recepciones-vacio p {
+    color: #77736c;
+}
+
+/* Bloque "Donaciones incluidas" de cada entrega */
+.recepcion-donaciones {
+    border-top: 1px solid #eee9e2;
+    padding-top: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.recepcion-donaciones h3 {
+    font-size: 13px;
+    font-weight: 600;
+    color: #77736c;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.recepcion-donacion {
+    display: flex;
+    gap: 10px;
+    font-size: 15px;
+    color: #242424;
+}
+
+.recepcion-donacion p {
+    margin: 0;
+}
+
+.recepcion-donacion strong {
+    font-family: monospace;
+    font-weight: 500;
     color: #77736c;
 }
 
