@@ -17,6 +17,9 @@ import ar.edu.utn.frba.dds.donatrack.logistica.persistencia.WithLogisticaPersist
 import ar.edu.utn.frba.dds.donatrack.logistica.web.shared.convers.CamionMapper;
 import ar.edu.utn.frba.dds.donatrack.logistica.web.shared.dto.camion.ActualizarCamionRequest;
 import ar.edu.utn.frba.dds.donatrack.logistica.web.shared.dto.camion.CamionResponse;
+import ar.edu.utn.frba.dds.donatrack.logistica.web.shared.integracion.microserviciosdonaciones.ConectorDonaciones;
+import ar.edu.utn.frba.dds.donatrack.logistica.web.shared.integracion.microserviciosdonaciones.ConectorDonacionesGrpc;
+import ar.edu.utn.frba.dds.donatrack.shared.excepciones.ServicioExternoException;
 import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
 import java.io.IOException;
@@ -37,6 +40,7 @@ public class LogisticaGrpc extends LogisticaServiceGrpc.LogisticaServiceImplBase
   private final GpsRepository repoGps;
   private final RutaRepository repoRutas;
   private final EntregaRepository repoEntregas;
+  private final ConectorDonaciones conectorDonaciones;
   private final Path directorioFotos = Path.of("microservicio-logistica", "uploads", "entregas");
 
   public LogisticaGrpc() {
@@ -44,18 +48,22 @@ public class LogisticaGrpc extends LogisticaServiceGrpc.LogisticaServiceImplBase
         CamionRepository.getInstancia(),
         GpsRepository.getInstancia(),
         RutaRepository.getInstancia(),
-        EntregaRepository.getInstancia()
+        EntregaRepository.getInstancia(),
+        new ConectorDonacionesGrpc()
     );
   }
 
   public LogisticaGrpc(CamionRepository repoCamiones,
                        GpsRepository repoGps,
                        RutaRepository repoRutas,
-                       EntregaRepository repoEntregas) {
+                       EntregaRepository repoEntregas,
+                       ConectorDonaciones conectorDonaciones
+                       ) {
     this.repoCamiones = repoCamiones;
     this.repoGps = repoGps;
     this.repoRutas = repoRutas;
     this.repoEntregas = repoEntregas;
+    this.conectorDonaciones = conectorDonaciones;
 
     try {
       if (!Files.exists(directorioFotos)) {
@@ -226,30 +234,68 @@ public class LogisticaGrpc extends LogisticaServiceGrpc.LogisticaServiceImplBase
   }
 
   @Override
-  public void confirmarRecepcion(ConfirmarRecepcionRequest req, StreamObserver<ResultadoLogistica> out){
+  public void confirmarRecepcion(
+      ConfirmarRecepcionRequest req,
+      StreamObserver<ResultadoLogistica> out) {
+
     responder(out, () -> {
-      withTransaction(() -> {
+
+      List<Long> idsDonaciones = withTransaction(() -> {
+
         Entrega entrega = buscarEntregaPorId(req.getIdEntrega());
+
         entrega.confirmarRecepcion();
-        try{
-          for(FotoRecepcionMsg foto : req.getFotosList()) {
-            String nombreArchivo = UUID.randomUUID().toString().substring(0, 8) + "-" + foto.getNombreArchivo();
+
+        try {
+          for (FotoRecepcionMsg foto : req.getFotosList()) {
+
+            String nombreArchivo =
+                UUID.randomUUID().toString().substring(0, 8)
+                    + "-" + foto.getNombreArchivo();
+
             Path rutaDestino = directorioFotos.resolve(nombreArchivo);
+
             Files.write(rutaDestino, foto.getContenido().toByteArray());
+
             String url = "/uploads/entregas/" + nombreArchivo;
+
             entrega.agregarFotoRecepcion(url);
           }
         } catch (IOException e) {
-          throw new RuntimeException("Error de conexión con el disco rígido", e);
+          throw new RuntimeException(
+              "Error al guardar las fotografías de recepción", e);
         }
+
         repoEntregas.actualizar(entrega);
+
+        return entrega.getDonaciones().stream()
+            .map(DonacionEnTransito::getId)
+            .toList();
       });
+
+      // Informamos a Donaciones mediante gRPC.
+      String linkComprobante = "Entrega ID: " + req.getIdEntrega();
+
+      try {
+        for (Long idDonacion : idsDonaciones) {
+          conectorDonaciones.marcarDonacionEntregaExitosa(
+              idDonacion,
+              linkComprobante
+          );
+        }
+      } catch (ServicioExternoException e) {
+        throw new RuntimeException(
+            "La entrega fue confirmada en Logística, "
+                + "pero no se pudo comunicar con Donaciones "
+                + "para actualizar su estado.",
+            e
+        );
+      }
       return ResultadoLogistica.newBuilder()
           .setMensaje("Recepción confirmada")
           .build();
     });
   }
-
   @Override
   public void obtenerCamionesDeDonaciones(DonacionesIdsRequest req, StreamObserver<ListaCamionesDonacionesResponse> out) {
     responder(out, () -> withTransaction(() -> {
