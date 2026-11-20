@@ -1,28 +1,27 @@
-
 /* PANTALLA HISTORIAL */
 
 .historial {
-    width: min(1200px, 100%);
+    width: min(1320px, 100%);
     margin: 0 auto;
-    padding: 48px 32px 80px;
+    padding: 32px 40px 80px;
 }
 
 /* ENCABEZADO */
 
 .historial-encabezado {
-    margin-bottom: 28px;
+    margin-bottom: 24px;
 }
 
 .historial-encabezado h1 {
-    font-size: 2rem;
+    font-size: 2.2rem;
     font-weight: 700;
     color: var(--accent-dark);
-    margin-bottom: 8px;
+    margin-bottom: 6px;
 }
 
 .historial-encabezado p {
     color: var(--text-muted);
-    font-size: 0.95rem;
+    font-size: 0.98rem;
 }
 
 /* FILTROS */
@@ -38,13 +37,13 @@
 .filtro-historial {
     padding: 9px 17px;
     border: 1px solid var(--border-color);
-    border-radius: 20px;
+    border-radius: 999px;
     background-color: var(--white);
     color: var(--accent-dark);
-    font-size: 0.8rem;
+    font-size: 0.85rem;
     font-weight: 600;
     cursor: pointer;
-    transition: 0.2s ease;
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
 }
 
 .filtro-historial:hover {
@@ -63,7 +62,7 @@
 .historial-lista {
     background-color: var(--white);
     border: 1px solid var(--border-color);
-    border-radius: 10px;
+    border-radius: 12px;
     overflow: hidden;
 }
 
@@ -73,8 +72,8 @@
     display: flex;
     align-items: center;
     gap: 20px;
-    padding: 22px 24px;
-    border-bottom: 1px solid var(--border-color);
+    padding: 20px 24px;
+    border-bottom: 1px solid #EFECE6;
     transition: background-color 0.2s ease;
 }
 
@@ -97,12 +96,12 @@
     height: 42px;
     min-width: 42px;
     border-radius: 10px;
-    background-color: #E6EFEA;
-    color: var(--accent-green);
+    background-color: #EBE9DF;
+    color: var(--accent-dark);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.85rem;
+    font-size: 0.9rem;
     font-weight: 700;
 }
 
@@ -114,31 +113,75 @@
 }
 
 .historial-tipo {
-    display: inline-block;
-    margin-bottom: 5px;
-    color: var(--accent-green);
-    font-size: 0.7rem;
-    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 8px;
+    padding: 3px 10px;
+    border-radius: 5px;
+    background-color: #EBE9DF;
+    color: var(--text-muted);
+    font-family: ui-monospace, Menlo, Consolas, monospace;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
+    white-space: nowrap;
+}
+
+.historial-tipo::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: currentColor;
+}
+
+.historial-tipo[data-estado="ASIGNACION_REALIZADA"] {
+    background-color: #EBE8F7;
+    color: #4B3F8F;
+}
+
+.historial-tipo[data-estado="LISTA_PARA_ENTREGAR"] {
+    background-color: #E6F0F7;
+    color: #2F5F8A;
+}
+
+.historial-tipo[data-estado="EN_TRASLADO"] {
+    background-color: #FDEBDD;
+    color: #9A4A1E;
+}
+
+.historial-tipo[data-estado="ENTREGADA"] {
+    background-color: #E3EFEA;
+    color: var(--accent-green);
+}
+
+.historial-tipo[data-estado="ENTREGA_FALLIDA"] {
+    background-color: #FFEBEE;
+    color: #C62828;
 }
 
 .historial-informacion h3 {
     color: var(--accent-dark);
-    font-size: 0.95rem;
+    font-size: 0.98rem;
     font-weight: 700;
-    margin-bottom: 6px;
+    margin-bottom: 4px;
 }
 
 .historial-informacion p {
     color: var(--text-muted);
-    font-size: 0.85rem;
+    font-size: 0.9rem;
     line-height: 1.5;
     margin-bottom: 4px;
 }
 
+.historial-informacion p:last-child {
+    margin-bottom: 0;
+}
+
 .historial-detalle {
-    font-size: 0.8rem !important;
+    font-size: 0.84rem;
 }
 
 /* FECHA Y ACCIONES */
@@ -147,19 +190,19 @@
     display: flex;
     flex-direction: column;
     align-items: flex-end;
-    gap: 10px;
-    min-width: 110px;
+    gap: 8px;
+    min-width: 130px;
 }
 
 .historial-fecha {
     color: var(--text-muted);
-    font-size: 0.75rem;
+    font-size: 0.8rem;
     white-space: nowrap;
 }
 
 .historial-derecha a {
     color: var(--accent-green);
-    font-size: 0.85rem;
+    font-size: 0.88rem;
     font-weight: 600;
     text-decoration: none;
     white-space: nowrap;
@@ -173,28 +216,33 @@
 
 .historial-vacio,
 .historial-sin-resultados {
-    padding: 60px 24px;
+    padding: 48px 24px;
     text-align: center;
     background-color: var(--white);
+    border-radius: 12px;
+}
+
+.historial-vacio {
     border: 1px solid var(--border-color);
-    border-radius: 10px;
 }
 
 .historial-vacio h2 {
     color: var(--accent-dark);
-    margin-bottom: 10px;
+    margin-bottom: 8px;
+    font-size: 1.25rem;
 }
 
 .historial-vacio p,
 .historial-sin-resultados {
     color: var(--text-muted);
+    font-size: 0.92rem;
 }
 
 /* RESPONSIVE */
 
-@media (max-width: 768px) {
+@media (max-width: 800px) {
     .historial {
-        padding: 30px 16px 60px;
+        padding: 24px 16px 60px;
     }
 
     .historial-item {
@@ -207,7 +255,9 @@
     .historial-derecha {
         width: 100%;
         min-width: 0;
-        padding-left: 56px;
-        align-items: flex-start;
+        padding-left: 62px;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
     }
 }

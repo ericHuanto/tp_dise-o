@@ -1,9 +1,9 @@
-
 {{#partial "nombre_pestaña"}}
-    Historial
+    Historial - DonaTrack
 {{/partial}}
 
 {{#partial "css_extra"}}
+    <link rel="stylesheet" href="/comun/css/formularios.css">
     <link rel="stylesheet" href="/donaciones/css/beneficiario/notificaciones.css">
 {{/partial}}
 
@@ -13,9 +13,7 @@
 {{/partial}}
 
 {{#partial "contenido_propio"}}
-
     <section class="historial">
-
         <div class="historial-encabezado">
             <div>
                 <h1>Historial</h1>
@@ -24,37 +22,38 @@
         </div>
 
         {{#if novedades}}
-
             <div class="historial-filtros">
-                <button type="button" class="filtro-historial activo" data-filtro="todos">
+                <button type="button" class="filtro-historial activo" data-estado="TODAS">
                     Todos
                 </button>
-                <button type="button" class="filtro-historial" data-filtro="asignacion">
-                    Asignaciones
+                <button type="button" class="filtro-historial" data-estado="ASIGNACION_REALIZADA">
+                    Asignada
                 </button>
-                <button type="button" class="filtro-historial" data-filtro="recepcion">
-                    Recepciones
+                <button type="button" class="filtro-historial" data-estado="LISTA_PARA_ENTREGAR">
+                    Preparando entrega
                 </button>
-                <button type="button" class="filtro-historial" data-filtro="otros">
-                    Otros
+                <button type="button" class="filtro-historial" data-estado="EN_TRASLADO">
+                    En traslado
+                </button>
+                <button type="button" class="filtro-historial" data-estado="ENTREGADA">
+                    Entregada
+                </button>
+                <button type="button" class="filtro-historial" data-estado="ENTREGA_FALLIDA">
+                    Entrega fallida
                 </button>
             </div>
 
             <div class="historial-lista">
-
                 {{#each novedades}}
-
                     <article class="historial-item" data-estado="{{tipoEstado}}">
-
                         <div class="historial-icono">
                             <span class="historial-inicial">D</span>
                         </div>
 
                         <div class="historial-informacion">
-
-                        <span class="historial-tipo">
-                            {{tipoEstado}}
-                        </span>
+                            <span class="historial-tipo" data-estado="{{tipoEstado}}">
+                                {{tipoEstado}}
+                            </span>
 
                             <h3>Donación #{{idDonacion}}</h3>
 
@@ -63,82 +62,74 @@
                             {{#if detalle}}
                                 <p class="historial-detalle">{{detalle}}</p>
                             {{/if}}
-
                         </div>
 
                         <div class="historial-derecha">
-
-                        <span class="historial-fecha">
-                            {{fecha}}
-                        </span>
+                            <span class="historial-fecha">{{fecha}}</span>
 
                             <a href="/mis-donaciones/{{idDonacion}}">
                                 Ver donación
                             </a>
-
                         </div>
-
                     </article>
-
                 {{/each}}
-
             </div>
 
             <p class="historial-sin-resultados" id="historial-sin-resultados" hidden>
                 No hay movimientos para este filtro.
             </p>
-
         {{else}}
-
             <div class="historial-vacio">
                 <h2>No hay movimientos registrados</h2>
                 <p>Todavía no tenés novedades sobre tus donaciones.</p>
             </div>
-
         {{/if}}
-
     </section>
-
 {{/partial}}
 
 {{#partial "scripts"}}
     <script>
-        const botonesFiltro = document.querySelectorAll(".filtro-historial");
-        const movimientos = document.querySelectorAll(".historial-item");
-        const mensajeVacio = document.getElementById("historial-sin-resultados");
+        document.addEventListener("DOMContentLoaded", function () {
+            const botonesFiltro = document.querySelectorAll(".filtro-historial");
+            const movimientos = document.querySelectorAll(".historial-item");
+            const mensajeVacio = document.getElementById("historial-sin-resultados");
 
-        botonesFiltro.forEach(boton => {
-            boton.addEventListener("click", () => {
-                const filtro = boton.dataset.filtro;
-                let visibles = 0;
+            const nombresEstados = {
+                ASIGNACION_REALIZADA: "Asignada",
+                LISTA_PARA_ENTREGAR: "Preparando entrega",
+                EN_TRASLADO: "En traslado",
+                ENTREGADA: "Entregada",
+                ENTREGA_FALLIDA: "Entrega fallida"
+            };
 
-                botonesFiltro.forEach(b => b.classList.remove("activo"));
-                boton.classList.add("activo");
+            document.querySelectorAll(".historial-tipo").forEach(etiqueta => {
+                const estado = (etiqueta.dataset.estado || "").trim().toUpperCase();
+                etiqueta.textContent = nombresEstados[estado] || etiqueta.dataset.estado;
+            });
 
-                movimientos.forEach(movimiento => {
-                    const estado = (movimiento.dataset.estado || "").toUpperCase();
+            botonesFiltro.forEach(boton => {
+                boton.addEventListener("click", () => {
+                    const estadoFiltro = boton.dataset.estado;
+                    let visibles = 0;
 
-                    const esAsignacion = estado.includes("ASIGN");
-                    const esRecepcion = estado.includes("RECIB")
-                            || estado.includes("RECEP")
-                            || estado.includes("ENTREG");
+                    botonesFiltro.forEach(b => b.classList.remove("activo"));
+                    boton.classList.add("activo");
 
-                    const mostrar =
-                            filtro === "todos" ||
-                            (filtro === "asignacion" && esAsignacion) ||
-                            (filtro === "recepcion" && esRecepcion) ||
-                            (filtro === "otros" && !esAsignacion && !esRecepcion);
+                    movimientos.forEach(movimiento => {
+                        const estadoItem = (movimiento.dataset.estado || "").trim().toUpperCase();
+                        const mostrar = estadoFiltro === "TODAS" || estadoItem === estadoFiltro;
 
-                    movimiento.hidden = !mostrar;
+                        movimiento.hidden = !mostrar;
 
-                    if (mostrar) {
-                        visibles++;
+                        if (mostrar) {
+                            visibles++;
+                        }
+                    });
+
+                    if (mensajeVacio) {
+                        mensajeVacio.hidden = visibles > 0;
                     }
                 });
-
-                if (mensajeVacio) {
-                    mensajeVacio.hidden = visibles > 0;
-                }
             });
         });
     </script>
