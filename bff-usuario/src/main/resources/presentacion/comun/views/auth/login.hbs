@@ -15,6 +15,9 @@
             <p class="subtitulo">Un único acceso para personas donantes, entidades beneficiarias y administración.</p>
 
             <form action="/login" method="post">
+                <button type="submit" tabindex="-1" aria-hidden="true"
+                    style="position: absolute; left: -9999px;">Ingresar</button>
+
                 {{#if mensajeExito}}
                     <div class="alerta-exito" style="color: green; background-color: #e6f4ea; padding: 10px; border-radius: 5px; margin-bottom: 15px;">
                         {{mensajeExito}}

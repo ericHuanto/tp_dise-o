@@ -14,6 +14,9 @@ public class DatosIniciales implements WithSimplePersistenceUnit {
   }
 
   public void comenzar() {
+    if (repoUsuarios.buscarPorCredenciales(cfg.adminUsuario("admin")) != null) {
+      return;
+    }
     //Usuarios
     Usuario comedorAmerica = new Usuario("comedorA", "beneficiario");
     Usuario comedorPibes = new Usuario("comedorP", "beneficiario");
