@@ -1,5 +1,6 @@
 package ar.edu.utn.frba.dds.donatrack.donaciones.dominio.mediocontacto;
 
+import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.mediocontacto.implementacion.ClientesMensajeria;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.mediocontacto.implementacion.whatsapp.ClienteWhatsappMock;
 import ar.edu.utn.frba.dds.donatrack.shared.excepciones.DominioException;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.mediocontacto.implementacion.whatsapp.ClienteWhatsapp;
@@ -19,7 +20,7 @@ public class WhatsappDeContacto extends MedioContacto {
     checkDatos(telefono, esPrincipal);
     this.detalle = telefono;
     this.esPrincipal = esPrincipal;
-    this.clienteWhatsapp = new ClienteWhatsappMock();
+    //this.clienteWhatsapp = new ClienteWhatsappMock();
   }
 
   public WhatsappDeContacto(String telefono, Boolean esPrincipal, ClienteWhatsapp clienteWhatsapp) {
@@ -43,8 +44,15 @@ public class WhatsappDeContacto extends MedioContacto {
 
   @Override
   public void enviarMensaje(String message) {
-    this.clienteWhatsapp = new ClienteWhatsappMock(); //para evitar el problema de null, en la populación
-    clienteWhatsapp.enviarWhatsapp(detalle, message);
+    //Al leerlo de la base, el cliente llega como null. Por eso se elige recién acá
+    if (clienteWhatsapp == null) {
+      clienteWhatsapp = ClientesMensajeria.whatsapp();
+    }
+    try {
+      clienteWhatsapp.enviarWhatsapp(detalle, message);
+    } catch (RuntimeException e) {
+      System.err.println("[AVISO] No se pudo enviar el mensaje a " + detalle + ": " + e.getMessage());
+    }
   }
 
   @Override

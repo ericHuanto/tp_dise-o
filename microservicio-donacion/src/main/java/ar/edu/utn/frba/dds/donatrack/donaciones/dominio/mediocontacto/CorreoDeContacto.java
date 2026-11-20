@@ -1,6 +1,6 @@
 package ar.edu.utn.frba.dds.donatrack.donaciones.dominio.mediocontacto;
 
-import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.mediocontacto.implementacion.correo.ClienteCorreoMock;
+import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.mediocontacto.implementacion.ClientesMensajeria;
 import ar.edu.utn.frba.dds.donatrack.shared.excepciones.DominioException;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.mediocontacto.implementacion.correo.ClienteCorreo;
 import javax.persistence.DiscriminatorValue;
@@ -19,7 +19,7 @@ public class CorreoDeContacto extends MedioContacto {
     checkDatos(correo, esPrincipal);
     this.detalle = correo;
     this.esPrincipal = esPrincipal;
-    this.clienteCorreo = new ClienteCorreoMock();
+    //this.clienteCorreo = new ClienteCorreoMock();
   }
 
   public CorreoDeContacto(String correo, Boolean esPrincipal, ClienteCorreo clienteCorreo) {
@@ -43,8 +43,15 @@ public class CorreoDeContacto extends MedioContacto {
 
   @Override
   public void enviarMensaje(String message) {
-    clienteCorreo = new ClienteCorreoMock(); // agregado para evitar el problema de que es null, ya que no fue persistido.
-    clienteCorreo.enviarCorreo(detalle, message);
+    //Al leerlo de la base, el cliente llega como null. Por eso se elige recién acá
+    if (clienteCorreo == null) {
+      clienteCorreo = ClientesMensajeria.correo();
+    }
+    try {
+      clienteCorreo.enviarCorreo(detalle, message);
+    } catch (RuntimeException e) {
+      System.err.println("[AVISO] No se pudo enviar el correo a " + detalle + ": " + e.getMessage());
+    }
   }
 
   @Override

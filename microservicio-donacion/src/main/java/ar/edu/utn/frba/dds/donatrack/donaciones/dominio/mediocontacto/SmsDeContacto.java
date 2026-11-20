@@ -1,5 +1,6 @@
 package ar.edu.utn.frba.dds.donatrack.donaciones.dominio.mediocontacto;
 
+import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.mediocontacto.implementacion.ClientesMensajeria;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.mediocontacto.implementacion.sms.ClienteSmsMock;
 import ar.edu.utn.frba.dds.donatrack.shared.excepciones.DominioException;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.mediocontacto.implementacion.sms.ClienteSms;
@@ -19,7 +20,7 @@ public class SmsDeContacto extends MedioContacto {
     checkDatos(telefono, esPrincipal);
     this.detalle = telefono;
     this.esPrincipal = esPrincipal;
-    this.clienteSms = new ClienteSmsMock();
+    //this.clienteSms = new ClienteSmsMock();
   }
 
   public SmsDeContacto(String telefono, Boolean esPrincipal, ClienteSms clienteSms) {
@@ -43,8 +44,15 @@ public class SmsDeContacto extends MedioContacto {
 
   @Override
   public void enviarMensaje(String message) {
-    this.clienteSms = new ClienteSmsMock(); //para evitar el problema de null, en la populación
-    clienteSms.enviarSms(detalle, message);
+    //Al leerlo de la base, el cliente llega como null. Por eso se elige recién acá
+    if (clienteSms == null) {
+      clienteSms = ClientesMensajeria.sms();
+    }
+    try {
+      clienteSms.enviarSms(detalle, message);
+    } catch (RuntimeException e) {
+      System.err.println("[AVISO] No se pudo enviar el mensaje a " + detalle + ": " + e.getMessage());
+    }
   }
 
   @Override
