@@ -51,7 +51,6 @@ public class SesionController implements WithSimplePersistenceUnit {
       context.sessionAttribute("nombreEscrito", nombreUsuario);
       context.redirect("/login");
     } else {
-      usuario.inicializarPermisos();
       context.sessionAttribute("usuario_actual", usuario);
       context.redirect("/");
     }

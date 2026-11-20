@@ -71,6 +71,12 @@ public final class ManejadorErrores {
   //============= FUNCIONES AUXILIARES =====================
 
   private static void mostrar(Context ctx, int codigo, String detalle) {
+    if (codigo == 401 && !ctx.path().startsWith("/api/")) {
+      ctx.sessionAttribute("errorFlash", "Necesitás iniciar sesión para ver esa página.");
+      ctx.redirect("/login");
+      return;
+    }
+
     ctx.attribute(YA_MOSTRADO, true);
     ctx.status(codigo);
     String detalleLimpio = (detalle == null || detalle.isBlank() || detalle.trim().startsWith("<")) ? null : detalle.trim();

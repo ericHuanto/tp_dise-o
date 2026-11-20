@@ -72,15 +72,19 @@ public class Usuario {
   }
 
   public boolean isDonante() {
-    return tienePermiso(Permiso.VER_DONACIONES);
+    return tieneRol(Permiso.VER_DONACIONES);
   }
 
   public boolean isBeneficiario() {
-    return tienePermiso(Permiso.SOLICITAR_AYUDA);
+    return tieneRol(Permiso.SOLICITAR_AYUDA);
   }
 
   public boolean isAdmin() {
-    return tienePermiso(Permiso.ADMINISTRADOR);
+    return tieneRol(Permiso.ADMINISTRADOR);
+  }
+
+  private boolean tieneRol(Permiso permisoDelRol) {
+    return this.permisos != null && this.permisos.contains(permisoDelRol);
   }
 
   public void cambiarContrasena(String nueva) {
@@ -96,9 +100,4 @@ public class Usuario {
     return Integridad.hashear(contraseña);
   }
 
-  public void inicializarPermisos() {
-    if (this.permisos != null) {
-      this.permisos = new ArrayList<>(this.permisos);
-    }
-  }
 }

@@ -122,8 +122,8 @@ public class App {
       config.routes.get("/health", ctx -> ctx.json("BFF Usuario funcionando"));
       //Rutas de gateway/bff
       HomeRoutes.registrar(config.routes, homeController);
-      SesionRoutes.registrar(config.routes, sesionController);
       PerfilRoutes.registrar(config.routes, perfilController);
+      SesionRoutes.registrar(config.routes, sesionController);
       MapaRoutes.registrar(config.routes, mapaController);
       //Rutas de donaciones
       DonacionRoutes.registrar(config.routes, donacionController);
@@ -139,6 +139,15 @@ public class App {
       CamionRoutes.registrar(config.routes, camionController);
       EntregaRoutes.registrar(config.routes, entregaController);
       RutaRoutes.registrar(config.routes, rutaController);
+
+      //Limpia la persistencia al terminar cada request
+      config.routes.after(ctx -> {
+        var acceso = WithSimplePersistenceUnit.PER_THREAD_ENTITY_MANAGER_ACCESS;
+        if (acceso.isAttached() && acceso.get().getTransaction().isActive()) {
+          acceso.get().getTransaction().rollback();
+        }
+        WithSimplePersistenceUnit.dispose();
+      });
 
       ManejadorErrores.registrar(config.routes);
 

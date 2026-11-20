@@ -14,23 +14,23 @@ public class DatosIniciales implements WithSimplePersistenceUnit {
   }
 
   public void comenzar() {
+    if (repoUsuarios.buscarPorCredenciales(cfg.adminUsuario("admin")) != null) {
+      return;
+    }
     //Usuarios
     Usuario comedorAmerica = new Usuario("comedorA", "beneficiario");
-    Usuario comedorPibes = new Usuario("comedorP", "beneficiario");
     Usuario juan = new Usuario("juan", "donante");
-    Usuario juana = new Usuario("juana", "donante");
     Usuario duenio = new Usuario(cfg.adminUsuario("admin"), cfg.adminPassword("admin"));
     Usuario encargadoDeposito = new Usuario("deposito", "deposito");
 
     //Acciones
     comedorAmerica.vincularBeneficiario(1L); // ID 1: Comedor america
-    comedorPibes.vincularBeneficiario(2L); // ID 2: Comedor Los Pibes
-    juan.vincularDonante(1L); // ID 1: Juan Perez
-    juana.vincularDonante(2L); // ID 2: Juana Perez
     comedorAmerica.otorgarPermiso(Permiso.AUTENTICADO);
-    comedorPibes.otorgarPermiso(Permiso.AUTENTICADO);
+    comedorAmerica.otorgarPermiso(Permiso.SOLICITAR_AYUDA);
+    juan.vincularDonante(1L); // ID 1: Juan Perez
     juan.otorgarPermiso(Permiso.AUTENTICADO);
-    juana.otorgarPermiso(Permiso.AUTENTICADO);
+    juan.otorgarPermiso(Permiso.VER_DONACIONES);
+    juan.otorgarPermiso(Permiso.VER_BENEFICIARIOS);
     duenio.otorgarPermiso(Permiso.ADMINISTRADOR);
     encargadoDeposito.otorgarPermiso(Permiso.CREAR_DONACION);
 
@@ -39,9 +39,7 @@ public class DatosIniciales implements WithSimplePersistenceUnit {
       repoUsuarios.guardar(duenio);
       repoUsuarios.guardar(encargadoDeposito);
       repoUsuarios.guardar(juan);
-      repoUsuarios.guardar(juana);
       repoUsuarios.guardar(comedorAmerica);
-      repoUsuarios.guardar(comedorPibes);
       commitTransaction();
       System.out.println("Usuarios iniciales cargados en BFF con éxito.");
     } catch (Exception e) {
