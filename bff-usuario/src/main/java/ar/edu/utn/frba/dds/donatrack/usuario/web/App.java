@@ -7,6 +7,7 @@ import ar.edu.utn.frba.dds.donatrack.shared.GsonConfig;
 import ar.edu.utn.frba.dds.donatrack.usuario.persistencia.DatosIniciales;
 import ar.edu.utn.frba.dds.donatrack.usuario.persistencia.UsuarioRepository;
 import ar.edu.utn.frba.dds.donatrack.usuario.web.config.GrpcClientsConfig;
+import ar.edu.utn.frba.dds.donatrack.usuario.web.config.ManejadorErrores;
 import ar.edu.utn.frba.dds.donatrack.usuario.web.controllers.AsignacionController;
 import ar.edu.utn.frba.dds.donatrack.usuario.web.controllers.CamionController;
 import ar.edu.utn.frba.dds.donatrack.usuario.web.controllers.CsvController;
@@ -134,7 +135,7 @@ public class App {
       EntregaRoutes.registrar(config.routes, entregaController);
       RutaRoutes.registrar(config.routes, rutaController);
 
-      ExceptionHandlers.registrar(config.routes);
+      ManejadorErrores.registrar(config.routes);
 
       config.routes.after(ctx -> {
         var acceso = WithSimplePersistenceUnit.PER_THREAD_ENTITY_MANAGER_ACCESS;
