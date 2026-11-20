@@ -4,6 +4,7 @@ import ar.edu.utn.frba.dds.donatrack.grpc.DonacionesServiceGrpc;
 import ar.edu.utn.frba.dds.donatrack.grpc.NotificacionPinRequest;
 import ar.edu.utn.frba.dds.donatrack.usuario.dominio.generadorhash.Integridad;
 import ar.edu.utn.frba.dds.donatrack.usuario.dominio.recuperacionusuario.CacheRecuperacion;
+import ar.edu.utn.frba.dds.donatrack.usuario.dominio.usuario.PoliticaContrasena;
 import ar.edu.utn.frba.dds.donatrack.usuario.dominio.usuario.Usuario;
 import ar.edu.utn.frba.dds.donatrack.usuario.persistencia.UsuarioRepository;
 import io.github.flbulgarelli.jpa.extras.simple.WithSimplePersistenceUnit;
@@ -119,6 +120,13 @@ public class SesionController implements WithSimplePersistenceUnit {
 
     if (!pinGuardado.equals(pinIngresado)) {
       context.sessionAttribute("errorFlash", "El código es incorrecto.");
+      context.redirect("/recuperacion?usuario=" + nombreUsuario);
+      return;
+    }
+
+    String errorPolitica = PoliticaContrasena.validar(nuevaContraseña);
+    if (errorPolitica != null) {
+      context.sessionAttribute("errorFlash", errorPolitica);
       context.redirect("/recuperacion?usuario=" + nombreUsuario);
       return;
     }
