@@ -12,9 +12,12 @@
 
 ![](docs/terceraEntrega/diagrama_de_clases_donaciones.png)
 
+## DER Usuarios:
+![](docs/entregaFinal/der_bff_usuario.png)
+
 ## DER Donaciones:
 
-![](docs/cuartaEntrega/der_donaciones_v2.png)
+![](docs/entregaFinal/der_donaciones_v3.png)
 
 ## DER Logistica:
 
