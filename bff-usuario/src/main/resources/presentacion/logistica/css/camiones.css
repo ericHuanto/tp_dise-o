@@ -8,18 +8,30 @@
     color: #1a1a1a;
 }
 
-/* Formulario de alta: tarjeta centrada */
+/* Formulario de alta: breadcrumb arriba y tarjeta centrada */
 .camiones-pagina--formulario {
     padding: 60px 30px;
     display: flex;
-    justify-content: center;
-    align-items: flex-start;
+    flex-direction: column;
+    align-items: center;
 }
 
-/* Edición: mapa + tarjeta centrados */
+/* Edición: breadcrumb arriba y mapa + tarjeta centrados */
 .camiones-pagina--centrada {
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* El breadcrumb ocupa el mismo ancho que el contenido de abajo, así queda alineado con su borde izquierdo */
+.breadcrumb-camion-alta {
+    width: 100%;
+    max-width: 600px;
+}
+
+.breadcrumb-camion-edicion {
+    width: 100%;
+    max-width: 1200px;
 }
 
 /* =========================================
