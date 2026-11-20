@@ -71,7 +71,9 @@ import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.function.Supplier;
 
@@ -277,28 +279,81 @@ public class DonacionesGrpc extends DonacionesServiceGrpc.DonacionesServiceImplB
     }));
   }
 
-  //Mapa de Beneficiarios
+  // Mapa público
   @Override
-  public void obtenerDatosMapaDonacionesRecibidas(Vacio req, StreamObserver<DatosMapaResponse> out) {
-    responder(out, () -> withTransaction(() -> {
-      List<Beneficiario> beneficiarios = repoBeneficiarios.buscarBeneficiariosConDonacionesRecibidas();
-      List<BeneficiarioMapaResponse> beneficiariosDto = BeneficiarioMapper.aDtoMapa(beneficiarios);
-      String beneficiariosJson = new Gson().toJson(beneficiariosDto);
+  public void obtenerDatosMapaDonacionesRecibidas(Vacio request, StreamObserver<DatosMapaResponse> responseObserver) {
+    List<Donacion> entregadas = repoDonaciones.buscarTodos().stream()
+        .filter(d -> d.getEstadoActual() == TipoEstadoDonacion.ENTREGADA)
+        .toList();
 
-      List<CategoriaMsg> categoriasProto = repoCategorias.buscarTodos().stream()
-          .map(c -> CategoriaMsg.newBuilder()
-              .setId(c.getId())
-              .setNombre(c.getNombre())
-              .build())
-          .toList();
+    java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy");
+    List<java.util.Map<String, Object>> marcadores = new java.util.ArrayList<>();
 
-      return DatosMapaResponse.newBuilder()
-          .setMarcadoresJson(beneficiariosJson)
-          .addAllCategorias(categoriasProto)
-          .build();
-    }));
+    for (Donacion d : entregadas) {
+      Beneficiario ben = d.getBeneficiario();
+      if (ben == null) continue;
+
+      String fechaStr = d.getHistorialEstados().stream()
+          .filter(e -> e.getTipoEstado() == TipoEstadoDonacion.ENTREGADA)
+          .findFirst()
+          .map(e -> e.getFecha() != null ? e.getFecha().format(formatter) : "-")
+          .orElse("-");
+
+      List<java.util.Map<String, Object>> bienesJson = new java.util.ArrayList<>();
+      List<String> fotosJson = new java.util.ArrayList<>();
+      List<Long> categoriasIds = new java.util.ArrayList<>();
+
+      for (Bien b : d.getBienes()) {
+        java.util.Map<String, Object> item = new java.util.HashMap<>();
+        item.put("descripcion", b.getDescripcion());
+        item.put("cantidad", b.getCantidad());
+        item.put("unidadMedida", b.getUnidadMedida() != null ? b.getUnidadMedida().name() : "");
+        bienesJson.add(item);
+
+        if (b.getFoto() != null && !b.getFoto().isBlank()) {
+          fotosJson.add(b.getFoto());
+        }
+
+        if (b.getSubcategoria() != null && b.getSubcategoria().getCategoria() != null) {
+          Long catId = b.getSubcategoria().getCategoria().getId();
+          if (!categoriasIds.contains(catId)) {
+            categoriasIds.add(catId);
+          }
+        }
+      }
+
+      java.util.Map<String, Object> marcador = new java.util.HashMap<>();
+      marcador.put("codigo", "D-" + String.format("%04d", d.getId()));
+      marcador.put("razonSocial", ben.getRazonSocial());
+      marcador.put("direccion", ben.getDireccion());
+      marcador.put("latitud", ben.getLatitud());
+      marcador.put("longitud", ben.getLongitud());
+      marcador.put("fechaEntrega", fechaStr);
+      marcador.put("donaciones", bienesJson);
+      marcador.put("fotos", fotosJson);
+      marcador.put("categoriasIds", categoriasIds); // Para filtrar en el mapa si tenés select de categorías
+
+      marcadores.add(marcador);
+    }
+
+    // Convertimos las categorías de la BD al formato CategoriaMsg del .proto
+    List<CategoriaMsg> categoriasProto = repoCategorias.buscarTodos().stream()
+        .map(cat -> CategoriaMsg.newBuilder()
+            .setId(cat.getId())
+            .setNombre(cat.getNombre())
+            .build())
+        .toList();
+
+    String jsonFinal = new com.google.gson.Gson().toJson(marcadores);
+
+    DatosMapaResponse response = DatosMapaResponse.newBuilder()
+        .setMarcadoresJson(jsonFinal)
+        .addAllCategorias(categoriasProto)
+        .build();
+
+    responseObserver.onNext(response);
+    responseObserver.onCompleted();
   }
-
   //
   @Override
   public void obtenerVistaDonacionesDonante(FiltroDonacionesDonanteRequest req,

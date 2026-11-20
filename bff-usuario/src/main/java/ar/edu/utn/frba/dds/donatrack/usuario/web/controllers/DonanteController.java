@@ -38,58 +38,6 @@ public class DonanteController {
     this.logisticaStub = logisticaStub;
   }
 
-  public void seguimientoEntregas(Context context) {
-    Long idDonante = idDonanteLogueado(context);
-    if (idDonante == null) {
-      return;
-    }
-
-    Map<Long, String> donacionesDelDonante;
-    try {
-      donacionesDelDonante = donacionesStub.obtenerVistaDonacionesDonante(FiltroDonacionesDonanteRequest.newBuilder()
-              .setIdDonante(idDonante)
-              .build())
-          .getDonacionesList().stream()
-          .collect(Collectors.toMap(DonacionVistaMsg::getId,
-              d -> DonacionVistaMapper.codigo(d.getId()) + " · " + d.getDescripcion(),
-              (a, b) -> a, LinkedHashMap::new));
-    } catch (StatusRuntimeException e) {
-      context.redirect("/");
-      return;
-    }
-
-    List<CamionSeguimiento> camiones = List.of();
-    boolean logisticaDisponible = true;
-    if (!donacionesDelDonante.isEmpty()) {
-      try {
-        camiones = logisticaStub.obtenerCamionesDeDonaciones(DonacionesIdsRequest.newBuilder()
-                .addAllIdsDonaciones(donacionesDelDonante.keySet())
-                .build())
-            .getCamionesList().stream()
-            .map(c -> CamionSeguimiento.builder()
-                .patente(c.getPatente())
-                .latitud(c.getLatitud())
-                .longitud(c.getLongitud())
-                .ultimaActualizacion(c.getUltimaActualizacion())
-                .donaciones(c.getIdsDonacionesList().stream().map(donacionesDelDonante::get).toList())
-                .build())
-            .toList();
-      } catch (StatusRuntimeException e) {
-        logisticaDisponible = false;
-      }
-    }
-
-    Map<String, Object> modelo = new HashMap<>();
-    modelo.put("usuario", context.sessionAttribute("usuario_actual"));
-    modelo.put("camiones", camiones);
-    modelo.put("camionesJson", new Gson().toJson(camiones));
-    modelo.put("cantidadCamiones", camiones.size());
-    modelo.put("donacionesEnCamino", camiones.stream().mapToInt(c -> c.getDonaciones().size()).sum());
-    modelo.put("logisticaDisponible", logisticaDisponible);
-
-    context.render("donaciones/views/donante/seguimiento_entregas.hbs", modelo);
-  }
-
   public void donacionesPropias(Context context) {
     Long idDonante = idDonanteLogueado(context);
     if (idDonante == null) {

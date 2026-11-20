@@ -8,6 +8,6 @@ public class RutaRoutes {
   private RutaRoutes() { }
 
   public static void registrar(RoutesConfig ruta, RutaController controller) {
-    ruta.get("/seguimiento_entregas", controller::verSeguimiento);
+    ruta.get("/seguimiento", controller::verSeguimiento);
   }
 }

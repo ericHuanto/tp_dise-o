@@ -42,7 +42,15 @@ public class Beneficiario {
   private List<Donacion> donaciones;
 
   public Beneficiario(String razonSocial, String direccion, List<MedioContacto> contactos) {
-    this(razonSocial, direccion, calcularLatitud(direccion), calcularLongitud(direccion), contactos);
+    checkDatos(razonSocial, contactos);
+    String[] coords = obtenerCoordenadas(direccion);
+    this.razonSocial = razonSocial;
+    this.direccion = direccion;
+    this.latitud = coords[0];
+    this.longitud = coords[1];
+    this.contactos = new ArrayList<>(contactos);
+    this.necesidades = new ArrayList<>();
+    this.donaciones = new ArrayList<>();
   }
 
   public Beneficiario(String razonSocial, String direccion, String latitud, String longitud, List<MedioContacto> contactos) {
@@ -107,12 +115,46 @@ public class Beneficiario {
 
   public void actualizarDatos(String razonSocial, String direccion, List<MedioContacto> contactos) {
     checkDatos(razonSocial, contactos);
+    if (direccion != null && !direccion.equalsIgnoreCase(this.direccion)) {
+      String[] coords = obtenerCoordenadas(direccion);
+      this.latitud = coords[0];
+      this.longitud = coords[1];
+    }
     this.razonSocial = razonSocial;
     this.direccion = direccion;
     this.contactos = new ArrayList<>(contactos);
   }
 
   //=============== FUNCIONES AUXILIARES =================
+  private static String[] obtenerCoordenadas(String direccion) {
+    if (direccion == null || direccion.isBlank()) {
+      return new String[] { "-34.6037", "-58.3816" };
+    }
+    try {
+      String query = java.net.URLEncoder.encode(direccion + ", Buenos Aires, Argentina", java.nio.charset.StandardCharsets.UTF_8);
+      java.net.http.HttpClient client = java.net.http.HttpClient.newHttpClient();
+      java.net.http.HttpRequest request = java.net.http.HttpRequest.newBuilder()
+          .uri(java.net.URI.create("https://nominatim.openstreetmap.org/search?format=json&limit=1&q=" + query))
+          .header("User-Agent", "DonaTrack-UTN-TP/1.0")
+          .GET()
+          .build();
+
+      java.net.http.HttpResponse<String> response = client.send(request, java.net.http.HttpResponse.BodyHandlers.ofString());
+      com.google.gson.JsonArray resultados = com.google.gson.JsonParser.parseString(response.body()).getAsJsonArray();
+
+      if (!resultados.isEmpty()) {
+        com.google.gson.JsonObject primerResultado = resultados.get(0).getAsJsonObject();
+        return new String[] {
+            primerResultado.get("lat").getAsString(),
+            primerResultado.get("lon").getAsString()
+        };
+      }
+    } catch (Exception e) {
+      System.err.println("No se pudo geocodificar la dirección: " + direccion + " -> " + e.getMessage());
+    }
+    return new String[] { "-34.6037", "-58.3816" };
+  }
+
   private static String calcularLatitud(String direccion) {
     //Usar un servicio externo que al pasarle la direccion devuelva la latitud
     Double latitudFalsa = -34.705 + (new Random()).nextDouble() * ((-34.526) - (-34.705));

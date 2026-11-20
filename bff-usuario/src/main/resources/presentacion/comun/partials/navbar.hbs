@@ -1,15 +1,15 @@
 <nav class="nav-links">
-    {{#if usuario.donante}}
+    {{#if usuario.idDonante}}
         <a href="/donante/donaciones">Mis Donaciones</a>
         <a href="/donante/beneficiarios">Entidades beneficiarias</a>
-        <a href="/donante/seguimiento">Seguimiento</a>
+        <a href="/seguimiento">Seguimiento</a>
     {{/if}}
 
-    {{#if usuario.beneficiario}}
+    {{#if usuario.idBeneficiario}}
         <!--<a href="/solicitudes/nueva">Solicitar Donación</a> -->
         <a href="/mis-donaciones">Mis Donaciones</a>
         <a href="/mis-entregas">Recepciones</a>
-        <a href="/seguimiento_entregas">Seguimiento</a>
+        <a href="/seguimiento">Seguimiento</a>
         <a href="/mis-necesidades">Mis Necesidades</a>
         <a href="/notificaciones">Historial</a>
     {{/if}}

@@ -1,0 +1,114 @@
+{{#partial "nombre_pestaña"}}Seguimiento de entregas - DonaTrack{{/partial}}
+
+{{#partial "css_extra"}}
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="/comun/css/formularios.css">
+    <link rel="stylesheet" href="/donaciones/css/general/seguimiento.css">
+{{/partial}}
+
+{{#partial "contenido_propio"}}
+    <section class="pagina-seguimiento">
+        <nav class="breadcrumb"><a href="/">Inicio</a><span>›</span>Seguimiento</nav>
+
+        <div class="pagina-cabecera">
+            <div>
+                <h1>Seguimiento de entregas</h1>
+                <p class="subtitulo">
+                    {{#if esDonante}}
+                        Camiones que hoy transportan tus donaciones.
+                    {{else}}
+                        Camiones en camino hacia tu entidad.
+                    {{/if}}
+                </p>
+            </div>
+            <a href="/seguimiento" class="btn-secondary">Actualizar</a>
+        </div>
+
+        {{#unless logisticaDisponible}}
+            <p class="aviso-error" role="alert">No pudimos consultar la ubicación de los camiones. Probá de nuevo en unos minutos.</p>
+        {{/unless}}
+
+        <div class="seguimiento-grilla">
+            <aside class="panel-camiones">
+                {{#each camiones}}
+                    <article class="camion-item" data-patente="{{this.patente}}">
+                        <div class="camion-item-cabecera">
+                            <strong>{{this.patente}}</strong>
+                            <span class="badge-traslado">● EN TRASLADO</span>
+                        </div>
+
+                        {{#each this.detallesDonaciones}}
+                        <div class="camion-donaciones-lista">
+                            <div class="camion-donacion-detalle">
+                                <span class="lbl-detalle">Donación</span>
+                                <span class="val-detalle">{{this.codigo}} · {{this.descripcion}}</span>
+                            </div>
+                            <div class="camion-donacion-detalle">
+                                <span class="lbl-detalle">Destino</span>
+                                <span class="val-detalle">{{this.destino}}</span>
+                            </div>
+                            <div class="camion-donacion-detalle">
+                                <span class="lbl-detalle">Ubicación</span>
+                                <span class="val-detalle">{{this.ubicacion}}</span>
+                            </div>
+                        </div>
+                        {{/each}}
+
+                        <div class="camion-footer">
+                            <span>Última actualización {{this.ultimaActualizacion}}</span>
+                        </div>
+                    </article>
+                {{else}}
+                        <p class="panel-vacio">
+                            {{#if (eq ../rolUsuario "DONANTE")}}
+                                Ninguna de tus donaciones está en traslado en este momento.
+                              {{else}}
+                                No hay camiones en camino hacia tu entidad en este momento.
+                              {{/if}}
+                        </p>
+                    {{/each}}
+                </aside>
+
+                  <div id="mapa" class="mapa-seguimiento"></div>
+                </div>
+    </section>
+
+    <script id="datos-camiones" type="application/json">{{{camionesJson}}}</script>
+{{/partial}}
+
+{{#partial "scripts"}}
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        const mapa = L.map('mapa').setView([-34.6037, -58.3816], 11);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; OpenStreetMap'
+        }).addTo(mapa);
+
+        const camiones = JSON.parse(document.getElementById('datos-camiones').textContent);
+        const limites = [];
+        const marcadores = {};
+
+        camiones.forEach(camion => {
+            const popup = L.popup().setContent(`<strong>Camión ${camion.patente}</strong>`);
+            const posicion = [parseFloat(camion.latitud), parseFloat(camion.longitud)];
+
+            marcadores[camion.patente] = L.marker(posicion).addTo(mapa).bindPopup(popup);
+            limites.push(posicion);
+        });
+
+        if (limites.length > 0) mapa.fitBounds(limites, { padding: [40, 40], maxZoom: 15 });
+
+        document.querySelectorAll('.camion-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const marcador = marcadores[item.dataset.patente];
+                if (marcador) {
+                    mapa.setView(marcador.getLatLng(), 15);
+                    marcador.openPopup();
+                }
+            });
+        });
+    </script>
+{{/partial}}
+
+{{> comun/partials/layout.hbs}}

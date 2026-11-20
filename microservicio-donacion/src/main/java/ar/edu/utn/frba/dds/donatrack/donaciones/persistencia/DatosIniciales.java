@@ -8,6 +8,7 @@ import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.bien.UnidadMedida;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.bien.tipobien.NoPerecedero;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.bien.tipobien.Perecedero;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.donacion.Donacion;
+import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.donacion.EstadoDonacion;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.donante.documento.Documento;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.donante.documento.TipoDocumento;
 import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.donante.tipodonantes.Genero;
@@ -19,6 +20,7 @@ import ar.edu.utn.frba.dds.donatrack.donaciones.dominio.necesidades.Necesidad;
 import io.github.flbulgarelli.jpa.extras.simple.WithSimplePersistenceUnit;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class DatosIniciales implements WithSimplePersistenceUnit {
@@ -38,8 +40,48 @@ public class DatosIniciales implements WithSimplePersistenceUnit {
     if (!repoCategorias.buscarTodos().isEmpty()) return;
 
     //Beneficiarios
-    Beneficiario comedorAmerica = new Beneficiario("Comedor america", "Av. Rivadavia 10000", List.of(new CorreoDeContacto("comedorAmerica@gmail.com", true)));
-    Beneficiario comedorPibes = new Beneficiario("Comedor Los Pibes", "Av. Rivadavia 1000", List.of(new CorreoDeContacto("comedor@gmail.com", true)));
+    // Comedor América -> Av. Rivadavia 10000 (Villa Luro)
+    Beneficiario comedorAmerica = new Beneficiario(
+        "Comedor america",
+        "Av. Rivadavia 10000, CABA",
+        "-34.6373",
+        "-58.5048",
+        List.of(new CorreoDeContacto("comedorAmerica@gmail.com", true))
+    );
+
+// Comedor Los Pibes -> Av. Rivadavia 4500 (Caballito)
+    Beneficiario comedorPibes = new Beneficiario(
+        "Comedor Los Pibes",
+        "Av. Rivadavia 4500, CABA",
+        List.of(new CorreoDeContacto("comedor@gmail.com", true))
+    );
+
+    Beneficiario hogarSantaRita = new Beneficiario(
+        "Hogar Santa Rita",
+        "Av. Santa Fe 3200", // Palermo / Barrio Norte
+        List.of(new CorreoDeContacto("santarita@gmail.com", true))
+    );
+    Beneficiario merenderoRayito = new Beneficiario(
+        "Merendero Rayito de Sol",
+        "Av. Cabildo 2100", // Belgrano
+        List.of(new CorreoDeContacto("rayitodesol@gmail.com", true))
+    );
+    Beneficiario fundacionAbrazo = new Beneficiario(
+        "Fundación Abrazo",
+        "Av. Almirante Brown 1200", // La Boca
+        List.of(new CorreoDeContacto("abrazo@gmail.com", true))
+    );
+    Beneficiario comedorEsperanza = new Beneficiario(
+        "Comedor Nueva Esperanza",
+        "Av. Nazca 1800", // Villa Santa Rita / Flores
+        List.of(new CorreoDeContacto("esperanza@gmail.com", true))
+    );
+    Beneficiario centroComunitario = new Beneficiario(
+        "Centro Comunitario El Ceibo",
+        "Av. Triunvirato 4500", // Villa Urquiza
+        List.of(new CorreoDeContacto("elceibo@gmail.com", true))
+    );
+
     //Donantes
     Humana juan = new Humana("Juan", "Perez", new Documento(TipoDocumento.DNI, "12345678"), LocalDate.now().minusYears(25), Genero.MASCULINO, "siempre viva 555", List.of(new CorreoDeContacto("correoJuan@gmail.com", true)));
     Humana juana = new Humana("Juana", "Perez", new Documento(TipoDocumento.DNI, "30111222"), LocalDate.of(1990, 5, 10), Genero.FEMENINO, "Calle Falsa 123", List.of(new CorreoDeContacto("juana@gmail.com", true)));
@@ -105,32 +147,81 @@ public class DatosIniciales implements WithSimplePersistenceUnit {
 
     Bien frazada2 = new NoPerecedero("Frazadas", 8f, UnidadMedida.UNIDADES, null, frazadas, true);
 
+    Bien arrozBien = new Perecedero("Arroz largo fino", 15f, UnidadMedida.KILOGRAMOS, null, arroz, LocalDate.now().plusMonths(8));
+    Bien aceiteBien = new Perecedero("Aceite de girasol", 12f, UnidadMedida.LITROS, null, aceite, LocalDate.now().plusMonths(10));
+
+    // Bienes para las entregas históricas
+    Bien lecheHist = new Perecedero("Leche en polvo fortificada", 25f, UnidadMedida.KILOGRAMOS, null, lacteos, LocalDate.now().plusMonths(5));
+    Bien panialesHist = new NoPerecedero("Pañales descartables talle G", 40f, UnidadMedida.UNIDADES, null, paniales, true);
+    Bien frazadasHist = new NoPerecedero("Frazadas polares", 18f, UnidadMedida.UNIDADES, null, frazadas, true);
+    Bien legumbresHist = new Perecedero("Lentejas secas", 30f, UnidadMedida.KILOGRAMOS, null, legumbres, LocalDate.now().plusMonths(9));
+    Bien limpiezaHist = new NoPerecedero("Bidones de lavandina", 15f, UnidadMedida.LITROS, null, lavandina, true);
+    Bien sillasHist = new NoPerecedero("Sillas plásticas reforzadas", 12f, UnidadMedida.UNIDADES, null, sillas, true);
+
+    Bien fideoHist = new Perecedero("Fideos tirabuzón", 20f, UnidadMedida.UNIDADES, null, pastas, LocalDate.now().plusMonths(6));
+    Bien aceiteHist = new Perecedero("Aceite mezcla", 10f, UnidadMedida.LITROS, null, aceite, LocalDate.now().plusMonths(10));
+
+    // Donaciones históricas (IDs 9L a 14L)
+    Donacion donacion9 = new Donacion(List.of(lecheHist, panialesHist), List.of(juan));
+    Donacion donacion10 = new Donacion(List.of(frazadasHist), List.of(juana));
+    Donacion donacion11 = new Donacion(List.of(legumbresHist), List.of(juan, juana));
+    Donacion donacion12 = new Donacion(List.of(limpiezaHist), List.of(juana));
+    Donacion donacion13 = new Donacion(List.of(sillasHist), List.of(juan));
+    Donacion donacion14 = new Donacion(List.of(fideoHist, aceiteHist), List.of(juana));
+
+    // Completamos el ciclo de vida y pisamos la fecha con fechas viejas
+    completarEntregaHistorica(donacion9, hogarSantaRita, LocalDateTime.of(2026, 10, 12, 14, 30));
+    completarEntregaHistorica(donacion10, merenderoRayito, LocalDateTime.of(2026, 10, 18, 11, 15));
+    completarEntregaHistorica(donacion11, fundacionAbrazo, LocalDateTime.of(2026, 10, 25, 16, 45));
+    completarEntregaHistorica(donacion12, comedorEsperanza, LocalDateTime.of(2026, 11, 2, 10, 20));
+    completarEntregaHistorica(donacion13, centroComunitario, LocalDateTime.of(2026, 11, 8, 15, 10));
+    completarEntregaHistorica(donacion14, hogarSantaRita, LocalDateTime.of(2026, 11, 14, 17, 0));
+
     // Necesidades
 
     Necesidad necesidadLecheRecurrente = Necesidad.crearNecesidadRecurrente("Leche para el comedor", lacteos, UnidadMedida.LITROS, 50, Frecuencia.MENSUAL);
     Necesidad necesidadAbrigo = Necesidad.crearNecesidadExtraordinaria("Abrigos para invierno", abrigos, UnidadMedida.UNIDADES, 20);
     //Donaciones
-    Donacion donacion1 = new Donacion(List.of(fideo), List.of(juan));
-    Donacion donacion2 = new Donacion(List.of(leche), List.of(juan));
-    Donacion donacion3 = new Donacion(List.of(manzana), List.of(juana));
-    Donacion donacion4 = new Donacion(List.of(campera), List.of(juana));
-    Donacion donacion5 = new Donacion(List.of(frazada), List.of(juana));
-    Donacion donacion6 = new Donacion(List.of(frazada2, campera2), List.of(juan, juana));
+    Donacion donacion1 = new Donacion(List.of(fideo), List.of(juan)); // ID 1
+    Donacion donacion2 = new Donacion(List.of(leche), List.of(juan)); // ID 2
+    Donacion donacion3 = new Donacion(List.of(manzana), List.of(juana)); // ID 3 -> EN CAMINO (Juana -> Comedor America)
+    Donacion donacion4 = new Donacion(List.of(campera), List.of(juana)); // ID 4 -> ENTREGADA (Juana -> Comedor America)
+    Donacion donacion5 = new Donacion(List.of(frazada), List.of(juana)); // ID 5 -> Ranking
+    Donacion donacion6 = new Donacion(List.of(frazada2, campera2), List.of(juan, juana)); // ID 6 -> Ranking
+    Donacion donacion7 = new Donacion(List.of(arrozBien), List.of(juan)); // ID 7 -> EN CAMINO (Juan -> Comedor Los Pibes)
+    Donacion donacion8 = new Donacion(List.of(aceiteBien), List.of(juan)); // ID 8 -> ENTREGADA (Juan -> Comedor Los Pibes)
     //Rankings
     Ranking ranking1 = new Ranking(donacion5, List.of(comedorAmerica, comedorPibes));
     Ranking ranking2 = new Ranking(donacion6, List.of(comedorAmerica, comedorPibes));
 
-    //Acciones
+    // Acciones
     donacion1.asignarA(comedorAmerica);
+
     donacion2.asignarA(comedorAmerica);
     donacion2.listaParaEntregar();
+
+    // En camino (para Seguimiento de Juana y Comedor America)
     donacion3.asignarA(comedorAmerica);
     donacion3.listaParaEntregar();
     donacion3.enCamino();
+
+    // Entregada (para Mapa Público en Villa Luro)
     donacion4.asignarA(comedorAmerica);
     donacion4.listaParaEntregar();
     donacion4.enCamino();
     donacion4.entregada();
+
+    // En camino (para Seguimiento de Juan y Comedor Los Pibes)
+    donacion7.asignarA(comedorPibes);
+    donacion7.listaParaEntregar();
+    donacion7.enCamino();
+
+    // Entregada (para Mapa Público en Caballito)
+    donacion8.asignarA(comedorPibes);
+    donacion8.listaParaEntregar();
+    donacion8.enCamino();
+    donacion8.entregada();
+
     comedorAmerica.agregarNecesidad(necesidadLecheRecurrente);
     comedorAmerica.agregarNecesidad(necesidadAbrigo);
 
@@ -177,14 +268,28 @@ public class DatosIniciales implements WithSimplePersistenceUnit {
       repoSubcategorias.guardar(lavandina);
       repoSubcategorias.guardar(detergente);
       repoSubcategorias.guardar(desinfectantes);
-      repoDonaciones.guardar(donacion1);
-      repoDonaciones.guardar(donacion2);
-      repoDonaciones.guardar(donacion3);
-      repoDonaciones.guardar(donacion4);
-      repoDonaciones.guardar(donacion5);
-      repoDonaciones.guardar(donacion6);
       repoRankings.guardar(ranking1);
       repoRankings.guardar(ranking2);
+      repoBeneficiarios.guardar(hogarSantaRita);
+      repoBeneficiarios.guardar(merenderoRayito);
+      repoBeneficiarios.guardar(fundacionAbrazo);
+      repoBeneficiarios.guardar(comedorEsperanza);
+      repoBeneficiarios.guardar(centroComunitario);
+
+      repoDonaciones.guardar(donacion1);  // ID 1L
+      repoDonaciones.guardar(donacion2);  // ID 2L
+      repoDonaciones.guardar(donacion3);  // ID 3L -> EN CAMINO (sincronizada con Logística)
+      repoDonaciones.guardar(donacion4);  // ID 4L -> ENTREGADA
+      repoDonaciones.guardar(donacion5);  // ID 5L
+      repoDonaciones.guardar(donacion6);  // ID 6L
+      repoDonaciones.guardar(donacion7);  // ID 7L -> EN CAMINO (sincronizada con Logística)
+      repoDonaciones.guardar(donacion8);  // ID 8L -> ENTREGADA
+      repoDonaciones.guardar(donacion9);  // ID 9L -> ENTREGADA (histórica)
+      repoDonaciones.guardar(donacion10); // ID 10L -> ENTREGADA (histórica)
+      repoDonaciones.guardar(donacion11); // ID 11L -> ENTREGADA (histórica)
+      repoDonaciones.guardar(donacion12); // ID 12L -> ENTREGADA (histórica)
+      repoDonaciones.guardar(donacion13); // ID 13L -> ENTREGADA (histórica)
+      repoDonaciones.guardar(donacion14); // ID 14L -> ENTREGADA (histórica)
       commitTransaction();
       System.out.println("Datos iniciales cargados con éxito.");
     } catch (Exception e) {
@@ -195,4 +300,21 @@ public class DatosIniciales implements WithSimplePersistenceUnit {
 
   }
 
+  //Auxiliar
+  private void completarEntregaHistorica(Donacion donacion, Beneficiario destino, LocalDateTime fechaEntrega) {
+    donacion.asignarA(destino);
+    donacion.listaParaEntregar();
+    donacion.enCamino();
+    donacion.entregada();
+
+    // Buscamos el último estado (ENTREGADA) y le pisamos la fecha actual por la histórica
+    List<EstadoDonacion> historial = donacion.getHistorialEstados();
+    if (historial != null && !historial.isEmpty()) {
+      EstadoDonacion ultimoEstado = historial.get(historial.size() - 1);
+      ultimoEstado.setFecha(fechaEntrega);
+    }
+  }
+
 }
+
+

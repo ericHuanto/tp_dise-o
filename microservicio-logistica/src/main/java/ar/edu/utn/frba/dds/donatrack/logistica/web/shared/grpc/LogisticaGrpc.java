@@ -1,6 +1,7 @@
 package ar.edu.utn.frba.dds.donatrack.logistica.web.shared.grpc;
 
 import ar.edu.utn.frba.dds.donatrack.grpc.*;
+import ar.edu.utn.frba.dds.donatrack.logistica.dominio.beneficiario.Beneficiario;
 import ar.edu.utn.frba.dds.donatrack.logistica.dominio.beneficiario.DonacionEnTransito;
 import ar.edu.utn.frba.dds.donatrack.logistica.dominio.camion.Camion;
 import ar.edu.utn.frba.dds.donatrack.logistica.dominio.camion.Coordenada;
@@ -250,35 +251,49 @@ public class LogisticaGrpc extends LogisticaServiceGrpc.LogisticaServiceImplBase
   }
 
   @Override
-  public void obtenerCamionesDeDonaciones(DonacionesIdsRequest req,
-                                          StreamObserver<ListaCamionesDonacionesResponse> out) {
+  public void obtenerCamionesDeDonaciones(DonacionesIdsRequest req, StreamObserver<ListaCamionesDonacionesResponse> out) {
     responder(out, () -> withTransaction(() -> {
       Set<Long> idsBuscados = new HashSet<>(req.getIdsDonacionesList());
       Map<String, CamionDonacionesMsg.Builder> porPatente = new LinkedHashMap<>();
 
-      for (Entrega entrega : repoEntregas.buscarTodas()) {
-        if (entrega.getEstadoActual() != TipoEstadoEntrega.EN_TRASLADO) {
-          continue;
-        }
-        Camion camion = entrega.getCamionAsignado();
-        if (camion == null || camion.getUbicacionActual() == null) {
-          continue;
-        }
-        List<Long> idsEnEntrega = entrega.getDonaciones().stream()
-            .map(DonacionEnTransito::getId)
-            .filter(idsBuscados::contains)
-            .toList();
-        if (idsEnEntrega.isEmpty()) {
+      // Iteramos sobre las rutas iniciadas en lugar de las entregas
+      for (Ruta ruta : repoRutas.buscarTodas()) {
+        if (!ruta.isEstaIniciada()) {
           continue;
         }
 
-        Coordenada ubicacion = camion.getUbicacionActual();
-        porPatente.computeIfAbsent(camion.getPatente(), patente -> CamionDonacionesMsg.newBuilder()
-                .setPatente(patente != null ? patente : "")
-                .setLatitud(String.valueOf(ubicacion.getLatitud()))
-                .setLongitud(String.valueOf(ubicacion.getLongitud()))
-                .setUltimaActualizacion("No disponible"))
-            .addAllIdsDonaciones(idsEnEntrega);
+        Camion camion = ruta.getCamion();
+        if (camion == null || camion.getUbicacionActual() == null) {
+          continue;
+        }
+
+        for (Entrega entrega : ruta.getEntregasOrdenadas()) {
+          if (entrega.getEstadoActual() != TipoEstadoEntrega.EN_TRASLADO) {
+            continue;
+          }
+
+          List<Long> idsEnEntrega = entrega.getDonaciones().stream()
+              .map(DonacionEnTransito::getId)
+              .filter(idsBuscados::contains)
+              .toList();
+
+          if (!idsEnEntrega.isEmpty()) {
+            Coordenada ubicacion = camion.getUbicacionActual();
+            Beneficiario ben = entrega.getDestino();
+            String destino = (ben != null && ben.getRazonSocial() != null) ? ben.getRazonSocial() : "Sin destino";
+            String direccion = (ben != null && ben.getDireccion() != null) ? ben.getDireccion() : "Dirección no disponible";
+
+            // Empaquetamos: "hace 3 min|Comedor america|Av. Rivadavia 10000, CABA"
+            String infoConDestino = "hace 3 min|" + destino + "|" + direccion;
+
+            porPatente.computeIfAbsent(camion.getPatente(), patente -> CamionDonacionesMsg.newBuilder()
+                    .setPatente(patente != null ? patente : "")
+                    .setLatitud(String.valueOf(ubicacion.getLatitud()))
+                    .setLongitud(String.valueOf(ubicacion.getLongitud()))
+                    .setUltimaActualizacion(infoConDestino))
+                .addAllIdsDonaciones(idsEnEntrega);
+          }
+        }
       }
 
       ListaCamionesDonacionesResponse.Builder builder = ListaCamionesDonacionesResponse.newBuilder();
@@ -286,7 +301,6 @@ public class LogisticaGrpc extends LogisticaServiceGrpc.LogisticaServiceImplBase
       return builder.build();
     }));
   }
-
   //Ruta
   @Override
   public void obtenerSeguimientoEntregas(VacioLogistica req, StreamObserver<ListaMarcadoresCamionResponse> out) {

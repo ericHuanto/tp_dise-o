@@ -46,7 +46,7 @@
             </a>
         {{/if}}
 
-        {{#if usuario.beneficiario}}
+        {{#if usuario.idBeneficiario}}
             <a href="/mis-donaciones" class="home-tarjeta">
                 <h3>Mis Donaciones</h3>
                 <p>Mirá el estado de las donaciones que te fueron asignadas.</p>
@@ -57,7 +57,7 @@
                 <p>Confirmá las entregas que recibiste, con fotos.</p>
                 <span class="home-ir">Ir →</span>
             </a>
-            <a href="/seguimiento_entregas" class="home-tarjeta">
+            <a href="/seguimiento" class="home-tarjeta">
                 <h3>Seguimiento</h3>
                 <p>Seguí en el mapa los camiones que traen tus donaciones.</p>
                 <span class="home-ir">Ir →</span>
@@ -74,7 +74,7 @@
             </a>
         {{/if}}
 
-        {{#if usuario.donante}}
+        {{#if usuario.idDonante}}
             <a href="/donante/donaciones" class="home-tarjeta">
                 <h3>Mis Donaciones</h3>
                 <p>Consultá tus donaciones y filtralas por estado o categoría.</p>
@@ -85,7 +85,7 @@
                 <p>Conocé a las organizaciones que reciben donaciones.</p>
                 <span class="home-ir">Ir →</span>
             </a>
-            <a href="/seguimiento_entregas" class="home-tarjeta">
+            <a href="/seguimiento" class="home-tarjeta">
                 <h3>Seguimiento</h3>
                 <p>Seguí en el mapa los camiones que llevan tus donaciones.</p>
                 <span class="home-ir">Ir →</span>

@@ -1,0 +1,103 @@
+.pagina-seguimiento { max-width: 1200px; margin: 0 auto; padding: 24px; }
+.pagina-cabecera { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 24px; }
+.pagina-cabecera h1 { margin: 0 0 8px 0; font-size: 1.75rem; color: #111827; }
+.subtitulo { color: #6B7280; margin: 0; font-size: 1rem; }
+.aviso-error { background: #FEE2E2; color: #991B1B; padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; }
+
+/* Grilla principal invertida */
+.seguimiento-grilla {
+    display: grid;
+    grid-template-columns: 420px 1fr;
+    gap: 24px;
+    align-items: stretch;
+}
+
+.mapa-seguimiento {
+    min-height: 600px;
+    border-radius: 12px;
+    border: 1px solid #E5E7EB;
+    z-index: 0;
+}
+
+.panel-camiones {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    max-height: 600px;
+    overflow-y: auto;
+    padding-right: 8px;
+}
+
+/* Tarjeta de camión */
+.camion-item {
+    background: #FFFFFF;
+    border: 1px solid #E5E7EB;
+    border-radius: 12px;
+    padding: 20px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.camion-item:hover {
+    border-color: #10B981;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+.camion-item-cabecera {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.camion-item-cabecera strong {
+    font-size: 1.25rem;
+    font-family: monospace;
+    letter-spacing: 1px;
+    color: #111827;
+}
+
+.badge-traslado {
+    background: #E0F2FE;
+    color: #0369A1;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 4px;
+    letter-spacing: 0.05em;
+}
+
+/* Lista de donaciones dentro del camión */
+.camion-donaciones-lista {
+    margin-bottom: 16px;
+}
+
+.camion-donacion-detalle {
+    display: grid;
+    grid-template-columns: 80px 1fr;
+    gap: 8px;
+    font-size: 0.85rem;
+    margin-bottom: 6px;
+}
+
+.lbl-detalle { color: #6B7280; }
+.val-detalle { color: #111827; font-weight: 500; }
+
+.camion-footer {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #F3F4F6;
+    font-size: 0.75rem;
+    color: #9CA3AF;
+}
+
+.panel-vacio { text-align: center; padding: 40px 20px; color: #6B7280; background: #F9FAFB; border-radius: 12px; }
+
+@media (max-width: 900px) {
+    .seguimiento-grilla { grid-template-columns: 1fr; }
+    .mapa-seguimiento { min-height: 400px; order: -1; } /* El mapa sube arriba en móviles */
+    .panel-camiones { max-height: none; }
+}

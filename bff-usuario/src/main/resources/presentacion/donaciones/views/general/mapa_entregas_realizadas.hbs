@@ -1,0 +1,145 @@
+{{#partial "nombre_pestaña"}}Mapa de entregas - DonaTrack{{/partial}}
+
+{{#partial "css_extra"}}
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="/donaciones/css/general/mapa_entregas_realizadas.css">
+{{/partial}}
+
+{{#partial "contenido_propio"}}
+<section class="entregas-page">
+    <nav class="breadcrumb">
+        <a href="/">Inicio</a> <span>›</span> Mapa de entregas
+    </nav>
+
+    <div class="entregas-header">
+        <div class="entregas-titulos">
+            {{#if usuario}}
+                <h1>Tus donaciones recibidas</h1>
+                <p>Historial de las entregas que tu entidad ya recibió.</p>
+            {{else}}
+                <h1>Impacto transparente</h1>
+                <p>Mapa público de todas las entregas confirmadas a los beneficiarios.</p>
+            {{/if}}
+        </div>
+    </div>
+
+    <div class="entregas-grid">
+        <div id="mapa" class="mapa-card"></div>
+
+        <aside class="detalle-card">
+            <div id="detalle-vacio" class="estado-vacio">
+                <p>Seleccioná un marcador en el mapa para ver el detalle de la entrega.</p>
+            </div>
+
+            <div id="detalle-contenido" class="oculto">
+                <div class="detalle-top">
+                    <span class="badge-estado">● ENTREGADA</span>
+                    <span id="detalle-codigo" class="codigo-entrega"></span>
+                </div>
+
+                <div class="detalle-entidad">
+                    <h2 id="detalle-nombre"></h2>
+                    <p id="detalle-direccion" class="detalle-subtitulo"></p>
+                </div>
+
+                <div class="meta-box">
+                    <div class="meta-item">
+                        <span class="meta-label">Fecha de entrega</span>
+                        <span id="detalle-fecha" class="meta-value"></span>
+                    </div>
+                </div>
+
+                <h3 class="seccion-titulo">Bienes entregados</h3>
+                <ul id="detalle-bienes" class="lista-bienes"></ul>
+
+                <div id="bloque-fotos" class="oculto">
+                    <h3 class="seccion-titulo">Fotos de recepción</h3>
+                    <div id="detalle-fotos" class="galeria-fotos"></div>
+                </div>
+            </div>
+        </aside>
+    </div>
+</section>
+<script id="datos-entregas" type="application/json">{{{marcadoresJson}}}</script>
+{{/partial}}
+
+{{#partial "scripts"}}
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        const map = L.map('mapa').setView([-34.6037, -58.3816], 11);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
+
+        const capaMarcadores = L.layerGroup().addTo(map);
+
+        const rawData = document.getElementById('datos-entregas').textContent;
+        const entregas = rawData.trim() !== "" ? JSON.parse(rawData) : [];
+
+        const limites = [];
+
+        function mostrarDetalle(entrega) {
+            document.getElementById('detalle-vacio').classList.add('oculto');
+            document.getElementById('detalle-contenido').classList.remove('oculto');
+
+            document.getElementById('detalle-codigo').textContent = entrega.codigo || '';
+            document.getElementById('detalle-nombre').textContent = entrega.razonSocial || '';
+            document.getElementById('detalle-direccion').textContent = entrega.direccion || '';
+            document.getElementById('detalle-fecha').textContent = entrega.fechaEntrega || '-';
+
+            const listaBienes = document.getElementById('detalle-bienes');
+            listaBienes.innerHTML = '';
+
+            if (entrega.donaciones) {
+                entrega.donaciones.forEach(don => {
+                    const li = document.createElement('li');
+                    li.className = 'item-bien';
+
+                    if (don.descripcion && don.cantidad !== undefined) {
+                        // Convierte "KILOGRAMOS" -> "kilogramos" y evita decimales ".0"
+                        const unidad = don.unidadMedida ? don.unidadMedida.toLowerCase() : '';
+                        const cantidad = Number(don.cantidad);
+                        const desc = don.descripcion.toLowerCase();
+
+                        const texto = unidad
+                            ? `${cantidad} ${unidad} de ${desc}`
+                            : `${cantidad} ${desc}`;
+
+                        li.innerHTML = `<span>${texto}</span>`;
+                    } else {
+                        li.innerHTML = `<span>${don.descripcion || don}</span>`;
+                    }
+
+                    listaBienes.appendChild(li);
+                });
+            }
+
+            const bloqueFotos = document.getElementById('bloque-fotos');
+            const galeriaFotos = document.getElementById('detalle-fotos');
+            galeriaFotos.innerHTML = '';
+
+            if (entrega.fotos && entrega.fotos.length > 0) {
+                bloqueFotos.classList.remove('oculto');
+                entrega.fotos.forEach(url => {
+                    const img = document.createElement('img');
+                    img.src = url;
+                    galeriaFotos.appendChild(img);
+                });
+            } else {
+                bloqueFotos.classList.add('oculto');
+            }
+        }
+
+        entregas.forEach((entrega, index) => {
+            const posicion = [parseFloat(entrega.latitud), parseFloat(entrega.longitud)];
+            const marker = L.marker(posicion).addTo(capaMarcadores);
+            marker.bindTooltip(entrega.razonSocial);
+            marker.on('click', () => mostrarDetalle(entrega));
+            limites.push(posicion);
+
+            if (index === 0) mostrarDetalle(entrega);
+        });
+
+        if(limites.length > 0) map.fitBounds(limites, { padding: [40, 40] });
+    </script>
+{{/partial}}
+
+{{> comun/partials/layout.hbs}}

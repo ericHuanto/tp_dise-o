@@ -25,6 +25,6 @@ public class MapaController {
     modelo.put("marcadoresJson", response.getMarcadoresJson());
     modelo.put("categorias", response.getCategoriasList());
 
-    context.render("donaciones/views/general/mapa_beneficiarios.hbs", modelo);
+    context.render("donaciones/views/general/mapa_entregas_realizadas.hbs", modelo);
   }
 }
