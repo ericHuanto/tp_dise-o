@@ -30,47 +30,50 @@
 
         <div class="seguimiento-grilla">
             <aside class="panel-camiones">
-                {{#each camiones}}
-                    <article class="camion-item" data-patente="{{this.patente}}">
-                        <div class="camion-item-cabecera">
-                            <strong>{{this.patente}}</strong>
-                            <span class="badge-traslado">EN TRASLADO</span>
-                        </div>
+                 {{#each camiones}}
+                     <article class="camion-item" data-patente="{{this.patente}}">
+                         <div class="camion-item-cabecera">
+                             <strong>{{this.patente}}</strong>
+                             <span class="badge-traslado">EN TRASLADO</span>
+                         </div>
 
-                        {{#each this.detallesDonaciones}}
-                        <div class="camion-donaciones-lista">
-                            <div class="camion-donacion-detalle">
-                                <span class="lbl-detalle">Donación</span>
-                                <span class="val-detalle">{{this.codigo}} · {{this.descripcion}}</span>
-                            </div>
-                            <div class="camion-donacion-detalle">
-                                <span class="lbl-detalle">Destino</span>
-                                <span class="val-detalle">{{this.destino}}</span>
-                            </div>
-                            <div class="camion-donacion-detalle">
-                                <span class="lbl-detalle">Ubicación</span>
-                                <span class="val-detalle">{{this.ubicacion}}</span>
-                            </div>
-                        </div>
-                        {{/each}}
+                         <div class="camion-donaciones-lista">
+                             {{#each this.detallesDonaciones}}
+                                 <div class="camion-donacion-detalle">
+                                     <span class="lbl-detalle">Donación</span>
+                                     <span class="val-detalle">{{this.codigo}} · {{this.descripcion}}</span>
+                                 </div>
+                             {{/each}}
 
-                        <div class="camion-footer">
-                            <span>Última actualización {{this.ultimaActualizacion}}</span>
-                        </div>
-                    </article>
-                {{else}}
-                        <p class="panel-vacio">
-                            {{#if (eq ../rolUsuario "DONANTE")}}
-                                Ninguna de tus donaciones está en traslado en este momento.
-                              {{else}}
-                                No hay camiones en camino hacia tu entidad en este momento.
-                              {{/if}}
-                        </p>
-                    {{/each}}
-                </aside>
+                             {{#with this.detallesDonaciones.[0]}}
+                                 <div class="camion-donacion-detalle">
+                                     <span class="lbl-detalle">Destino</span>
+                                     <span class="val-detalle">{{this.destino}}</span>
+                                 </div>
+                                 <div class="camion-donacion-detalle">
+                                     <span class="lbl-detalle">Ubicación</span>
+                                     <span class="val-detalle">{{this.ubicacion}}</span>
+                                 </div>
+                             {{/with}}
+                         </div>
 
-                  <div id="mapa" class="mapa-seguimiento"></div>
-                </div>
+                         <div class="camion-footer">
+                             <span>Última actualización {{this.ultimaActualizacion}}</span>
+                         </div>
+                     </article>
+                 {{else}}
+                     <p class="panel-vacio">
+                         {{#if esDonante}}
+                             Ninguna de tus donaciones está en traslado en este momento.
+                         {{else}}
+                             No hay camiones en camino hacia tu entidad en este momento.
+                         {{/if}}
+                     </p>
+                 {{/each}}
+             </aside>
+
+            <div id="mapa" class="mapa-seguimiento"></div>
+        </div>
     </section>
 
     <script id="datos-camiones" type="application/json">{{{camionesJson}}}</script>
@@ -88,16 +91,93 @@
         const camiones = JSON.parse(document.getElementById('datos-camiones').textContent);
         const limites = [];
         const marcadores = {};
+        const destinosMarcados = new Set();
 
-        camiones.forEach(camion => {
-            const popup = L.popup().setContent(`<strong>Camión ${camion.patente}</strong>`);
-            const posicion = [parseFloat(camion.latitud), parseFloat(camion.longitud)];
-
-            marcadores[camion.patente] = L.marker(posicion).addTo(mapa).bindPopup(popup);
-            limites.push(posicion);
+        const iconoCamion = L.divIcon({
+            className: 'marcador-camion',
+            html: `<div style="width:36px;height:36px;border-radius:50%;background:#245c46;border:3px solid #ffffff;box-shadow:0 2px 6px rgba(0,0,0,0.35);display:flex;align-items:center;justify-content:center;color:#ffffff;">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M10 17h4V5H2v12h3"/>
+                        <path d="M20 17h2v-3.34a4 4 0 0 0-1.17-2.83L19 9h-5v8h1"/>
+                        <circle cx="7.5" cy="17.5" r="2.5"/>
+                        <circle cx="17.5" cy="17.5" r="2.5"/>
+                    </svg>
+                   </div>`,
+            iconSize: [36, 36],
+            iconAnchor: [18, 18],
+            popupAnchor: [0, -18]
         });
 
-        if (limites.length > 0) mapa.fitBounds(limites, { padding: [40, 40], maxZoom: 15 });
+        const iconoDestino = L.divIcon({
+            className: 'marcador-destino',
+            html: '<div style="width:16px;height:16px;border-radius:50%;background:#9A4A1E;border:3px solid #ffffff;box-shadow:0 1px 4px rgba(0,0,0,0.4);"></div>',
+            iconSize: [16, 16],
+            iconAnchor: [8, 8]
+        });
+
+        async function trazarRutaPorCalles(latOrigen, lonOrigen, latDestino, lonDestino) {
+            const url = `https://router.project-osrm.org/route/v1/driving/${lonOrigen},${latOrigen};${lonDestino},${latDestino}?overview=full&geometries=geojson`;
+            try {
+                const res = await fetch(url);
+                const data = await res.json();
+                if (data.routes && data.routes.length > 0) {
+                    const puntosCalle = data.routes[0].geometry.coordinates.map(c => [c[1], c[0]]);
+                    L.polyline(puntosCalle, {
+                        color: '#245c46',
+                        weight: 4,
+                        opacity: 0.85
+                    }).addTo(mapa);
+                    return;
+                }
+            } catch (e) {
+                // Si falla OSRM, dibuja línea punteada como respaldo
+            }
+
+            L.polyline([[latOrigen, lonOrigen], [latDestino, lonDestino]], {
+                color: '#3B6B5B',
+                weight: 3,
+                dashArray: '6, 8'
+            }).addTo(mapa);
+        }
+
+        camiones.forEach(camion => {
+            const latCamion = parseFloat(camion.latitud);
+            const lonCamion = parseFloat(camion.longitud);
+            if (isNaN(latCamion) || isNaN(lonCamion)) return;
+
+            const posicionCamion = [latCamion, lonCamion];
+            const popupCamion = L.popup().setContent(
+                `<strong>Camión ${camion.patente}</strong><br>Actualizado ${camion.ultimaActualizacion}`
+            );
+
+            marcadores[camion.patente] = L.marker(posicionCamion, { icon: iconoCamion })
+                .addTo(mapa)
+                .bindPopup(popupCamion);
+            limites.push(posicionCamion);
+
+            (camion.detallesDonaciones || []).forEach(don => {
+                const latDest = parseFloat(don.latitudDestino);
+                const lonDest = parseFloat(don.longitudDestino);
+                if (isNaN(latDest) || isNaN(lonDest)) return;
+
+                const posicionDestino = [latDest, lonDest];
+                const claveDestino = `${don.destino}|${latDest}|${lonDest}`;
+
+                if (!destinosMarcados.has(claveDestino)) {
+                    destinosMarcados.add(claveDestino);
+                    L.marker(posicionDestino, { icon: iconoDestino })
+                        .addTo(mapa)
+                        .bindPopup(`<strong>Destino: ${don.destino}</strong><br>${don.ubicacion}<br>Entrega ${don.codigo}`);
+                    limites.push(posicionDestino);
+                }
+
+                trazarRutaPorCalles(latCamion, lonCamion, latDest, lonDest);
+            });
+        });
+
+        if (limites.length > 0) {
+            mapa.fitBounds(limites, { padding: [45, 45], maxZoom: 15 });
+        }
 
         document.querySelectorAll('.camion-item').forEach(item => {
             item.addEventListener('click', () => {

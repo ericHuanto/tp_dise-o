@@ -23,5 +23,7 @@ public class CamionSeguimiento {
     private final String descripcion;
     private final String destino;
     private final String ubicacion;
+    private final String latitudDestino;
+    private final String longitudDestino;
   }
 }

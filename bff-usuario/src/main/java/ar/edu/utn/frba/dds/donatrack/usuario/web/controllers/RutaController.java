@@ -12,11 +12,16 @@ import ar.edu.utn.frba.dds.donatrack.grpc.ListaMarcadoresCamionResponse;
 import ar.edu.utn.frba.dds.donatrack.grpc.LogisticaServiceGrpc.LogisticaServiceBlockingStub;
 import ar.edu.utn.frba.dds.donatrack.grpc.DonacionesServiceGrpc.DonacionesServiceBlockingStub;
 import ar.edu.utn.frba.dds.donatrack.grpc.MarcadorCamionMsg;
+import ar.edu.utn.frba.dds.donatrack.grpc.Vacio;
 import ar.edu.utn.frba.dds.donatrack.grpc.VacioLogistica;
 import ar.edu.utn.frba.dds.donatrack.grpc.VistaDonacionesDonanteResponse;
 import ar.edu.utn.frba.dds.donatrack.usuario.dominio.usuario.Usuario;
 import ar.edu.utn.frba.dds.donatrack.usuario.web.dto.CamionSeguimiento;
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import io.javalin.http.Context;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -35,7 +40,6 @@ public class RutaController {
   public void verSeguimiento(Context context) {
     Usuario usuario = context.sessionAttribute("usuario_actual");
 
-    // Si por algún motivo no hay usuario en sesión, redirigimos al login
     if (usuario == null) {
       context.redirect("/login");
       return;
@@ -47,7 +51,6 @@ public class RutaController {
     record DonacionComun(Long id, String estadoActual, String descripcion) {}
     List<DonacionComun> todasLasDonaciones = new ArrayList<>();
 
-    // 2. Extraemos y unificamos los datos según el rol
     if (esDonante) {
       donacionesStub.obtenerVistaDonacionesDonante(
           FiltroDonacionesDonanteRequest.newBuilder().setIdDonante(usuario.getIdDonante()).build()
@@ -66,7 +69,6 @@ public class RutaController {
       );
     }
 
-    // 3. Filtramos usando nuestro nuevo objeto unificado
     List<DonacionComun> donacionesEnTraslado = todasLasDonaciones.stream()
         .filter(d -> "EN_TRASLADO".equals(d.estadoActual()))
         .toList();
@@ -79,6 +81,8 @@ public class RutaController {
     String camionesJson = "[]";
 
     if (!idsEnTraslado.isEmpty()) {
+      var coordsPorDestino = obtenerCoordenadasBeneficiarios();
+
       ListaCamionesDonacionesResponse logisticaResponse = logisticaStub.obtenerCamionesDeDonaciones(
           DonacionesIdsRequest.newBuilder().addAllIdsDonaciones(idsEnTraslado).build()
       );
@@ -89,6 +93,11 @@ public class RutaController {
         String destinoEntrega = partes.length > 1 ? partes[1] : "Sin destino asignado";
         String ubicacionEntrega = partes.length > 2 ? partes[2] : "Dirección no disponible";
 
+        String[] coordsDest = coordsPorDestino.getOrDefault(
+            destinoEntrega.trim().toLowerCase(),
+            new String[]{"", ""}
+        );
+
         List<CamionSeguimiento.DetalleDonacion> detallesDonaciones = new ArrayList<>();
         for (Long idDon : cam.getIdsDonacionesList()) {
           String desc = todasLasDonaciones.stream()
@@ -98,10 +107,12 @@ public class RutaController {
               .orElse("Donación #" + idDon);
 
           detallesDonaciones.add(CamionSeguimiento.DetalleDonacion.builder()
-              .codigo("D-" + String.format("%04d", idDon))
+              .codigo("#" + idDon)
               .descripcion(desc)
               .destino(destinoEntrega)
               .ubicacion(ubicacionEntrega)
+              .latitudDestino(coordsDest[0])
+              .longitudDestino(coordsDest[1])
               .build());
         }
 
@@ -124,5 +135,28 @@ public class RutaController {
     modelo.put("logisticaDisponible", true);
 
     context.render("donaciones/views/general/seguimiento_entregas.hbs", modelo);
+  }
+
+  private Map<String, String[]> obtenerCoordenadasBeneficiarios() {
+    Map<String, String[]> mapa = new HashMap<>();
+    try {
+      String json = donacionesStub.obtenerDatosMapaDonacionesRecibidas(Vacio.getDefaultInstance())
+          .getMarcadoresJson();
+      JsonArray arr = JsonParser.parseString(json).getAsJsonArray();
+      for (JsonElement el : arr) {
+        JsonObject obj = el.getAsJsonObject();
+        String nombre = obj.has("nombre") ? obj.get("nombre").getAsString()
+            : (obj.has("razonSocial") ? obj.get("razonSocial").getAsString() : "");
+        String lat = obj.has("latitud") ? obj.get("latitud").getAsString()
+            : (obj.has("lat") ? obj.get("lat").getAsString() : "");
+        String lon = obj.has("longitud") ? obj.get("longitud").getAsString()
+            : (obj.has("lng") ? obj.get("lng").getAsString() : "");
+        if (!nombre.isBlank() && !lat.isBlank() && !lon.isBlank()) {
+          mapa.put(nombre.trim().toLowerCase(), new String[]{lat, lon});
+        }
+      }
+    } catch (Exception ignored) {
+    }
+    return mapa;
   }
 }
