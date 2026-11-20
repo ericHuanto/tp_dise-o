@@ -150,6 +150,9 @@ public class DatosIniciales implements WithSimplePersistenceUnit {
     Bien arrozBien = new Perecedero("Arroz largo fino", 15f, UnidadMedida.KILOGRAMOS, null, arroz, LocalDate.now().plusMonths(8));
     Bien aceiteBien = new Perecedero("Aceite de girasol", 12f, UnidadMedida.LITROS, null, aceite, LocalDate.now().plusMonths(10));
 
+    Bien yogurPrueba = new Perecedero(
+        "Yogur bebible", 12f, UnidadMedida.LITROS, null, lacteos, LocalDate.now().plusDays(3));
+
     // Bienes para las entregas históricas
     Bien lecheHist = new Perecedero("Leche en polvo fortificada", 25f, UnidadMedida.KILOGRAMOS, null, lacteos, LocalDate.now().plusMonths(5));
     Bien panialesHist = new NoPerecedero("Pañales descartables talle G", 40f, UnidadMedida.UNIDADES, null, paniales, true);
@@ -168,6 +171,7 @@ public class DatosIniciales implements WithSimplePersistenceUnit {
     Donacion donacion12 = new Donacion(List.of(limpiezaHist), List.of(juana));
     Donacion donacion13 = new Donacion(List.of(sillasHist), List.of(juan));
     Donacion donacion14 = new Donacion(List.of(fideoHist, aceiteHist), List.of(juana));
+    Donacion donacion15 = new Donacion(List.of(yogurPrueba), List.of(juan)); // ID 15 -> EN_DEPOSITO (Perecedero)
 
     // Completamos el ciclo de vida y pisamos la fecha con fechas viejas
     completarEntregaHistorica(donacion9, hogarSantaRita, LocalDateTime.of(2026, 10, 12, 14, 30));
@@ -268,6 +272,7 @@ public class DatosIniciales implements WithSimplePersistenceUnit {
       repoSubcategorias.guardar(lavandina);
       repoSubcategorias.guardar(detergente);
       repoSubcategorias.guardar(desinfectantes);
+      repoDonaciones.guardar(donacion15);
       repoRankings.guardar(ranking1);
       repoRankings.guardar(ranking2);
       repoBeneficiarios.guardar(hogarSantaRita);
