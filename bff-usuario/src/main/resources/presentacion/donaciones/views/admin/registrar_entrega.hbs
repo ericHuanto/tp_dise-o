@@ -247,9 +247,9 @@
                     li.appendChild(b);
                     lista.appendChild(li);
                 });
-                const reg = document.createElement('li');
-                reg.innerHTML = '<a class="res-registrar" href="/donantes/nuevo?volver=/registros-entrega/nueva">+ No está registrada: registrarla</a>';
-                lista.appendChild(reg);
+                if (donantes.length === 0) {
+                    lista.innerHTML = '<li class="res-vacio">No se encontraron donantes.</li>';
+                }
                 lista.classList.remove('oculto');
             }
 

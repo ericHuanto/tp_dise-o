@@ -11,9 +11,9 @@ public class SesionRoutes {
   public static void registrar(RoutesConfig ruta, SesionController controller) {
     ruta.get("/login", controller::mostrarFormularioInicioSesion);
     ruta.post("/login", controller::iniciarSesion);
-    ruta.post("/solicitacion-pin", controller::solicitarPin, Permiso.AUTENTICADO);
-    ruta.get("/recuperacion", controller::mostrarFormularioRecuperacion, Permiso.AUTENTICADO);
-    ruta.post("/recuperacion", controller::actualizarContraseña, Permiso.AUTENTICADO);
+    ruta.post("/solicitacion-pin", controller::solicitarPin);
+    ruta.get("/recuperacion", controller::mostrarFormularioRecuperacion);
+    ruta.post("/recuperacion", controller::actualizarContraseña);
     ruta.post("/logout", controller::cerrarSesion, Permiso.AUTENTICADO);
   }
 }
