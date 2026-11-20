@@ -10,6 +10,7 @@ import ar.edu.utn.frba.dds.donatrack.grpc.RepresentanteMsg;
 import ar.edu.utn.frba.dds.donatrack.grpc.ResumenDonacionesMsg;
 import ar.edu.utn.frba.dds.donatrack.grpc.UltimaActividadMsg;
 import ar.edu.utn.frba.dds.donatrack.usuario.dominio.generadorhash.Integridad;
+import ar.edu.utn.frba.dds.donatrack.usuario.dominio.usuario.PoliticaContrasena;
 import ar.edu.utn.frba.dds.donatrack.usuario.dominio.usuario.Usuario;
 import ar.edu.utn.frba.dds.donatrack.usuario.persistencia.UsuarioRepository;
 import ar.edu.utn.frba.dds.donatrack.usuario.web.dto.PerfilVista;
@@ -86,7 +87,7 @@ public class MiPerfilController implements WithSimplePersistenceUnit {
     } else if (actual.equals(nueva)) {
       error = "La nueva contraseña debe ser distinta de la actual";
     } else {
-      error = validarPolitica(nueva);   // null si cumple
+      error = PoliticaContrasena.validar(nueva);   // null si cumple
     }
 
     if (error != null) {
@@ -105,14 +106,6 @@ public class MiPerfilController implements WithSimplePersistenceUnit {
 
     context.req().changeSessionId();
     context.redirect("/perfil?cambio=ok");
-  }
-
-  // Devuelve el mensaje de error, o null si la clave cumple la política.
-  private static String validarPolitica(String clave) {
-    if (clave.length() < 8) return "La contraseña debe tener al menos 8 caracteres";
-    if (clave.length() > 72) return "La contraseña no puede superar los 72 caracteres";
-    if (clave.chars().noneMatch(Character::isDigit)) return "La contraseña debe incluir al menos un número";
-    return null;
   }
 
   //============= DATOS POR PERFIL =====================

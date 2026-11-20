@@ -93,7 +93,7 @@ public class App {
 
     //LOGÍSTICA
     CamionController camionController = new CamionController(grpcClients.getLogisticaStub());
-    EntregaController entregaController = new EntregaController(grpcClients.getLogisticaStub());
+    EntregaController entregaController = new EntregaController(grpcClients.getLogisticaStub(), grpcClients.getDonacionesStub());
     RutaController rutaController = new RutaController(grpcClients.getLogisticaStub(), grpcClients.getDonacionesStub());    return Javalin.create(config -> {
       config.jsonMapper(GsonConfig.jsonMapper());
       config.staticFiles.add("/presentacion", Location.CLASSPATH);
