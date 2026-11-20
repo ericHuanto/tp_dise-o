@@ -211,6 +211,9 @@
 /* =========================================
    ESTADO (píldora con punto)
    ========================================= */
+/* =========================================
+   ESTADO (píldora con punto)
+   ========================================= */
 .estado {
     display: inline-flex;
     align-items: center;
@@ -235,11 +238,37 @@
     background: currentColor;
 }
 
-.estado-pendiente { background: #FCF3DC; color: #8A6A2F; }
-.estado-asignada { background: #EBE8F7; color: #4B3F8F; }
-.estado-vencida { background: #FFEBEE; color: #C62828; }
-.estado-entregada { background: #E3EFEA; color: var(--accent-green); }
+.estado-pendiente,
+.estado-pendiente_de_asignacion {
+    background: #FCF3DC;
+    color: #8A6A2F;
+}
 
+.estado-asignada {
+    background: #EBE8F7;
+    color: #4B3F8F;
+}
+
+.estado-vencida,
+.estado-entrega_fallida {
+    background: #FFEBEE;
+    color: #C62828;
+}
+
+.estado-entregada {
+    background: #E3EFEA;
+    color: var(--accent-green);
+}
+
+.estado-lista_para_entregar {
+    background: #E6F0F7;
+    color: #2F5F8A;
+}
+
+.estado-en_traslado {
+    background: #FDEBDD;
+    color: #9A4A1E;
+}
 /* =========================================
    BOTONES Y ENLACES
    ========================================= */
