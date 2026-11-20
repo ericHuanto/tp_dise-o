@@ -1,1 +1,69 @@
+@startuml DonaTrack_Despliegue_E5
+left to right direction
 
+actor admin
+actor Donante
+actor Beneficiario
+
+node "Dispositivo Cliente / Local" {
+  component "Navegador" as navegador
+  component "Cliente SQL" as clienteSql
+}
+
+node "Microsoft Azure Cloud" {
+  node "Máquina Virtual (Ubuntu)" {
+
+    node "Host Nativo" {
+      component "Servidor SSH" as ssh
+      component "cron" as cron
+    }
+
+    node "Docker Engine (red interna donatrack)" {
+      component "BFF\n(bff-app)" as bff
+      component "Microservicio Donaciones\n(donaciones-app)" as donaciones
+      component "Microservicio Logistica\n(logistica-app)" as logistica
+      component "Jobs\n(contenedores temporales)" as jobs
+
+      database "MySQL 8 Server" as mysql {
+        artifact "Esquema: donaciones" as esqDon
+        artifact "Esquema: logistica" as esqLog
+        artifact "Esquema: usuarios" as esqBff
+      }
+    }
+  }
+}
+
+node "Gps" as gps
+cloud "Broker" as broker
+cloud "Correo" as correo
+cloud "Sms" as sms
+cloud "Whatsapp" as whatsapp
+
+admin --> navegador
+admin --> clienteSql
+Donante --> navegador
+Beneficiario --> navegador
+
+navegador --> bff : HTTP (Puerto 80)
+clienteSql --> ssh : SSH (Puerto 22)
+ssh ..> mysql : Túnel a 3306
+
+bff --> donaciones : gRPC
+bff --> logistica : gRPC
+logistica --> donaciones : gRPC
+
+bff --> esqBff : JDBC
+donaciones --> esqDon : JDBC
+logistica --> esqLog : JDBC
+
+cron ..> jobs
+jobs --> esqDon : JDBC
+jobs --> esqLog : JDBC
+
+gps --> broker : mqtt
+logistica --> broker : mqtt
+donaciones --> correo : smtp
+donaciones --> sms : https
+donaciones --> whatsapp : https
+
+@enduml
