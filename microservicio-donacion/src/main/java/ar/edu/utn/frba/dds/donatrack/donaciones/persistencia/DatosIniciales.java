@@ -136,21 +136,21 @@ public class DatosIniciales implements WithSimplePersistenceUnit {
     Bien fideo = new Perecedero("Fideos secos", 10f, UnidadMedida.UNIDADES, null, pastas, LocalDate.now().plusMonths(6));
     Bien leche = new Perecedero("Leche entera", 10f, UnidadMedida.LITROS, null, lacteos, LocalDate.now().plusDays(20));
     Bien manzana = new Perecedero("Manzanas", 5f, UnidadMedida.KILOGRAMOS, null, frutas, LocalDate.now().plusDays(7));
-    Bien campera = new NoPerecedero("Camperas", 3f, UnidadMedida.UNIDADES, null, abrigos, true);
-    Bien campera2 = new NoPerecedero("Camperas", 3f, UnidadMedida.UNIDADES, null, abrigos, true);
+    Bien campera = new NoPerecedero("Camperas", 3f, UnidadMedida.UNIDADES, "/comun/img/entregas/campera.jpg", abrigos, true);
+    Bien campera2 = new NoPerecedero("Camperas", 3f, UnidadMedida.UNIDADES, "/comun/img/entregas/campera.jpg", abrigos, true);
     Bien frazada = new NoPerecedero("Frazadas", 8f, UnidadMedida.UNIDADES, null, frazadas, true);
     Bien frazada2 = new NoPerecedero("Frazadas", 8f, UnidadMedida.UNIDADES, null, frazadas, true);
     Bien arrozBien = new Perecedero("Arroz largo fino", 15f, UnidadMedida.KILOGRAMOS, null, arroz, LocalDate.now().plusMonths(8));
-    Bien aceiteBien = new Perecedero("Aceite de girasol", 12f, UnidadMedida.LITROS, null, aceite, LocalDate.now().plusMonths(10));
+    Bien aceiteBien = new Perecedero("Aceite de girasol", 12f, UnidadMedida.LITROS, "/comun/img/entregas/aceite.jpg", aceite, LocalDate.now().plusMonths(10));
     Bien yogurPrueba = new Perecedero("Yogur bebible", 12f, UnidadMedida.LITROS, null, lacteos, LocalDate.now().plusDays(3));
 
     Bien lecheHist = new Perecedero("Leche en polvo fortificada", 25f, UnidadMedida.KILOGRAMOS, null, lacteos, LocalDate.now().plusMonths(5));
     Bien panialesHist = new NoPerecedero("Pañales descartables talle G", 40f, UnidadMedida.UNIDADES, null, paniales, true);
     Bien frazadasHist = new NoPerecedero("Frazadas polares", 18f, UnidadMedida.UNIDADES, null, frazadas, true);
-    Bien legumbresHist = new Perecedero("Lentejas secas", 30f, UnidadMedida.KILOGRAMOS, null, legumbres, LocalDate.now().plusMonths(9));
+    Bien legumbresHist = new Perecedero("Lentejas secas", 30f, UnidadMedida.KILOGRAMOS, "/comun/img/entregas/lentejas.jpg", legumbres, LocalDate.now().plusMonths(9));
     Bien limpiezaHist = new NoPerecedero("Bidones de lavandina", 15f, UnidadMedida.LITROS, null, lavandina, true);
-    Bien sillasHist = new NoPerecedero("Sillas plásticas reforzadas", 12f, UnidadMedida.UNIDADES, null, sillas, true);
-    Bien fideoHist = new Perecedero("Fideos tirabuzón", 20f, UnidadMedida.UNIDADES, null, pastas, LocalDate.now().plusMonths(6));
+    Bien sillasHist = new NoPerecedero("Sillas plásticas reforzadas", 12f, UnidadMedida.UNIDADES, "/comun/img/entregas/sillas.jpg", sillas, true);
+    Bien fideoHist = new Perecedero("Fideos tirabuzón", 20f, UnidadMedida.UNIDADES, "/comun/img/entregas/fideos.jpg", pastas, LocalDate.now().plusMonths(6));
     Bien aceiteHist = new Perecedero("Aceite mezcla", 10f, UnidadMedida.LITROS, null, aceite, LocalDate.now().plusMonths(10));
 
     // Bienes adicionales para múltiples camiones y entregas en traslado (16 a 20)
