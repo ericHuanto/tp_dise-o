@@ -78,7 +78,7 @@ public class App {
     UsuarioRepository usuarioRepository = UsuarioRepository.getInstancia();
 
     //DONACIONES
-    HomeController homeController = new HomeController();
+    HomeController homeController = new HomeController(grpcClients.getDonacionesStub());
     SesionController sesionController = new SesionController(grpcClients.getDonacionesStub(), usuarioRepository);
     PerfilController perfilController = new PerfilController(grpcClients.getDonacionesStub(), usuarioRepository);
     MapaController mapaController = new MapaController(grpcClients.getDonacionesStub());

@@ -205,3 +205,14 @@ main {
 .link-ver-mapa:hover {
     text-decoration: underline;
 }
+
+/* La foto ocupa el cuadradito sin deformarse */
+img.item-imagen {
+    object-fit: cover;
+}
+
+.sin-entregas {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    padding: 16px 0;
+}

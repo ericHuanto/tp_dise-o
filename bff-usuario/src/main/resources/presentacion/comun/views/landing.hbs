@@ -26,41 +26,22 @@
             </div>
 
             <div class="lista-entregas">
-                <div class="item-entrega">
-                    <div class="item-imagen"></div>
-                    <div class="item-info">
-                        <h4>Comedor Los Pibes</h4>
-                        <p>Leche en polvo, fideos, aceite</p>
+                {{#each ultimasEntregas}}
+                    <div class="item-entrega">
+                        {{#if foto}}
+                            <img class="item-imagen" src="{{foto}}" alt="Foto de la entrega a {{entidad}}">
+                        {{else}}
+                            <div class="item-imagen"></div>
+                        {{/if}}
+                        <div class="item-info">
+                            <h4>{{entidad}}</h4>
+                            <p>{{bienes}}</p>
+                        </div>
+                        <span class="item-fecha">{{fecha}}</span>
                     </div>
-                    <span class="item-fecha">02/11/2026</span>
-                </div>
-
-                <div class="item-entrega">
-                    <div class="item-imagen"></div>
-                    <div class="item-info">
-                        <h4>Hogar Santa Rita</h4>
-                        <p>Frazadas, pañales</p>
-                    </div>
-                    <span class="item-fecha">01/11/2026</span>
-                </div>
-
-                <div class="item-entrega">
-                    <div class="item-imagen"></div>
-                    <div class="item-info">
-                        <h4>Merendero Rayito de Sol</h4>
-                        <p>Cacao, galletitas</p>
-                    </div>
-                    <span class="item-fecha">30/10/2026</span>
-                </div>
-
-                <div class="item-entrega">
-                    <div class="item-imagen"></div>
-                    <div class="item-info">
-                        <h4>Fundación Abrazo</h4>
-                        <p>Útiles escolares</p>
-                    </div>
-                    <span class="item-fecha">28/10/2026</span>
-                </div>
+                {{else}}
+                    <p class="sin-entregas">Todavía no hay entregas confirmadas.</p>
+                {{/each}}
             </div>
 
             <a href="/donaciones/recibidas" class="link-ver-mapa">Ver el mapa de donaciones entregadas →</a>
