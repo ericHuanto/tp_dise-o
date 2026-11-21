@@ -26,6 +26,7 @@ import io.grpc.stub.StreamObserver;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -291,6 +292,8 @@ public class LogisticaGrpc extends LogisticaServiceGrpc.LogisticaServiceImplBase
 
     responder(out, () -> {
 
+      List<String> urlsFotos = new ArrayList<>();
+
       List<Long> idsDonaciones = withTransaction(() -> {
 
         Entrega entrega = buscarEntregaPorId(req.getIdEntrega());
@@ -313,6 +316,7 @@ public class LogisticaGrpc extends LogisticaServiceGrpc.LogisticaServiceImplBase
             String url = "/uploads/entregas/" + nombreArchivo;
 
             entrega.agregarFotoRecepcion(url);
+            urlsFotos.add(url);
           }
         } catch (IOException e) {
           throw new RuntimeException(
@@ -326,8 +330,10 @@ public class LogisticaGrpc extends LogisticaServiceGrpc.LogisticaServiceImplBase
             .toList();
       });
 
-      // Informamos a Donaciones mediante gRPC.
-      String linkComprobante = "Entrega ID: " + req.getIdEntrega();
+      // Mandamos la primera foto como comprobante; si no subieron fotos, texto
+      String linkComprobante = urlsFotos.isEmpty()
+          ? "Entrega ID: " + req.getIdEntrega()
+          : urlsFotos.get(0);
 
       try {
         for (Long idDonacion : idsDonaciones) {

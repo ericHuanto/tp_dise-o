@@ -69,4 +69,7 @@ public abstract class Bien {
     this.cantidad += extra;
   }
 
+  public void registrarFoto(String url) {
+    this.foto = url;
+  }
 }

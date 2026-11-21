@@ -161,6 +161,10 @@ public class DonacionesGrpc extends DonacionesServiceGrpc.DonacionesServiceImplB
       withTransaction(() -> {
         Donacion donacion = buscarDonacionPorId(req.getId());
         donacion.entregada();
+        String comprobante = req.getLinkComprobanteEntrega();
+        if (comprobante.startsWith("/uploads/")) {
+          donacion.getBienes().forEach(bien -> bien.registrarFoto(comprobante));
+        }
         repoDonaciones.actualizar(donacion);
         DispatcherEventos.getInstancia().publicar(new EventoEntregaExitosa(
             donacion.getBeneficiario(), donacion.getDonantes(),
